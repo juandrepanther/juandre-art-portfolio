@@ -115,7 +115,6 @@ interface IContacts {
 
 export const contact_details: IContacts[] = [
   { title: 'DOB:', data: '23/12/1989' },
-  { title: 'Phone:', data: '+371 26711108' },
   { title: 'Email:', data: 'juandre@inbox.lv' },
   { title: 'Website:', data: 'www.janisdregeris.com' }
 ]
