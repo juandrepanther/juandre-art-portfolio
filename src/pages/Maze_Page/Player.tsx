@@ -32,9 +32,21 @@ function Player() {
 
   // key handlers by using hook
   const forward: boolean = useKeyPress('w')
+  const forward_arrow: boolean = useKeyPress('ArrowUp')
+  const forward_azerty: boolean = useKeyPress('KeyW')
+
   const back: boolean = useKeyPress('s')
+  const back_arrow: boolean = useKeyPress('ArrowDown')
+  const back_azerty: boolean = useKeyPress('KeyS')
+
   const left: boolean = useKeyPress('a')
+  const left_arrow: boolean = useKeyPress('ArrowLeft')
+  const left_azerty: boolean = useKeyPress('KeyA')
+
   const right: boolean = useKeyPress('d')
+  const right_arrow: boolean = useKeyPress('ArrowRight')
+  const right_azerty: boolean = useKeyPress('KeyD')
+
   const reset_keyPressed: boolean = useKeyPress('r')
 
   useFrame((state, delta) => {
@@ -45,22 +57,22 @@ function Player() {
     const impulseStrength = (0.1 * delta) / 80
     const torqueStrength = (0.1 * delta) / 80
 
-    if (forward) {
+    if (forward || forward_arrow || forward_azerty) {
       impulse.z -= impulseStrength
       torque.x -= torqueStrength
     }
 
-    if (right) {
+    if (right || right_arrow || right_azerty) {
       impulse.x += impulseStrength
       torque.z -= torqueStrength
     }
 
-    if (back) {
+    if (back || back_arrow || back_azerty) {
       impulse.z += impulseStrength
       torque.x += torqueStrength
     }
 
-    if (left) {
+    if (left || left_arrow || left_azerty) {
       impulse.x -= impulseStrength
       torque.z += torqueStrength
     }

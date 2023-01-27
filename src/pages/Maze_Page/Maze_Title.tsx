@@ -1,6 +1,7 @@
 import { Float, Html, Image, Text } from '@react-three/drei'
 import React from 'react'
 import wsadImg from '../../assets/images/wsad.png'
+import arrowsKeysImg from '../../assets/images/arrowsKeys.png'
 
 function Maze_Title() {
   return (
@@ -24,9 +25,17 @@ function Maze_Title() {
       </Text>
       <Image
         rotation={[Math.PI / -2, 0, 0]}
-        position={[0, 0.1, 0.45]}
+        position={[-0.2, 0, 0.38]}
         scale={[0.3, 0.2]}
         url={wsadImg}
+        transparent
+        opacity={0.8}
+      ></Image>
+      <Image
+        rotation={[Math.PI / -2, 0, 0]}
+        position={[0.2, 0, 0.38]}
+        scale={[0.3, 0.2]}
+        url={arrowsKeysImg}
         transparent
         opacity={0.8}
       ></Image>

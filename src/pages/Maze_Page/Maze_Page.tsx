@@ -1,6 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import React, { Suspense, useMemo, useRef } from 'react'
-import { cameraDepthLimit } from '../../data/ContentData'
+import React from 'react'
 import * as THREE from 'three'
 import Maze_Model from './Maze_Model'
 import { CameraShake, OrbitControls } from '@react-three/drei/core'

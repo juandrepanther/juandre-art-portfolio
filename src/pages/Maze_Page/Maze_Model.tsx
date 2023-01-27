@@ -1,7 +1,7 @@
 import { useGLTF } from '@react-three/drei'
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { RigidBody } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
 import { GLTFResult } from '../../types'
 
@@ -24,7 +24,7 @@ function Maze_Model() {
   const Up_3_Meshes = useRef<any>()
   const Down_3_Meshes = useRef<any>()
 
-  const { nodes, materials } = useGLTF(
+  const { nodes } = useGLTF(
     `${
       process.env.NODE_ENV !== 'development'
         ? '/juandre-art-portfolio/models/Maze_full.glb'
