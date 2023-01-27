@@ -33,8 +33,6 @@ export default defineConfig({
         //       return 'vendor_three'
         //     } else if (id.includes('@mui')) {
         //       return 'vendor_mui'
-        //     } else if (id.includes('@azure')) {
-        //       return 'vendor_azure'
         //     } else if (id.includes('leva')) {
         //       return 'vendor_leva'
         //     } else if (id.includes('r3f-perf')) {
