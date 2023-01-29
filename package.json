@@ -3,6 +3,7 @@
   "name": "three-floor",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "build": "vite build",
@@ -38,7 +39,8 @@
     "stats.js": "^0.17.0",
     "theme": "^0.1.0",
     "three": "^0.138.3",
-    "type-fest": "^2.19.0"
+    "type-fest": "^2.19.0",
+    "vite-plugin-glsl": "^1.1.1"
   },
   "devDependencies": {
     "@locator/runtime": "^0.2.2",
