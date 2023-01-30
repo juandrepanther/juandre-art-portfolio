@@ -7,6 +7,7 @@ import Object_1 from './Objects/Object_1/Object_1'
 import { Leva } from 'leva'
 import { Html } from '@react-three/drei'
 import Object_2 from './Objects/Object_2/Object_2'
+import Object_3 from './Objects/Object_3/Object_3'
 const hdrImg = '/images/hdrImg.hdr'
 
 function Features_Page() {
@@ -41,6 +42,7 @@ function Features_Page() {
       <Environment files={hdrImg} background />
       <Object_1 />
       <Object_2 />
+      <Object_3 />
       <Stats />
     </Canvas>
   )

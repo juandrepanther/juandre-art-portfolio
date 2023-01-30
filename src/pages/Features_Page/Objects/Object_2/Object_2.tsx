@@ -42,7 +42,7 @@ function Object_2() {
 
   return (
     <mesh material={mesh_material} position={[-20, 0, 17]}>
-      <sphereBufferGeometry attach="geometry" args={[15, 15, 32, 32]} />
+      <sphereBufferGeometry attach="geometry" args={[7, 7, 32, 32]} />
     </mesh>
   )
 }
