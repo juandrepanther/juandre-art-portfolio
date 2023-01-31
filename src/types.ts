@@ -1,6 +1,12 @@
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector3 } from 'three/src/math/Vector3'
 
+export type cameraTargetsTypes = {
+  object_1: Vector3
+  object_2: Vector3
+  object_3: Vector3
+}
+
 export type sideType =
   | 'frontSide'
   | 'backSide'

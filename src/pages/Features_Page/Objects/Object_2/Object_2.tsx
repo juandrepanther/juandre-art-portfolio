@@ -5,8 +5,9 @@ import { useControls } from 'leva'
 
 import vertexShader from './shader1.vert'
 import fragmentShader from './shader1.frag'
+import { cameraTargetsTypes } from '../../../../types'
 
-function Object_2() {
+function Object_2({ object_2 }: Pick<cameraTargetsTypes, 'object_2'>) {
   // variables for the Leva debugger
   const { frequency_x, frequency_y, wireframe, intensity } = useControls(
     'Object_2',
@@ -43,7 +44,7 @@ function Object_2() {
   })
 
   return (
-    <mesh material={mesh_material} position={[-20, 0, 17]}>
+    <mesh material={mesh_material} position={object_2}>
       <sphereBufferGeometry attach="geometry" args={[7, 7, 32, 32]} />
     </mesh>
   )

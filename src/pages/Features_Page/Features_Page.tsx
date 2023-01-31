@@ -1,16 +1,33 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
 import * as THREE from 'three'
-import { Environment, OrbitControls, Sky } from '@react-three/drei/core'
+import { Environment, OrbitControls } from '@react-three/drei/core'
 import Stats from '../Scene_Page/Stats'
+import { cameraTargetsTypes } from '../../types'
+
 import Object_1 from './Objects/Object_1/Object_1'
-import { Leva } from 'leva'
-import { Html } from '@react-three/drei'
 import Object_2 from './Objects/Object_2/Object_2'
 import Object_3 from './Objects/Object_3/Object_3'
+import { buttonGroup, useControls } from 'leva'
+
 const hdrImg = '/images/hdrImg.hdr'
 
 function Features_Page() {
+  const cameraTargets = [
+    new THREE.Vector3(0, 0, 20),
+    new THREE.Vector3(-20, 0, 17),
+    new THREE.Vector3(15, 0, 3)
+  ]
+
+  const [objectValue, set] = useControls(() => ({
+    ObjectNumber: 0,
+    ' ': buttonGroup({
+      '1': () => set({ ObjectNumber: 0 }),
+      '2': () => set({ ObjectNumber: 1 }),
+      '3': () => set({ ObjectNumber: 2 })
+    })
+  }))
+  console.log(objectValue.ObjectNumber)
   return (
     <Canvas
       performance={{ current: 1, min: 0.1, max: 1, debounce: 200 }}
@@ -24,7 +41,7 @@ function Features_Page() {
       }}
       camera={{
         near: 0.1,
-        far: 60, // 3 for game, more - for the dev
+        far: 100, // 3 for game, more - for the dev
         fov: 75,
         position: new THREE.Vector3(0, 0, -10)
       }}
@@ -38,11 +55,16 @@ function Features_Page() {
       //   canvas.gl.setClearColor('grey', 1)
       // }}
     >
-      <OrbitControls />
+      <OrbitControls
+        target={cameraTargets[objectValue.ObjectNumber]} // <-- Vec3
+        enableDamping={false}
+        enablePan={false}
+        enableZoom={false}
+      />
       <Environment files={hdrImg} background />
-      <Object_1 />
-      <Object_2 />
-      <Object_3 />
+      <Object_1 object_1={cameraTargets[0]} />
+      <Object_2 object_2={cameraTargets[1]} />
+      <Object_3 object_3={cameraTargets[2]} />
       <Stats />
     </Canvas>
   )

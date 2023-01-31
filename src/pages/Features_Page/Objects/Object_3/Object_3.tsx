@@ -4,8 +4,9 @@ import { useControls } from 'leva'
 
 import vertexShader from './shader1.vert'
 import fragmentShader from './shader1.frag'
+import { cameraTargetsTypes } from '../../../../types'
 
-function Object_3() {
+function Object_3({ object_3 }: Pick<cameraTargetsTypes, 'object_3'>) {
   // variables for the Leva debugger
   const {
     axis_x,
@@ -56,7 +57,7 @@ function Object_3() {
       onPointerMove={onHoverHandler}
       material={mesh_material}
       rotation-y={1.5}
-      position={[15, 0, 3]}
+      position={object_3}
     >
       <planeBufferGeometry attach="geometry" args={[15, 15, 1, 1]} />
     </mesh>

@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { cameraTargetsTypes } from '../../../../types'
 
-function Object_1() {
+function Object_1({ object_1 }: Pick<cameraTargetsTypes, 'object_1'>) {
   // references
   const mesh_ref = useRef<any>()
 
@@ -12,7 +13,7 @@ function Object_1() {
   })
 
   return (
-    <mesh ref={mesh_ref} position={[0, 0, 20]}>
+    <mesh ref={mesh_ref} position={object_1}>
       <planeBufferGeometry attach="geometry" args={[10, 10, 1]} />
       <meshStandardMaterial
         side={2}
