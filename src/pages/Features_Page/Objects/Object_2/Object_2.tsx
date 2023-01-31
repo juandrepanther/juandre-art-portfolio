@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
@@ -8,12 +8,15 @@ import fragmentShader from './shader1.frag'
 
 function Object_2() {
   // variables for the Leva debugger
-  const { frequency_x, frequency_y, wireframe, intensity } = useControls({
-    frequency_x: 1,
-    frequency_y: 1,
-    intensity: { value: 0.1, step: 0.5, max: 20, min: 0.1 },
-    wireframe: false
-  })
+  const { frequency_x, frequency_y, wireframe, intensity } = useControls(
+    'Object_2',
+    {
+      frequency_x: 1,
+      frequency_y: 1,
+      intensity: { value: 0.1, step: 0.5, max: 20, min: 0.1 },
+      wireframe: false
+    }
+  )
 
   // uniforms values
 
@@ -37,7 +40,6 @@ function Object_2() {
 
     // sending elapsed time to the material uniform and retrieve it in the vertex shader
     mesh_material.uniforms.uTime.value = time
-    // animated rotation
   })
 
   return (

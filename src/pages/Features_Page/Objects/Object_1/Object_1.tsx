@@ -1,12 +1,11 @@
-import React, { useMemo, useRef } from 'react'
-import * as THREE from 'three'
+import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 
 function Object_1() {
   // references
   const mesh_ref = useRef<any>()
 
-  useFrame((state) => {
+  useFrame(() => {
     // animated rotation
     mesh_ref.current.rotation.x += 0.005
     mesh_ref.current.rotation.y += 0.005
@@ -14,13 +13,14 @@ function Object_1() {
 
   return (
     <mesh ref={mesh_ref} position={[0, 0, 20]}>
-      <planeBufferGeometry attach="geometry" args={[10, 10, 50]} />
+      <planeBufferGeometry attach="geometry" args={[10, 10, 1]} />
       <meshStandardMaterial
         side={2}
         metalness={1}
         roughness={0}
         opacity={1}
         transparent
+        wireframe={false}
       />
     </mesh>
   )

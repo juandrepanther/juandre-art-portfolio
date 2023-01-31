@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import * as THREE from 'three'
-import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 
 import vertexShader from './shader1.vert'
@@ -8,16 +7,27 @@ import fragmentShader from './shader1.frag'
 
 function Object_3() {
   // variables for the Leva debugger
-  const { axis_x, axis_y } = useControls({
+  const {
+    axis_x,
+    axis_y,
+    tone: { x, y, z }
+  } = useControls('Object_3', {
     axis_x: { value: 0.5, step: 0.1, min: 0.0, max: 1.0 },
-    axis_y: { value: 0.5, step: 0.1, min: 0.0, max: 1.0 }
+    axis_y: { value: 0.5, step: 0.1, min: 0.0, max: 1.0 },
+    tone: {
+      value: { x: 0.41, y: 0.86, z: 1.0 },
+      step: 0.005,
+      min: 0.0,
+      max: 1.0
+    }
   })
 
   // uniforms values
 
   const uniforms = {
     uTime: { value: 0 },
-    uAxis: { value: new THREE.Vector2(axis_x, axis_y) }
+    uAxis: { value: new THREE.Vector2(axis_x, axis_y) },
+    uTone: { value: new THREE.Vector3(x, y, z) }
   }
 
   // references
@@ -25,15 +35,19 @@ function Object_3() {
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
     side: 2,
-    uniforms: uniforms
+    uniforms: uniforms,
+    wireframe: false
   })
 
   const onHoverHandler = (e: { spaceX: number; spaceY: number }) => {
+    //getting the mesh coordinates in the 3D space
     const coordinates = new THREE.Vector2(e.spaceX, e.spaceY)
 
+    //normalizing the coordinates
     coordinates.x = (coordinates.x + 1) / 2
     coordinates.y = -(coordinates.y - 1) / 2
 
+    // changing the uniforms
     uniforms.uAxis.value = new THREE.Vector2(coordinates.x, coordinates.y)
   }
 
@@ -44,7 +58,7 @@ function Object_3() {
       rotation-y={1.5}
       position={[15, 0, 3]}
     >
-      <planeBufferGeometry attach="geometry" args={[15, 15, 32, 32]} />
+      <planeBufferGeometry attach="geometry" args={[15, 15, 1, 1]} />
     </mesh>
   )
 }
