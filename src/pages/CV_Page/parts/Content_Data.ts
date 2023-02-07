@@ -123,6 +123,7 @@ export const contact_details: IContacts[] = [
 import awsImg from '../../../assets/icons/aws.png'
 import reactReduxImg from '../../../assets/icons/reactRedux.png'
 import ue5Img from '../../../assets/icons/ue5.png'
+import threeJsImg from '../../../assets/icons/threeJsLogo.png'
 
 interface ICertificates {
   title: string
@@ -147,5 +148,10 @@ export const certificates_data: ICertificates[] = [
     title: 'UNREAL ENGINE 5',
     logo: ue5Img,
     url: 'https://www.udemy.com/certificate/UC-675514df-9ae3-4e25-b346-cee05ed47cda/'
+  },
+  {
+    title: 'THREE.JS JOURNEY',
+    logo: threeJsImg,
+    url: 'https://threejs-journey.com/certificate/view/14767'
   }
 ]

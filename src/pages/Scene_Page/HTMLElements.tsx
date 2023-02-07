@@ -24,15 +24,13 @@ import { changeInitialPopupVisibility } from '../../redux/reducers/initialPopupR
 import InitialPopUp from './InitialPopUp'
 import { displayFlexCenter } from '../../utils/globalStyles'
 import Container from '@mui/material/Container'
-import CV_Page from '../CV_Page/CV_Page'
-import Contact_Page from '../Contact_Page/Contact_Page'
-import background from '../../assets/images/CV_bgd.png'
+
+const CV_Page = lazy(() => import('../CV_Page/CV_Page'))
+const Contact_Page = lazy(() => import('../Contact_Page/Contact_Page'))
+
 import CloseIcon from '@mui/icons-material/Close'
 
 const LazySideBar = lazy(() => import('./SideBar'))
-// const LazyNavigatorPanel = lazy(
-//   () => import('./NavigationPanel/NavigatorPannel')
-// )
 
 import useDarkMode from '../../hooks/useDarkMode'
 import { useNavigate } from 'react-router-dom'
@@ -128,8 +126,11 @@ function HTMLElements() {
               disableGutters
               maxWidth="lg"
             >
-              {id === 1 && <CV_Page />}
-              {id === 3 && <Contact_Page />}
+              <Suspense fallback={null}>
+                {id === 1 && <CV_Page />}
+                {id === 3 && <Contact_Page />}
+              </Suspense>
+
               {/* {id === 4 && navigate('/juandre-art-portfolio/maze-game/')} */}
             </Container>
           </Box>

@@ -6,7 +6,7 @@ function useKeyPress(targetKey: string): boolean {
 
   // If pressed key is our target key then set to true
   function downHandler({ key }): void {
-    console.log(key)
+    // console.log(key)
     if (key === targetKey) {
       setKeyPressed(true)
     }
