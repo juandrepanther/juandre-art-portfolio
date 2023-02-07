@@ -15,8 +15,10 @@ function Certificates_section() {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          justifyContent: 'center',
+          gap: 5,
+          alignItems: 'center',
+          flexWrap: 'wrap'
         }}
       >
         {certificates_data.map((certificate) => {
@@ -34,7 +36,12 @@ function Certificates_section() {
                 }}
               >
                 <Box onClick={() => checkValidityHandler(certificate.url)}>
-                  <img width="90rem" src={certificate.logo} alt="" />
+                  <img
+                    loading="lazy"
+                    width="90rem"
+                    src={certificate.logo}
+                    alt=""
+                  />
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box
