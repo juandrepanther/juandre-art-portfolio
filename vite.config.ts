@@ -18,10 +18,10 @@ export default defineConfig({
     port: 3001
   },
 
-  define: {
-    global: 'globalThis'
-    // global: {}
-  },
+  // define: {
+  //   global: 'globalThis'
+  //   // global: {}
+  // },
   base: '/juandre-art-portfolio/',
   build: {
     outDir: 'build',
