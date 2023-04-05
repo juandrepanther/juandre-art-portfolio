@@ -1,5 +1,5 @@
 import { Box, Paper, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import background from '../../assets/images/CV_bgd.png'
 import face from '../../assets/images/photo.png'
@@ -10,8 +10,10 @@ import useDarkMode, {
 import { selectDarkMode } from '../../redux/selectors/useSelectors'
 import Content_part from './parts/Content_Part/Content_part'
 import Header_part from './parts/Header_part'
+import jsPDF from 'jspdf'
 
 function CV_Page() {
+  const certificateTemplateRef = useRef<any>(null)
   const isDarkMode_store = useSelector(selectDarkMode)
   const [darkModeClass, setDarkModeClass] =
     useState<DarkModeClassType>('on-page-load')
@@ -27,6 +29,28 @@ function CV_Page() {
     }
   }, [isDarkMode_store])
 
+  const handleGeneratePdf = () => {
+    var margin = { top: 10, right: 20, bottom: 10, left: 20 }
+
+    const doc = new jsPDF({
+      orientation: 'p',
+      format: 'a2',
+      unit: 'pt',
+      compress: true
+    })
+
+    // Adding the fonts
+    doc.setFont('Helvetica', 'Arial', 500)
+
+    doc.html(certificateTemplateRef.current, {
+      margin: [20, 20, 20, 20],
+      async callback(doc) {
+        // save the document as a PDF with name of Memes
+        doc.save('CV_Janis_Dregeris')
+      }
+    })
+  }
+
   return (
     <Box
       sx={{
@@ -37,6 +61,7 @@ function CV_Page() {
       }}
     >
       <Box
+        ref={certificateTemplateRef}
         sx={{
           pt: '10rem',
           pb: '2rem',
@@ -81,6 +106,23 @@ function CV_Page() {
           </Paper>
         </Box>
       </Box>
+      <button
+        style={{
+          margin: '50px',
+          padding: '10px',
+          backgroundColor: 'black',
+          color: 'white',
+          fontFamily: 'Anton',
+          fontSize: '1.2rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1rem',
+          cursor: 'pointer',
+          width: '200px'
+        }}
+        onClick={handleGeneratePdf}
+      >
+        Generate Pdf
+      </button>
     </Box>
   )
 }
