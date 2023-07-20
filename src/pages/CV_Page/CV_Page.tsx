@@ -30,13 +30,12 @@ function CV_Page() {
   }, [isDarkMode_store])
 
   const handleGeneratePdf = () => {
-    var margin = { top: 10, right: 20, bottom: 10, left: 20 }
-
     const doc = new jsPDF({
       orientation: 'p',
       format: 'a2',
       unit: 'pt',
-      compress: true
+      compress: true,
+      precision: 10
     })
 
     // Adding the fonts
@@ -44,9 +43,9 @@ function CV_Page() {
 
     doc.html(certificateTemplateRef.current, {
       margin: [20, 20, 20, 20],
-      async callback(doc) {
+      async callback(document) {
         // save the document as a PDF with name of Memes
-        doc.save('CV_Janis_Dregeris')
+        document.save('CV_Janis_Dregeris')
       }
     })
   }

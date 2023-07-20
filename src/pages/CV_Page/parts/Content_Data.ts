@@ -67,13 +67,16 @@ export const mySkills: IMySkills[] = [
   { tech: 'TYPESCRIPT', level: 80 },
   { tech: 'REDUX (RTK)', level: 85 },
   { tech: 'MATERIAL UI', level: 91 },
+  { tech: 'MATERIAL UI', level: 91 },
   { tech: 'THREE.JS', level: 70 },
+  { tech: 'MONGODB', level: 70 },
+  { tech: 'NODE', level: 50 },
   { tech: 'BLENDER', level: 50 },
   { tech: 'UE 5', level: 45 }
 ]
 
 export const generalSKills =
-  'Html, css/scss, git, react/three-fiber, nodeJs, OvermindJs, zustand, vite.js, cannon.js, python, Adobe XD, Figma, MongoDB.'
+  'Html, css/scss, git, react/three-fiber, zustand, vite.js, cannon.js, python, Adobe XD, Figma, Express.js'
 
 // Education & Courses section
 
