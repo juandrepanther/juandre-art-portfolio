@@ -92,9 +92,9 @@ function Contact_Page() {
                       alt=""
                       style={{ marginBottom: '1rem' }}
                     />
-                    <a style={{ textDecoration: 'none', color: 'black' }}>
+                    <span style={{ textDecoration: 'none', color: 'black' }}>
                       {contact.title}
-                    </a>
+                    </span>
                   </a>
                 )}
               </Box>

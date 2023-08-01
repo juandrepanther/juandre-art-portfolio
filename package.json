@@ -1,6 +1,5 @@
 {
-  "homepage": "https://juandrepanther.github.io/juandre-art-portfolio",
-  "name": "three-floor",
+  "name": "juandre-art-portfolio",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +7,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "predeploy": "yarn build",
-    "deploy": "gh-pages -d build"
+    "predeploy": "yarn build"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",
@@ -27,7 +25,6 @@
     "@types/stats.js": "^0.17.0",
     "@types/three": "^0.138.0",
     "camera-controls": "^1.34.2",
-    "gh-pages": "^4.0.0",
     "jspdf": "^2.5.1",
     "react": "^18.2.0",
     "react-device-detect": "^2.2.2",

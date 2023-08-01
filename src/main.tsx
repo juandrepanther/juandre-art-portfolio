@@ -28,15 +28,15 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 const router = createBrowserRouter([
   {
-    path: '/juandre-art-portfolio/',
+    path: '/',
     element: <App />
   },
   {
-    path: '/juandre-art-portfolio/maze-game/',
+    path: '/maze-game/',
     element: <Maze_Page />
   },
   {
-    path: '/juandre-art-portfolio/features/',
+    path: '/features/',
     element: <Features_Page />
   }
 ])

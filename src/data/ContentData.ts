@@ -29,21 +29,15 @@ const ContentData: ContentDataType[] = [
     cameraSide: 'backSide',
     labelTooltipTitle: 'Explore my Curriculum vitae (CV).'
   },
-  {
-    id: 2,
-    position: [1.64, 0.36, 1.03],
-    cameraSide: 'backSide',
-    labelTooltipTitle: 'Check my Music Portfolio prototype here.'
-  },
 
   {
-    id: 3,
+    id: 2,
     position: [-0.76, 1.27, 1.5],
     cameraSide: 'backSide',
     labelTooltipTitle: 'Want to contact me? Check my contacts here.'
   },
   {
-    id: 4,
+    id: 3,
     position: [-1.44, 0.32, -0.43],
     cameraSide: 'backSide',
     labelTooltipTitle: 'PLAY a GAME: Dark Maze.'

@@ -8,9 +8,10 @@ function Experience_section() {
       <h4 style={{ fontSize: '2rem', marginBottom: '2rem' }}>
         {section_titles[1]}
       </h4>
-      {experienceSteps.map((experienceItem) => {
+      {experienceSteps.map((experienceItem, i) => {
         return (
           <Box
+            key={i}
             sx={{
               pb: '2rem',
               borderLeft: '.3rem solid #e0e0e0 ',
@@ -33,9 +34,10 @@ function Experience_section() {
             </h6>
             <Box sx={{ mt: '.5rem' }}>
               <ul style={{ paddingLeft: '.5rem' }}>
-                {experienceItem.responsibilities.map((responsibility) => {
+                {experienceItem.responsibilities.map((responsibility, i) => {
                   return (
                     <li
+                      key={i}
                       className="zoom-in effect"
                       style={{ marginTop: '.5rem' }}
                     >

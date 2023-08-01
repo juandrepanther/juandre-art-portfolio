@@ -20,13 +20,7 @@ const Tower_Model = () => {
 
   //@LOADING Building model
 
-  const gltf = modelLoader(
-    `${
-      process.env.NODE_ENV !== 'development'
-        ? '/juandre-art-portfolio/models/Laptop.glb'
-        : '/models/Laptop.glb'
-    }`
-  )
+  const gltf = modelLoader('/models/Laptop.glb')
 
   gltf.scene.traverse(function (model: any) {
     if (model.isMesh) {

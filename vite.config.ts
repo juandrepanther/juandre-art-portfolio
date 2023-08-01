@@ -22,7 +22,7 @@ export default defineConfig({
   //   global: 'globalThis'
   //   // global: {}
   // },
-  base: '/juandre-art-portfolio/',
+  // base: '/juandre-art-portfolio/',
   build: {
     outDir: 'build',
     chunkSizeWarningLimit: 250,

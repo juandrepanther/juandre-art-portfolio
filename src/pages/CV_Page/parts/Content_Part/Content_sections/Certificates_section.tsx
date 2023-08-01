@@ -21,9 +21,9 @@ function Certificates_section() {
           flexWrap: 'wrap'
         }}
       >
-        {certificates_data.map((certificate) => {
+        {certificates_data.map((certificate, i) => {
           return (
-            <Tooltip title="Click & Check the Validity" placement="top">
+            <Tooltip key={i} title="Click & Check the Validity" placement="top">
               <Box
                 sx={{
                   cursor: 'pointer',

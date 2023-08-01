@@ -6,9 +6,10 @@ function MySkills_section() {
   return (
     <div style={{ marginTop: '2rem' }}>
       <h4 style={{ fontSize: '2rem' }}>{section_titles[2]}</h4>
-      {mySkills.map((skill) => {
+      {mySkills.map((skill, index) => {
         return (
           <Box
+            key={index}
             sx={{
               mt: '1rem',
               display: 'flex',

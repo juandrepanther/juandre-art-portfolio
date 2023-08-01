@@ -20,18 +20,13 @@ import { setZoom } from '../../redux/reducers/zoomReducer'
 import { resetCurrentPulsar } from '../../redux/reducers/currentPulsarReducer'
 import { Box, Modal, Switch, Tooltip } from '@mui/material'
 import { changeInitialPopupVisibility } from '../../redux/reducers/initialPopupReducer'
-
 import InitialPopUp from './InitialPopUp'
 import { displayFlexCenter } from '../../utils/globalStyles'
 import Container from '@mui/material/Container'
-
 const CV_Page = lazy(() => import('../CV_Page/CV_Page'))
 const Contact_Page = lazy(() => import('../Contact_Page/Contact_Page'))
-
 import CloseIcon from '@mui/icons-material/Close'
-
 const LazySideBar = lazy(() => import('./SideBar'))
-
 import useDarkMode from '../../hooks/useDarkMode'
 import { useNavigate } from 'react-router-dom'
 
@@ -85,7 +80,7 @@ function HTMLElements() {
     <>
       <div className={`overlay ${darkModeClass}`}></div>
       {isInitialPopupVisible && <InitialPopUp />}
-      {id > 0 && id !== 2 && (
+      {id > 0 && id < 3 && (
         <Modal
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
@@ -112,7 +107,7 @@ function HTMLElements() {
             >
               <CloseIcon
                 stroke={'black'}
-                stroke-width={0.2}
+                strokeWidth={0.2}
                 sx={{ color: 'white', fontSize: '4rem' }}
               />
             </Box>
@@ -128,10 +123,8 @@ function HTMLElements() {
             >
               <Suspense fallback={null}>
                 {id === 1 && <CV_Page />}
-                {id === 3 && <Contact_Page />}
+                {id === 2 && <Contact_Page />}
               </Suspense>
-
-              {/* {id === 4 && navigate('/juandre-art-portfolio/maze-game/')} */}
             </Container>
           </Box>
         </Modal>
@@ -141,9 +134,6 @@ function HTMLElements() {
           <LaptopIcon sx={{ color: iconColor }} />
         </div>
       )}
-      {/* <Suspense fallback={<div>Loading...</div>}>
-        {cameraType === 'locked' && !sideBar_status && <LazyNavigatorPanel />}
-      </Suspense> */}
 
       {!isInitialPopupVisible && sideBar_status ? (
         <Suspense fallback={<div>Loading...</div>}>

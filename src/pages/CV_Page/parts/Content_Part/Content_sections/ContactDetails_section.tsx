@@ -5,9 +5,9 @@ import { contact_details } from '../../Content_Data'
 function ContactDetails_section() {
   return (
     <>
-      {contact_details.map((detailsItem) => {
+      {contact_details.map((detailsItem, i) => {
         return (
-          <Box sx={{ mt: '2rem' }}>
+          <Box key={i} sx={{ mt: '2rem' }}>
             <h6 style={{ fontSize: '1.5rem' }}>{detailsItem.title}</h6>
             <p style={{ fontSize: '1.5rem' }}>{detailsItem.data}</p>
           </Box>

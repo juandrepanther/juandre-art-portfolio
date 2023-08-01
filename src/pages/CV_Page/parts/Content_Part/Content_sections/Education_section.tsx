@@ -8,9 +8,10 @@ function Education_section() {
       <h4 style={{ fontSize: '2rem', marginBottom: '2rem' }}>
         {section_titles[3]}
       </h4>
-      {educationAndCourses.map((item) => {
+      {educationAndCourses.map((item, i) => {
         return (
           <Box
+            key={i}
             sx={{
               pb: '2rem',
               borderLeft: '.3rem solid #e0e0e0 ',

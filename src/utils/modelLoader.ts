@@ -6,11 +6,7 @@ export const modelLoader = (modelUrl: string) => {
   const loadedModel: any = useLoader(GLTFLoader, modelUrl, (loader: any) => {
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath(
-      `${
-        process.env.NODE_ENV !== 'development'
-          ? '/juandre-art-portfolio/draco/gltf/'
-          : '/draco/gltf/'
-      }`
+      '/draco/gltf/'
     )
     loader.setDRACOLoader(dracoLoader)
   })

@@ -37,13 +37,7 @@ function Maze_Model() {
   const Up_3_Meshes = useRef<any>()
   const Down_3_Meshes = useRef<any>()
 
-  const { nodes } = useGLTF(
-    `${
-      process.env.NODE_ENV !== 'development'
-        ? '/juandre-art-portfolio/models/Maze_full.glb'
-        : '/models/Maze_full.glb'
-    }`
-  ) as GLTFResult
+  const { nodes } = useGLTF('/models/Maze_full.glb') as GLTFResult
 
   // CUSTOM ANIMATIONS SETUP
 
