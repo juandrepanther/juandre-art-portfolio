@@ -118,7 +118,7 @@ interface IContacts {
 export const contact_details: IContacts[] = [
   { title: 'DOB:', data: '23/12/1989' },
   { title: 'Email:', data: 'juandre@inbox.lv' },
-  { title: 'Website:', data: 'www.janisdregeris.com' }
+  { title: 'Website:', data: 'https://ee-ze.com/' }
 ]
 
 // Certificates section

@@ -21,7 +21,7 @@ function Header_part() {
       </Box>
       <Tooltip placement="bottom" title="You are already here.">
         <p style={{ fontSize: '1.5rem', fontWeight: 300, marginTop: '.7rem' }}>
-          https://juandrepanther.github.io/juandre-art-portfolio/
+          https://ee-ze.com/
         </p>
       </Tooltip>
     </Box>
