@@ -75,7 +75,7 @@ export const mySkills: IMySkills[] = [
 ]
 
 export const generalSKills =
-  'Docker | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier'
+  'Docker | Linux | Nginx | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier'
 
 // Education & Courses section
 
