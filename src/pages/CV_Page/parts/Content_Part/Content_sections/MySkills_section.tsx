@@ -18,7 +18,7 @@ function MySkills_section() {
             }}
           >
             <p>{skill.tech}</p>
-            <Box
+            {/* <Box
               className="progress-container"
               sx={{
                 width: '50%',
@@ -40,7 +40,7 @@ function MySkills_section() {
                   style={{ marginLeft: '.4rem', fontSize: '.7rem' }}
                 >{`~ ${skill.level}%`}</p>
               </Box>
-            </Box>
+            </Box> */}
           </Box>
         )
       })}

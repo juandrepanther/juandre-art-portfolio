@@ -9,10 +9,10 @@ export const section_titles = [
 // About Me section data
 
 export const paragraph1 =
-  'Overall coding experience 5+ years. Keep forward on Interactive 3D animations mostly using Three.js and React-three-fiber libraries.'
+  'Overall coding experience 5+ years. As a fullstack developer, I take care of high-quality and timely product development.'
 
 export const paragraph2 =
-  'Always Passionate about intensive deep-learning on new Technologies to expand knowledge and find most efficient solutions.'
+  'Always Passionate about intensive deep-learning on new Technologies to expand knowledge and find most efficient solutions. Whatever time it will take - I will find the solution! Addicted from the deep learning and passion for the details.'
 
 // Experience section
 
@@ -67,6 +67,7 @@ export const mySkills: IMySkills[] = [
   { tech: 'TYPESCRIPT', level: 80 },
   { tech: 'REDUX (RTK)', level: 85 },
   { tech: 'MATERIAL UI', level: 91 },
+  { tech: 'STYLED COMPONENTS', level: 91 },
   { tech: 'THREE.JS', level: 70 },
   { tech: 'MONGODB', level: 70 },
   { tech: 'NODE', level: 50 },
