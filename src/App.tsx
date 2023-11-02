@@ -61,7 +61,7 @@ function App() {
           backgroundColor: 'white',
           position: 'fixed'
         }}
-        //@ if you want to all properties (also RENDERER), access like below
+        //@ if you want to all properties (also RENDERER), access like below:
         onCreated={(canvas) => {
           canvas.gl.setClearColor('#fff', 1)
         }}
