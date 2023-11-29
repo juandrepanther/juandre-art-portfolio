@@ -1,16 +1,13 @@
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Paper } from '@mui/material'
 import React, { useEffect, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import background from '../../assets/images/CV_bgd.png'
 import face from '../../assets/images/photo.png'
-import useDarkMode, {
-  DarkModeClassType,
-  SetIconColorType
-} from '../../hooks/useDarkMode'
+import { DarkModeClassType, SetIconColorType } from '../../hooks/useDarkMode'
 import { selectDarkMode } from '../../redux/selectors/useSelectors'
 import Content_part from './parts/Content_Part/Content_part'
 import Header_part from './parts/Header_part'
-import jsPDF from 'jspdf'
+// import jsPDF from 'jspdf'
 
 function CV_Page() {
   const certificateTemplateRef = useRef<any>(null)
@@ -29,25 +26,33 @@ function CV_Page() {
     }
   }, [isDarkMode_store])
 
-  const handleGeneratePdf = () => {
-    const doc = new jsPDF({
-      orientation: 'p',
-      format: 'a2',
-      unit: 'pt',
-      compress: true,
-      precision: 10
-    })
+  // const handleGeneratePdf = () => {
+  //   const doc = new jsPDF({
+  //     orientation: 'p',
+  //     format: 'a2',
+  //     unit: 'pt',
+  //     compress: true,
+  //     precision: 10
+  //   })
 
-    // Adding the fonts
-    doc.setFont('Helvetica', 'Arial', 500)
+  //   // Adding the fonts
+  //   doc.setFont('Helvetica', 'Arial', 500)
 
-    doc.html(certificateTemplateRef.current, {
-      margin: [20, 20, 20, 20],
-      async callback(document) {
-        // save the document as a PDF with name of Memes
-        document.save('CV_Janis_Dregeris')
-      }
-    })
+  //   doc.html(certificateTemplateRef.current, {
+  //     margin: [20, 20, 20, 20],
+  //     async callback(document) {
+  //       // save the document as a PDF with name of Memes
+  //       document.save('CV_Janis_Dregeris')
+  //     }
+  //   })
+  // }
+
+  const download = () => {
+    const fileUrl = '/CV.pdf'
+    const link = document.createElement('a')
+    link.href = fileUrl
+    link.download = 'CV_Janis_Dregeris.pdf'
+    link.click()
   }
 
   return (
@@ -73,7 +78,8 @@ function CV_Page() {
             position: 'relative',
             backgroundColor: 'white',
             width: '95%',
-            mx: 'auto'
+            mx: 'auto',
+            borderRadius: '2rem'
           }}
         >
           <div className={`overlay ${darkModeClass}`}></div>
@@ -97,7 +103,8 @@ function CV_Page() {
             sx={{
               pt: '6.7rem',
               fontFamily: 'Montserrat',
-              px: '2rem'
+              px: '2rem',
+              borderRadius: '1rem'
             }}
           >
             <Header_part />
@@ -107,20 +114,23 @@ function CV_Page() {
       </Box>
       <button
         style={{
+          position: 'absolute',
+          top: 4,
+          left: 4,
           margin: '50px',
           padding: '10px',
-          backgroundColor: 'black',
-          color: 'white',
-          fontFamily: 'Anton',
+          backgroundColor: 'white',
+          color: 'black',
           fontSize: '1.2rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1rem',
           cursor: 'pointer',
-          width: '200px'
+          fontWeight: 'bold',
+          width: '200px',
+          zIndex: 1,
+          borderRadius: '2rem'
         }}
-        onClick={handleGeneratePdf}
+        onClick={download}
       >
-        Generate Pdf
+        Download
       </button>
     </Box>
   )

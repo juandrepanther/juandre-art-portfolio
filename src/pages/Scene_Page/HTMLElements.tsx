@@ -116,7 +116,8 @@ function HTMLElements() {
                 overflow: 'auto',
                 position: 'relative',
                 height: '90%',
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                borderRadius: '1rem'
               }}
               disableGutters
               maxWidth="lg"

@@ -53,8 +53,8 @@ function App() {
         camera={{
           near: 0.1,
           far: cameraDepthLimit,
-          fov: 75,
-          position: [0, 5, 7]
+          fov: 75
+          // position: [0, 5, 7]
         }}
         style={{
           width: '100%',
@@ -66,12 +66,8 @@ function App() {
           canvas.gl.setClearColor('#fff', 1)
         }}
       >
-        {/* <fog attach="fog" args={['grey', 1, 30]} /> */}
-
         <Provider store={store}>
           <Suspense fallback={<Loader />}>
-            <ambientLight intensity={2} />
-            <pointLight intensity={1.5} position={[10, 10, 10]} />
             <Tower_Model />
             <ContentOverlay />
             <CameraSwitcher />
@@ -91,7 +87,6 @@ function App() {
       </div>
       <div className="container">
         <HTMLElements />
-        {/* {isPlayingBackgroundMusic && <AudioPlayer />} */}
       </div>
     </div>
   )

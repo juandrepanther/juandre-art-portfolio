@@ -621,3 +621,21 @@ STYLES FOR LABELS
   width: 30px;
   background: #181c20;
 }
+
+/* Custom scrollbar */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 1px 1px #111, inset 0 0 4px rgb(0 0 0 / 30%);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #3d3d3d;
+}

@@ -8,11 +8,19 @@ export const section_titles = [
 
 // About Me section data
 
-export const paragraph1 =
-  'Overall coding experience 5+ years. As a fullstack developer, I take care of high-quality and timely product development.'
+export const paragraph1 = `Fullstack Developer with wealth of
+  experience in building scalable and
+  user-friendly web applications.
+  Proficient in front-end and back-end
+  development, utilizing various
+  technologies. Proven track record of
+  delivering high-quality code and
+  meeting project deadlines. `
 
-export const paragraph2 =
-  'Always Passionate about intensive deep-learning on new Technologies to expand knowledge and find most efficient solutions. Whatever time it will take - I will find the solution! Addicted from the deep learning and passion for the details.'
+export const paragraph2 = `Overall coding experience 6+ years.
+  Whatever time it will take - I will find the
+  solution! Addicted from the deep
+  learning and passion for the details.`
 
 // Experience section
 
@@ -25,33 +33,37 @@ interface IExperienceSteps {
 
 export const experienceSteps: IExperienceSteps[] = [
   {
-    title: 'SENIOR ANALYST',
+    title: 'SENIOR WEB DEVELOPER',
     place: 'Accenture - Baltics, Latvia, Riga',
     year: '2022/01 - current',
     responsibilities: [
-      'Develop modern, interactive, high quality UI for user-facing and enterprise applications using React using modern front-end engineering tools and practices.',
-      'Work as a member of a team specializing in design, build and test of responsive user interfaces, SPAs & websites using React framework.',
-      'Integrate applications with existing tools used in a company.',
-      'Work closely with the design team on creating solutions which improves business value.',
-      'Work closely with client stakeholders to clarify requirements and functionality.'
+      `Developed scalable full-stack web applications using technologies
+      like React, Typescript, Material UI and more.`,
+      `Designed and implemented RESTful APIs using Node.js and Express, MongoDB for seamless data communication.
+      `,
+      `Develop modern, interactive, high-quality UI for user-facing and
+      enterprise applications using React using modern front-end
+      engineering tools and practices.`
     ]
   },
   {
-    title: 'FREELANCE DEVELOPMENT',
-    year: '2018 - 2021/12',
+    title: 'FULLSTACK WEB DEVELOPER',
+    place: 'Freelance',
+    year: '2018 - current',
     responsibilities: [
-      'Build Client-side from Design (Figma) and connect to back-end point.',
-      'Cooperate with the client for delivering high quality web products.'
-    ]
-  },
-  {
-    title: 'FORENSIC DOC EXPERT',
-    place: 'State Border Guard HQ - Latvia',
-    year: '2009 - 2022',
-    responsibilities: [
-      'Physical and Electronic Document Component Forensic Investigations. As a Software engineer Developed Full-stack Information System of world Travel documents using HTML, CSS, Vanilla JavaScript, PowerShell, VBA (Excel), XML. '
+      `Developed responsive websites using HTML, CSS, and JavaScript for optimal user experience.`,
+      `Optimized website performance through code optimization and use of best practices.
+      `
     ]
   }
+  // {
+  //   title: 'FORENSIC DOC EXPERT',
+  //   place: 'State Border Guard HQ - Latvia',
+  //   year: '2009 - 2022',
+  //   responsibilities: [
+  //     'Physical and Electronic Document Component Forensic Investigations. As a Software engineer Developed Full-stack Information System of world Travel documents using HTML, CSS, Vanilla JavaScript, PowerShell, VBA (Excel), XML. '
+  //   ]
+  // }
 ]
 
 // My Skills Section
@@ -117,7 +129,6 @@ interface IContacts {
 }
 
 export const contact_details: IContacts[] = [
-  { title: 'DOB:', data: '23/12/1989' },
   { title: 'Email:', data: 'juandre@inbox.lv' },
   { title: 'Website:', data: 'https://ee-ze.com/' }
 ]

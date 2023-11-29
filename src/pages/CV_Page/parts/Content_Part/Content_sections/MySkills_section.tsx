@@ -14,33 +14,10 @@ function MySkills_section() {
               mt: '1rem',
               display: 'flex',
               justifyContent: 'space-between',
-              height: '1.8rem'
+              height: '1rem'
             }}
           >
             <p>{skill.tech}</p>
-            {/* <Box
-              className="progress-container"
-              sx={{
-                width: '50%',
-                height: '70%',
-                border: '.2rem solid black',
-                borderRadius: '5px'
-              }}
-            >
-              <Box
-                className="progress-level"
-                sx={{
-                  width: `${skill.level}%`,
-                  backgroundColor: 'black',
-                  height: '100%',
-                  color: 'white'
-                }}
-              >
-                <p
-                  style={{ marginLeft: '.4rem', fontSize: '.7rem' }}
-                >{`~ ${skill.level}%`}</p>
-              </Box>
-            </Box> */}
           </Box>
         )
       })}

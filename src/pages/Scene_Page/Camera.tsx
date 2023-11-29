@@ -142,12 +142,6 @@ const Camera = ({
       )
     }
 
-    // auto rotation testing
-    // if (cameraType === 'free') {
-    //   controls.azimuthAngle += 0.05 * delta
-    //   controls.azimuthRotateSpeed = 1
-    // }
-
     if (cameraType === 'free' && witness) {
       // controls.setTarget(0, 4, 0)
       pos.set(
@@ -172,14 +166,17 @@ const Camera = ({
     }
 
     if (cameraType === 'free') {
-      // controls.azimuthAngle += 0.05 * delta
-      // controls.azimuthRotateSpeed = 1
       witness = false
       controls.setTarget(
         lockedCamera_targetPosition[0],
         lockedCamera_targetPosition[1],
         lockedCamera_targetPosition[2]
       )
+
+      // auto rotation of the main model
+
+      controls.azimuthAngle += 0.05 * delta
+      controls.azimuthRotateSpeed = 1
     }
 
     return controls.update(delta)
