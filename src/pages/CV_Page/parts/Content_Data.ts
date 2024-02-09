@@ -33,9 +33,19 @@ interface IExperienceSteps {
 
 export const experienceSteps: IExperienceSteps[] = [
   {
+    title: 'FULL STACK ENGINEER',
+    place: 'Supliful, Latvia, Riga',
+    year: '2024/02 - current',
+    responsibilities: [
+      `Developing of the new features and maintaining the existing ones for the Supliful platform.`,
+      `Backend development using PostgreSQL, GraphQL, Prisma, MongoDB and more`,
+      `Frontend development using Next.js, Typescript, Chakra UI and more.`
+    ]
+  },
+  {
     title: 'SENIOR WEB DEVELOPER',
     place: 'Accenture - Baltics, Latvia, Riga',
-    year: '2022/01 - current',
+    year: '2022/01 - 2024/01',
     responsibilities: [
       `Developed scalable full-stack web applications using technologies
       like React, Typescript, Material UI and more.`,
@@ -82,6 +92,7 @@ export const mySkills: IMySkills[] = [
   { tech: 'STYLED COMPONENTS', level: 91 },
   { tech: 'THREE.JS', level: 70 },
   { tech: 'MONGODB', level: 70 },
+  { tech: 'POSTGRESQL', level: 70 },
   { tech: 'NODE', level: 50 },
   { tech: 'BLENDER', level: 50 },
   { tech: 'UE 5', level: 45 }
