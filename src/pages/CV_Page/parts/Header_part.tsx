@@ -17,7 +17,7 @@ function Header_part() {
           mt: '.5rem'
         }}
       >
-        <p style={{ fontWeight: 300 }}>FULL-STACK WEB DEVELOPER</p>
+        <p style={{ fontWeight: 300 }}>FULL STACK ENGINEER</p>
       </Box>
       <Tooltip placement="bottom" title="You are already here.">
         <p style={{ fontSize: '1.5rem', fontWeight: 300, marginTop: '.7rem' }}>

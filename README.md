@@ -4,6 +4,7 @@
 - `yarn install` (if new dependencies)
 - `yarn build`
 
+- remove docker container and image by using Docker Portainer extension
 - `docker build -t juandre-art-portfolio .`
 - `docker run -d --restart=unless-stopped --network proxy --name juandre-art-portfolio juandre-art-portfolio`
 

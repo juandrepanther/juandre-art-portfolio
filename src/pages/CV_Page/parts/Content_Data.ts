@@ -8,7 +8,7 @@ export const section_titles = [
 
 // About Me section data
 
-export const paragraph1 = `Fullstack Developer with wealth of
+export const paragraph1 = `Full Stack Engineer with wealth of
   experience in building scalable and
   user-friendly web applications.
   Proficient in front-end and back-end
