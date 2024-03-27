@@ -35,7 +35,7 @@ export const experienceSteps: IExperienceSteps[] = [
   {
     title: 'FULL STACK ENGINEER',
     place: 'Supliful, Latvia, Riga',
-    year: '2024/02 - current',
+    year: '2024/02 - 2024/03',
     responsibilities: [
       `Developing of the new features and maintaining the existing ones for the Supliful platform.`,
       `Backend development using PostgreSQL, GraphQL, Prisma, MongoDB and more`,
