@@ -33,6 +33,16 @@ interface IExperienceSteps {
 
 export const experienceSteps: IExperienceSteps[] = [
   {
+    title: 'FRONTEND DEVELOPER',
+    place: 'IF Insurance, Latvia, Riga',
+    year: '2024/06 - Current',
+    responsibilities: [
+      `Designing and implementing new software features, improving the existing ones.`,
+      `Work with software performance tune and code optimization`,
+      `Participation in the design, re-design and development of applications`
+    ]
+  },
+  {
     title: 'FULL STACK ENGINEER',
     place: 'Supliful, Latvia, Riga',
     year: '2024/02 - 2024/03',
@@ -99,7 +109,7 @@ export const mySkills: IMySkills[] = [
 ]
 
 export const generalSKills =
-  'Docker | Linux | Nginx | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier'
+  'Docker | Linux | Nginx | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier | Angular'
 
 // Education & Courses section
 
