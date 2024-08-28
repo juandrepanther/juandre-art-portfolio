@@ -1,13 +1,12 @@
-import { Box, Paper } from '@mui/material'
 import React, { useEffect, useState, useRef } from 'react'
+import { Box, Paper } from '@mui/material'
 import { useSelector } from 'react-redux'
-import background from '../../assets/images/CV_bgd.png'
-import face from '../../assets/images/photo.png'
-import { DarkModeClassType, SetIconColorType } from '../../hooks/useDarkMode'
 import { selectDarkMode } from '../../redux/selectors/useSelectors'
+import { DarkModeClassType, SetIconColorType } from '../../hooks/useDarkMode'
 import Content_part from './parts/Content_Part/Content_part'
 import Header_part from './parts/Header_part'
-// import jsPDF from 'jspdf'
+import background from '../../assets/images/CV_bgd.png'
+import face from '../../assets/images/photo.png'
 
 function CV_Page() {
   const certificateTemplateRef = useRef<any>(null)
@@ -26,34 +25,7 @@ function CV_Page() {
     }
   }, [isDarkMode_store])
 
-  // const handleGeneratePdf = () => {
-  //   const doc = new jsPDF({
-  //     orientation: 'p',
-  //     format: 'a2',
-  //     unit: 'pt',
-  //     compress: true,
-  //     precision: 10
-  //   })
-
-  //   // Adding the fonts
-  //   doc.setFont('Helvetica', 'Arial', 500)
-
-  //   doc.html(certificateTemplateRef.current, {
-  //     margin: [20, 20, 20, 20],
-  //     async callback(document) {
-  //       // save the document as a PDF with name of Memes
-  //       document.save('CV_Janis_Dregeris')
-  //     }
-  //   })
-  // }
-
-  const download = () => {
-    const fileUrl = '/CV.pdf'
-    const link = document.createElement('a')
-    link.href = fileUrl
-    link.download = 'CV_Janis_Dregeris.pdf'
-    link.click()
-  }
+  const openCV = () => window.open(import.meta.env.VITE_CV_URL, '_blank')
 
   return (
     <Box
@@ -128,9 +100,9 @@ function CV_Page() {
           zIndex: 1,
           borderRadius: '2rem'
         }}
-        onClick={download}
+        onClick={openCV}
       >
-        Download
+        Open & Download
       </button>
     </Box>
   )
