@@ -1,4 +1,4 @@
-### BUILD THE CHANGES (manual)
+# BUILD THE CHANGES (manual)
 
 - `git pull`
 - `yarn install` (if new dependencies)
@@ -10,7 +10,7 @@
 
 Check if proxy network is present. If no, run `docker network create proxy`
 
-### DEVELOPMENT LOCAL (manual):
+# DEVELOPMENT LOCAL (manual):
 
 For development the port can be exposed and app can be opened in the browser at localhost:8080
 
@@ -21,3 +21,7 @@ Port 8080 is access port via browser. Port 80 is the containers nginx web server
 - `docker run -d --restart=unless-stopped --name juandre-art-portfolio -p 8080:80 juandre-art-portfolio`
 
 At the production do not forget to add `server_name localhost;` at the nginx.conf file.
+
+# CV Download
+
+Minio S3 bucket has been used. CV file has ReadOnly Access Policy.
