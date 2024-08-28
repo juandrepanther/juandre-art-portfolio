@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-import backgroundMusicReducer from '../reducers/backgroundMusicReducer'
 import cameraReducer from '../reducers/cameraReducer'
 import currentPulsarReducer from '../reducers/currentPulsarReducer'
 import darkModeReducer from '../reducers/darkModeReducer'
@@ -20,7 +19,6 @@ export const store = configureStore({
     lockedCameraStartPos_reducer: lockedCameraStartPos,
     currentPulsar_reducer: currentPulsarReducer,
     initialPopup_Reducer: initialPopupReducer,
-    backgroundMusic_Reducer: backgroundMusicReducer,
     debugger_reducer: debuggerReducer,
     logoTopIconsVisible_Reducer: logoTopIconsReducer,
     darkMode_reducer: darkModeReducer
@@ -30,8 +28,6 @@ export const store = configureStore({
       serializableCheck: false
     })
 })
-
-//EXPORTS TYPES
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

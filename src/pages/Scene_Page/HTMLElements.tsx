@@ -1,8 +1,7 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react'
+import React, { lazy, Suspense } from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
 import CropSquareIcon from '@mui/icons-material/CropSquare'
 import LaptopIcon from '@mui/icons-material/Laptop'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSideBar_status } from '../../redux/reducers/sideBarReducer'
 import {
@@ -23,15 +22,16 @@ import { changeInitialPopupVisibility } from '../../redux/reducers/initialPopupR
 import InitialPopUp from './InitialPopUp'
 import { displayFlexCenter } from '../../utils/globalStyles'
 import Container from '@mui/material/Container'
+import CloseIcon from '@mui/icons-material/Close'
+import useDarkMode from '../../hooks/useDarkMode'
+
 const CV_Page = lazy(() => import('../CV_Page/CV_Page'))
 const Contact_Page = lazy(() => import('../Contact_Page/Contact_Page'))
-import CloseIcon from '@mui/icons-material/Close'
 const LazySideBar = lazy(() => import('./SideBar'))
-import useDarkMode from '../../hooks/useDarkMode'
-import { useNavigate } from 'react-router-dom'
 
 function HTMLElements() {
-  const navigate = useNavigate()
+  const [darkModeClass, isDarkMode, setDarkModeHandler, iconColor] =
+    useDarkMode()
   const dispatch = useDispatch()
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
   const cameraType = useSelector(selectCameraType)
@@ -45,7 +45,7 @@ function HTMLElements() {
     dispatch(setSideBar_status(true))
   }
 
-  //@ CLOSE MODAL
+  // CLOSE MODAL
   const freeCameraMode = (e: any) => {
     dispatch(
       setLockedCameraStartPos({
@@ -67,14 +67,7 @@ function HTMLElements() {
     dispatch(resetCurrentPulsar())
   }
 
-  //@SHOW INITIAL POP UP FUNCTION
-
   const showInitialPopUp = () => dispatch(changeInitialPopupVisibility(true))
-
-  //@DARK MODE SETUP
-
-  const [darkModeClass, isDarkMode, setDarkModeHandler, iconColor] =
-    useDarkMode()
 
   return (
     <>
@@ -99,16 +92,24 @@ function HTMLElements() {
               onClick={freeCameraMode}
               sx={{
                 position: 'absolute',
-                zIndex: 9,
                 right: '10%',
-                top: '1.2rem',
-                cursor: 'pointer'
+                top: '3rem',
+                cursor: 'pointer',
+                zIndex: 9,
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                  transition: '0.3s'
+                }
               }}
             >
               <CloseIcon
                 stroke={'black'}
                 strokeWidth={0.2}
-                sx={{ color: 'white', fontSize: '4rem' }}
+                sx={{
+                  color: 'white',
+                  fontSize: '4rem',
+                  position: 'relative'
+                }}
               />
             </Box>
             <Container

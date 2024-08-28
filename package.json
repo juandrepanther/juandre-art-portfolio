@@ -7,7 +7,9 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "predeploy": "yarn build"
+    "lint": "eslint --debug",
+    "lint:inspect": "eslint --debug --inspect-config",
+    "lint:fix": "eslint --fix"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",
@@ -40,11 +42,18 @@
     "vite-plugin-glsl": "^1.1.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.1",
     "@locator/runtime": "^0.2.2",
     "@testing-library/react": "12.1.2",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
     "@vitejs/plugin-react": "^1.0.7",
+    "eslint": "^9.9.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "jiti": "^1.21.6",
     "leva": "^0.9.34",
     "r3f-perf": "^6.6.3",
     "typescript": "^4.5.4",

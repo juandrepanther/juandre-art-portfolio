@@ -1,9 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
 import THREEx from '../../utils/drawCalls/threex.rendererstats.js'
-
-//@FPS METER IMPORT
-
 import FPS from 'stats.js'
 
 const Stats = () => {

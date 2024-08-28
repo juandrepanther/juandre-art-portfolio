@@ -1,4 +1,3 @@
-import React from 'react'
 import { sideType } from '../types'
 
 function cameraSideApply(originalPosition: number[], cameraSide: sideType) {

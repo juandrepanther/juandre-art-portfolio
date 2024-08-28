@@ -1,4 +1,3 @@
-import React from 'react'
 import { setCamera } from '../../redux/reducers/cameraReducer'
 import { setCurrentPulsar } from '../../redux/reducers/currentPulsarReducer'
 import { setFocus } from '../../redux/reducers/focusReducer'

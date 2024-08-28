@@ -10,7 +10,7 @@
 
 Check if proxy network is present. If no, run `docker network create proxy`
 
-# DEVELOPMENT LOCAL (manual):
+## DEVELOPMENT LOCAL (manual)
 
 For development the port can be exposed and app can be opened in the browser at localhost:8080
 
@@ -22,6 +22,12 @@ Port 8080 is access port via browser. Port 80 is the containers nginx web server
 
 At the production do not forget to add `server_name localhost;` at the nginx.conf file.
 
-# CV Download
+## CV Download
 
-Minio S3 bucket has been used. CV file has ReadOnly Access Policy.
+The Minio S3 bucket has been used. CV file has ReadOnly Access Policy.
+
+## EsLint
+
+To run the linter, run `yarn lint`
+
+You can use the `yarn lint:inspect` to debug the linter.

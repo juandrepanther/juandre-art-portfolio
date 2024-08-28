@@ -1,40 +1,20 @@
-//@GENERAL IMPORTS
 import { cameraDepthLimit, developerMode } from './data/ContentData'
 import React, { lazy, Suspense } from 'react'
 import CameraControls from 'camera-controls'
 CameraControls.install({ THREE })
-
-//@UTILS IMPORTS
-import CameraSwitcher from './utils/CameraSwitcher'
-
-//@IMPORT COMPONENTS
-
-import ContentOverlay from './pages/Scene_Page/ContentOverlay'
 import Tower_Model from './pages/Scene_Page/Tower_Model'
 import Loader from './pages/Scene_Page/Loader'
 import LabelsHTML from './pages/Scene_Page/LabelsHTML'
 import HTMLElements from './pages/Scene_Page/HTMLElements'
-
-const LazyStats = lazy(() => import('./pages/Scene_Page/Stats'))
-const LazyDebugger = lazy(() => import('./pages/Scene_Page/Debugger'))
-const LazyHTMLDebugger = lazy(() => import('./pages/Scene_Page/HTMLDebugger'))
-
-//@REDUX-TOOLKIT SETUP
-
 import { store } from './redux/store/store'
-import { Provider, useSelector } from 'react-redux'
-import { selectIsMonitoring_status } from './redux/selectors/useSelectors'
-
-//@THREE JS FIBER IMPORTS
-
+import { Provider } from 'react-redux'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
+import Camera from './pages/Scene_Page/Camera'
 
-//@PARENT COMPONENT
+const LazyStats = lazy(() => import('./pages/Scene_Page/Stats'))
 
 function App() {
-  // const isPlayingBackgroundMusic = useSelector(selectIsPlayingBackgroundMusic)
-  const isMonitoringSelected = useSelector(selectIsMonitoring_status)
   return (
     <div>
       <LabelsHTML />
@@ -54,14 +34,12 @@ function App() {
           near: 0.1,
           far: cameraDepthLimit,
           fov: 75
-          // position: [0, 5, 7]
         }}
         style={{
           width: '100%',
           backgroundColor: 'white',
           position: 'fixed'
         }}
-        //@ if you want to all properties (also RENDERER), access like below:
         onCreated={(canvas) => {
           canvas.gl.setClearColor('#fff', 1)
         }}
@@ -69,22 +47,14 @@ function App() {
         <Provider store={store}>
           <Suspense fallback={<Loader />}>
             <Tower_Model />
-            <ContentOverlay />
-            <CameraSwitcher />
+            <Camera />
             <Suspense fallback={<Loader />}>
-              {developerMode && isMonitoringSelected && <LazyStats />}
-              {developerMode && <LazyDebugger />}
+              {developerMode && <LazyStats />}
             </Suspense>
           </Suspense>
         </Provider>
       </Canvas>
-      {/*//@ RENDERING HTML ELEMENTS in the CONTAINER */}
 
-      <div className="debugger-container">
-        <Suspense fallback={<div>Loading...</div>}>
-          {developerMode && <LazyHTMLDebugger />}
-        </Suspense>
-      </div>
       <div className="container">
         <HTMLElements />
       </div>

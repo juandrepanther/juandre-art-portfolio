@@ -1,10 +1,8 @@
-import { useHelper, useKeyboardControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import useKeyPress from '../../utils/useKeyPress'
 import * as THREE from 'three'
-import { SpotLightHelper } from 'three'
 
 function Player() {
   const [smoothedCameraPosition] = useState(() => new THREE.Vector3(2, 5, 10))

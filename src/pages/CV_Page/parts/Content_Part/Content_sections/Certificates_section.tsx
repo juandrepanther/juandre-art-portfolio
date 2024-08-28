@@ -1,6 +1,5 @@
-import { Box, Tooltip } from '@mui/material'
 import React from 'react'
-import { displayFlexCenterColumn } from '../../../../../utils/globalStyles'
+import { Box, Tooltip } from '@mui/material'
 import { certificates_data, section_titles } from '../../Content_Data'
 
 function Certificates_section() {

@@ -1,17 +1,9 @@
-import { Html, useGLTF } from '@react-three/drei'
+import { useGLTF } from '@react-three/drei'
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import {
-  CuboidCollider,
-  HeightfieldCollider,
-  HeightfieldColliderProps,
-  RigidBody
-} from '@react-three/rapier'
+import { HeightfieldCollider, RigidBody } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
 import { GLTFResult } from '../../types'
-
-import waves_fragment from './shaders/waves.frag'
-import waves_vertex from './shaders/waves.vert'
 
 import { useControls } from 'leva'
 import { PlaneGeometry } from 'three'
@@ -37,7 +29,9 @@ function Maze_Model() {
   const Up_3_Meshes = useRef<any>()
   const Down_3_Meshes = useRef<any>()
 
-  const { nodes } = useGLTF('/models/Maze_full.glb') as GLTFResult
+  const { nodes } = useGLTF(
+    import.meta.env.VITE_API_URL + 'Maze_full.glb'
+  ) as GLTFResult
 
   // CUSTOM ANIMATIONS SETUP
 
@@ -56,7 +50,7 @@ function Maze_Model() {
 
   const waves_ref = useRef<any>()
 
-  const properties = useControls(
+  useControls(
     'Shader Properties: Lever 2',
     {
       Elevation: 0.51,
@@ -73,33 +67,9 @@ function Maze_Model() {
     { collapsed: !isLevel_2 }
   )
 
-  const uniforms = {
-    uElevation: { value: properties.Elevation },
-    uFrequency: {
-      value: new THREE.Vector2(properties.FrequencyX, properties.FrequencyY)
-    },
-    uTime: { value: 0 },
-    uSpeed: { value: new THREE.Vector2(properties.SpeedX, properties.SpeedY) },
-    uTopColor: { value: properties.TopColor },
-    uBottomColor: { value: properties.BottomColor },
-    uColorMultiplier: { value: properties.ColorMultiplier },
-    uColorOffset: { value: properties.ColorOffset }
-  }
-
-  // const waves_material = new THREE.RawShaderMaterial({
-  //   wireframe: properties.wireframe,
-  //   fragmentShader: waves_fragment,
-  //   vertexShader: waves_vertex,
-  //   uniforms: uniforms
-  // })
-  const waves_material = new THREE.MeshStandardMaterial({
-    wireframe: properties.wireframe,
-    side: 1
-  })
-
   // conditions for the moving are in the useFrame hook
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     if (!isLevel_2) {
       const moving_2_Up = new THREE.Quaternion()
       const moving_2_Down = new THREE.Quaternion()
@@ -171,30 +141,17 @@ function Maze_Model() {
         }
       }
     } else {
-      // uniforms.uTime.value = clock.getElapsedTime()
-
-      const moving_Waves = new THREE.Quaternion()
     }
   })
 
-  /**
- * For stopping the animation at the end of the frame, use in the useFrame hook
-      actions[names[1] as string].clampWhenFinished = true
-      actions[names[1] as string].repetitions = 1
- */
-
-  // names.map((name) => actions[name as string].play())
-
   //@TEST
   const heighfield_ref = useRef<any>()
-  const dynamic_mesh_ref = useRef<any>()
-
   const heightFieldHeight = 30
   const heightFieldWidth = 30
 
   const heightField = Array.from({
     length: heightFieldHeight * heightFieldWidth
-  }).map((_, index) => {
+  }).map(() => {
     return Math.random()
   })
 
@@ -211,17 +168,10 @@ function Maze_Model() {
     ] = v
   })
 
-  // heightFieldGeometry.scale(1, -1, 1)
   heightFieldGeometry.scale(1, -1, 1)
   heightFieldGeometry.rotateX(-Math.PI / 2)
   heightFieldGeometry.rotateY(-Math.PI / 2)
   heightFieldGeometry.computeVertexNormals()
-
-  //!need to update the heighfield_ref.current[0]._shape.heights if possible
-  useFrame(() => {
-    // console.log(heighfield_ref)
-    // console.log(dynamic_mesh_ref)
-  })
 
   return (
     <>
@@ -420,20 +370,6 @@ function Maze_Model() {
           </RigidBody>
         </group>
       ) : (
-        // <RigidBody
-        //   position={[0, -1, -3]}
-        //   ref={waves_ref}
-        //   type="fixed"
-        //   colliders={false}
-        // >
-        //   {/* <CuboidCollider args={[10, 10, 10]} /> */}
-
-        //   {/* <HeightfieldCollider args={[nsubdivs, nsubdivs, positions, scale]} /> */}
-
-        //   <mesh ref={waves_mesh_ref} material={waves_material}>
-        //     <boxGeometry args={[20, 0.2, 30, 30, 1, 29]} />
-        //   </mesh>
-        // </RigidBody>
         <RigidBody
           ref={waves_ref}
           type="kinematicPosition"
@@ -450,13 +386,7 @@ function Maze_Model() {
             ]}
           />
 
-          <mesh
-            // ref={dynamic_mesh_ref}
-            geometry={heightFieldGeometry}
-            // material={waves_material}
-            castShadow
-            receiveShadow
-          >
+          <mesh geometry={heightFieldGeometry} castShadow receiveShadow>
             <meshStandardMaterial color="orange" side={2} />
           </mesh>
         </RigidBody>

@@ -16,123 +16,18 @@ export type sideType =
   | 'backLeft'
   | ''
 
-export type documentsUrlsType = {
-  title: string
-  url: string | any[]
-}
-
-export type linksType = {
-  title: string
-  link: string
-  videoDuration?: number
-}
-
-export type externalContentType = {
-  documentsUrls?: documentsUrlsType[]
-  links?: linksType[]
-}
-
-export type SubTriggersType = {
-  id: number
-  type: 'slides' | 'video' | 'none'
-  position: [x: number, y: number, z: number]
-  cameraSide: sideType
-  subLabelTooltipTitle?: string
-  data?: {
-    parameters?: {
-      isPlaying?: boolean
-      isMuted?: boolean
-      videoProgress?: number
-      videoDuration?: number
-      isVideoThumbnail?: string
-      isSlidesThumbnail?: string
-    }
-    content: string[] | linksType[] | any
-    externalContent?: externalContentType
-    currentSlide?: number
-    currentVideo?: number
-  }
-}
-
 export type ContentDataType = {
   id: number
   type?: string
   position: [x: number, y: number, z: number]
   cameraSide: sideType
-  subTriggers?: SubTriggersType[]
   labelTooltipTitle?: string
-  data?: {
-    parameters?: {
-      isPlaying?: boolean
-      isMuted?: boolean
-      videoProgress?: number
-      videoDuration?: number
-      isVideoThumbnail?: string
-      isSlidesThumbnail?: string
-    }
-    content: string[] | linksType[] | any
-    externalContent?: externalContentType
-    currentSlide?: number
-    currentVideo?: number
-  }
-}
-
-export interface IModelValidator {
-  isNotBuildingMesh?: boolean
-  currentBuildingType?: string
-  isRoom01?: boolean
-  isRoom02?: boolean
-  isRoom03?: boolean
-  isRoom04?: boolean
-  isRoom05?: boolean
-  isBuildingModel?: boolean
-  isVoid?: boolean
-  isBuilding?: boolean
-  BakedRoom01?: any
-  BakedRoom02?: any
-  BakedRoom03?: any
-  BakedRoom04?: any
-  BakedRoom05?: any
-  BakedBuilding?: any
-  BakedVOID?: any
-  isGltf?: any
-  scene?: any
-}
-
-export interface ITower_Model {
-  isWireframe?: boolean
-}
-
-export interface IDebugger {
-  color?: string
-  size?: [x: number, y: number, z: number]
 }
 
 export interface ICamera {
   zoom?: boolean
   pos?: Vector3
   look?: Vector3
-}
-
-export interface ISlide {
-  position: number[]
-  slidesUrls: string[]
-  isThumbnailRequired?: any
-  subLabelID: number
-  cameraSide: sideType
-}
-
-export interface IVideoPlayer {
-  position: number[]
-  videoUrls: string[] | linksType[]
-  isThumbnailRequired?: any
-  subLabelID: number
-  cameraSide: sideType
-}
-
-export type IRoomCharacters = {
-  charactersPath: string
-  roomID: number
 }
 
 export type GLTFResult = GLTF & {

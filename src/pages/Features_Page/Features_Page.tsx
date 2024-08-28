@@ -33,7 +33,7 @@ function Features_Page() {
         near: 0.1,
         far: 100, // 3 for game, more - for the dev
         fov: 75,
-        position: [0, 5, -20]
+        position: new THREE.Vector3(0, 5, -20)
       }}
       style={{
         width: '100%',

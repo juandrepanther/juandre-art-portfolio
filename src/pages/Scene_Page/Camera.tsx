@@ -88,6 +88,7 @@ const Camera = ({
 
   //VARIABLES for combining cameras
 
+  // eslint-disable-next-line no-unused-vars
   let enableOrbit = true
   let witness = true
 
@@ -97,6 +98,7 @@ const Camera = ({
     if (cameraType === 'locked') {
       enableOrbit = false
       witness = true
+
       zoom
         ? pos.set(
             conditionalFocusXaxis(focus.x),

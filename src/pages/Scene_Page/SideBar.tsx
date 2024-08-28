@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 
 interface ISideBar {
   isOpen: boolean
-  setIsOpen: (value: boolean) => void
+  setIsOpen: () => void
 }
 
 function SideBar({ isOpen }: ISideBar) {
@@ -51,7 +51,7 @@ function SideBar({ isOpen }: ISideBar) {
     >
       <div className="menu-close-wrapper">
         <div
-          onClick={(e) => dispatch(setSideBar_status(false))}
+          onClick={() => dispatch(setSideBar_status(false))}
           className="menu-close-icon"
         >
           <CloseIcon />

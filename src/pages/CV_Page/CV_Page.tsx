@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Box, Paper } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { selectDarkMode } from '../../redux/selectors/useSelectors'
-import { DarkModeClassType, SetIconColorType } from '../../hooks/useDarkMode'
+import { DarkModeClassType } from '../../hooks/useDarkMode'
 import Content_part from './parts/Content_Part/Content_part'
 import Header_part from './parts/Header_part'
 import background from '../../assets/images/CV_bgd.png'
@@ -13,19 +13,20 @@ function CV_Page() {
   const isDarkMode_store = useSelector(selectDarkMode)
   const [darkModeClass, setDarkModeClass] =
     useState<DarkModeClassType>('on-page-load')
-  const [iconColor, setIconColor] = useState<SetIconColorType>('black')
 
   useEffect(() => {
     if (isDarkMode_store) {
       setDarkModeClass('dark-mode')
-      setIconColor('white')
     } else if (darkModeClass !== 'on-page-load') {
       setDarkModeClass('light-mode')
-      setIconColor('black')
     }
   }, [isDarkMode_store])
 
-  const openCV = () => window.open(import.meta.env.VITE_CV_URL, '_blank')
+  const openCV = () =>
+    window.open(
+      import.meta.env.VITE_API_URL + 'Janis_Dregeris_CV.pdf',
+      '_blank'
+    )
 
   return (
     <Box
@@ -96,13 +97,13 @@ function CV_Page() {
           fontSize: '1.2rem',
           cursor: 'pointer',
           fontWeight: 'bold',
-          width: '200px',
+          width: '150px',
           zIndex: 1,
           borderRadius: '2rem'
         }}
         onClick={openCV}
       >
-        Open & Download
+        Download
       </button>
     </Box>
   )

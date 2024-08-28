@@ -1,4 +1,4 @@
-import { Float, Html, Image, Text } from '@react-three/drei'
+import { Float, Image, Text } from '@react-three/drei'
 import React from 'react'
 import wsadImg from '../../assets/images/wsad.png'
 import arrowsKeysImg from '../../assets/images/arrowsKeys.png'
