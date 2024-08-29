@@ -44,7 +44,9 @@ function LabelsDynamic({ allIntersectionMeshes }) {
           `.point-${point.id}`
         )
 
-        parentLabel.style.transform = `translate(${translateX}px, ${translateY}px)`
+        if (parentLabel) {
+          parentLabel.style.transform = `translate(${translateX}px, ${translateY}px)`
+        }
 
         //Raycasting
 

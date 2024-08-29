@@ -85,24 +85,7 @@ function CV_Page() {
           </Paper>
         </Box>
       </Box>
-      <button
-        style={{
-          position: 'absolute',
-          top: 4,
-          left: 4,
-          margin: '50px',
-          padding: '10px',
-          backgroundColor: 'white',
-          color: 'black',
-          fontSize: '1.2rem',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          width: '150px',
-          zIndex: 1,
-          borderRadius: '2rem'
-        }}
-        onClick={openCV}
-      >
+      <button className="download-button" onClick={openCV}>
         Download
       </button>
     </Box>

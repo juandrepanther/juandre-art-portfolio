@@ -1,13 +1,11 @@
-import { Box, Tooltip } from '@mui/material'
 import React from 'react'
+import { Box, Tooltip } from '@mui/material'
 import { displayFlexCenterColumn } from '../../../utils/globalStyles'
 
 function Header_part() {
   return (
     <Box className="header-part" sx={displayFlexCenterColumn}>
-      <header style={{ fontSize: '4rem', fontWeight: 700 }}>
-        JANIS DREGERIS
-      </header>
+      <header className="header-developer">JANIS DREGERIS</header>
       <Box
         sx={{
           backgroundColor: 'black',

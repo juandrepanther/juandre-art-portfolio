@@ -1,5 +1,4 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { isMobile } from 'react-device-detect'
 import CameraControls from 'camera-controls'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
@@ -13,7 +12,7 @@ import { RootState } from '../../redux/store/store'
 import { ICamera } from '../../types'
 import { selectID } from '../../redux/selectors/useSelectors'
 
-//@CAMERA-CONTROLS FUNCTION
+//CAMERA-CONTROLS FUNCTION
 
 const Camera = ({
   pos = new THREE.Vector3(),
@@ -125,7 +124,7 @@ const Camera = ({
 
       //Camera moving on mouse move. For its amplitude change numbers below x and y
 
-      if (!isMobile && Number.isInteger(id)) {
+      if (Number.isInteger(id)) {
         camera.position.lerp(
           vector.set(mouse.x * 1.2, mouse.y * 1.2, camera.position.z),
           0.01

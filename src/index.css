@@ -80,6 +80,13 @@ body {
   user-select: none;
 }
 
+@media screen and (max-width: 768px) {
+  .dark-mode-switch {
+    top: 0.9rem;
+    right: 5rem;
+  }
+}
+
 /* modal parts */
 
 /* .modal-close-icon {
@@ -109,6 +116,13 @@ body {
   right: 6rem;
   user-select: none;
   cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .help-btn {
+    right: 3rem;
+    top: 1.3rem;
+  }
 }
 
 .box {
@@ -165,6 +179,15 @@ body {
   user-select: none;
 }
 
+@media screen and (max-width: 768px) {
+  .menu-icon {
+    top: 1rem;
+    right: 0rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
 #enablePointerLock {
   display: flex;
   justify-content: center;
@@ -195,12 +218,25 @@ body {
   justify-content: flex-start;
 }
 
+@media screen and (max-width: 768px) {
+  .menu-list {
+    align-items: flex-end;
+    padding: 0rem;
+  }
+}
+
 .menu-list-items-wrapper {
   height: 2rem;
   margin-bottom: 2rem;
   width: 100%;
   cursor: pointer;
   user-select: none;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-list-items-wrapper {
+    width: 80%;
+  }
 }
 
 .menu-list-headers {
@@ -210,6 +246,14 @@ body {
   padding-bottom: 0.2rem;
   font-size: 1.7rem;
   letter-spacing: 0.2rem;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-list-headers {
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 .menu-list-headers:hover {
@@ -620,6 +664,39 @@ STYLES FOR LABELS
   height: 2px;
   width: 30px;
   background: #181c20;
+}
+
+.download-button {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  margin: 50px;
+  padding: 10px;
+  background-color: white;
+  color: black;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  width: 150px;
+  z-index: 1;
+  border-radius: 2rem;
+}
+
+.header-developer {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 768px) {
+  .download-button {
+    top: 1rem;
+    left: 1rem;
+    margin: 8px;
+  }
+
+  .header-developer {
+    font-size: 2.5rem;
+  }
 }
 
 /* Custom scrollbar */
