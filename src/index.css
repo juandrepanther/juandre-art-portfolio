@@ -89,10 +89,6 @@ body {
 
 /* modal parts */
 
-/* .modal-close-icon {
-  animation: rotateIcon 50s infinite;
-} */
-
 @keyframes rotateIcon {
   100% {
     transform: rotate(360deg);
@@ -472,11 +468,10 @@ STYLES FOR LABELS
 /* Styles for Initial Pop-up */
 
 .initialPopUp-container {
+  margin: 0 1rem;
   position: relative;
   padding: 3rem;
   z-index: 999;
-  /* padding-bottom: 3rem; */
-  /* height: 30%; */
   animation: fadeIn 1s ease-in-out;
 }
 
@@ -668,9 +663,8 @@ STYLES FOR LABELS
 
 .download-button {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  margin: 50px;
+  top: 1.3rem;
+  left: 1.3rem;
   padding: 10px;
   background-color: white;
   color: black;
@@ -689,13 +683,13 @@ STYLES FOR LABELS
 
 @media screen and (max-width: 768px) {
   .download-button {
-    top: 1rem;
-    left: 1rem;
+    top: 0.5rem;
+    left: 0.5rem;
     margin: 8px;
   }
 
   .header-developer {
-    font-size: 2.5rem;
+    font-size: 2.3rem;
   }
 }
 

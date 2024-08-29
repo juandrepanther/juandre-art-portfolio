@@ -1,16 +1,18 @@
-import { cameraDepthLimit, developerMode } from './data/ContentData'
 import React, { lazy, Suspense } from 'react'
+import { cameraDepthLimit, developerMode } from './data/ContentData'
+
 import CameraControls from 'camera-controls'
 CameraControls.install({ THREE })
-import Tower_Model from './pages/Scene_Page/Tower_Model'
+
+import Model from './pages/Scene_Page/Model'
 import Loader from './pages/Scene_Page/Loader'
 import LabelsHTML from './pages/Scene_Page/LabelsHTML'
 import HTMLElements from './pages/Scene_Page/HTMLElements'
+import Camera from './pages/Scene_Page/Camera'
 import { store } from './redux/store/store'
 import { Provider } from 'react-redux'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
-import Camera from './pages/Scene_Page/Camera'
 
 const LazyStats = lazy(() => import('./pages/Scene_Page/Stats'))
 
@@ -46,7 +48,7 @@ function App() {
       >
         <Provider store={store}>
           <Suspense fallback={<Loader />}>
-            <Tower_Model />
+            <Model />
             <Camera />
             <Suspense fallback={<Loader />}>
               {developerMode && <LazyStats />}

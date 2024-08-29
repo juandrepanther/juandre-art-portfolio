@@ -1,11 +1,12 @@
-import { Box } from '@mui/material'
 import React from 'react'
-import backgroundImg from '../../assets/images/contactsBgd.jpg'
+import { Box, Typography } from '@mui/material'
 import { ContactsData } from './ContactData'
+import backgroundImg from '../../assets/images/contactsBgd.jpg'
 
 function Contact_Page() {
   const openSiteHandler = (url: string) =>
     url && window.open(url, '_blank', 'noreferrer')
+
   return (
     <Box
       sx={{
@@ -18,27 +19,31 @@ function Contact_Page() {
     >
       <Box
         sx={{
-          p: '3rem',
+          p: { xs: '1rem', md: '3rem' },
           pt: '3.5rem',
-          height: '60%',
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center'
         }}
       >
-        <h4 style={{ fontSize: '3rem' }}>Contact Me</h4>
-        <p
-          style={{
+        <Typography sx={{ fontSize: '3rem', fontFamily: 'monospace' }}>
+          Contact Me
+        </Typography>
+        <Typography
+          sx={{
+            fontFamily: 'monospace',
             textAlign: 'center',
             color: 'grey',
             marginTop: '1.3rem',
-            width: '60%'
+            width: { xs: '100%', md: '60%' }
           }}
         >
-          I am pretty happy that you have been here. In case of the interesting
-          deals please reach me out using the contacts below.
-        </p>
+          I appreciate your visit. For any inquiries or potential
+          collaborations, please feel free to contact me using the options
+          provided below.
+        </Typography>
         <Box
           sx={{
             display: 'flex',

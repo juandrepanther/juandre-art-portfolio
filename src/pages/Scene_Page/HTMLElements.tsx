@@ -45,7 +45,6 @@ function HTMLElements() {
     dispatch(setSideBar_status(true))
   }
 
-  // CLOSE MODAL
   const freeCameraMode = (e: any) => {
     dispatch(
       setLockedCameraStartPos({
@@ -82,8 +81,9 @@ function HTMLElements() {
           <Box
             sx={{
               position: 'relative',
-              width: '100%',
+              maxWidth: '100%',
               height: '100%',
+              margin: '0 .5rem',
               ...displayFlexCenter
             }}
           >
@@ -92,8 +92,8 @@ function HTMLElements() {
               onClick={freeCameraMode}
               sx={{
                 position: 'absolute',
-                right: '10%',
-                top: '3rem',
+                right: '3%',
+                top: '2.5rem',
                 cursor: 'pointer',
                 zIndex: 9,
                 '&:hover': {

@@ -1,5 +1,5 @@
-import { Canvas } from '@react-three/fiber'
 import React from 'react'
+import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import Maze_Model, { isLevel_2 } from './Maze_Model'
 import { OrbitControls } from '@react-three/drei/core'
@@ -36,7 +36,6 @@ function Maze_Page() {
           backgroundColor: 'black',
           position: 'fixed'
         }}
-        //@ if you want to all properties (also RENDERER), access like below
         onCreated={(canvas) => {
           canvas.gl.setClearColor('#000', 1)
         }}

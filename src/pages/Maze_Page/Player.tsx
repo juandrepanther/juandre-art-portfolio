@@ -1,8 +1,9 @@
+import React, { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import React, { useRef, useState } from 'react'
 import useKeyPress from '../../utils/useKeyPress'
 import * as THREE from 'three'
+import useSwipe from '../../hooks/useSwipe'
 
 function Player() {
   const [smoothedCameraPosition] = useState(() => new THREE.Vector3(2, 5, 10))
@@ -29,19 +30,19 @@ function Player() {
   }
 
   // key handlers by using hook
-  const forward: boolean = useKeyPress('w')
+  const forward: boolean = useKeyPress('w') || 'up' === useSwipe()
   const forward_arrow: boolean = useKeyPress('ArrowUp')
   const forward_azerty: boolean = useKeyPress('KeyW')
 
-  const back: boolean = useKeyPress('s')
+  const back: boolean = useKeyPress('s') || 'down' === useSwipe()
   const back_arrow: boolean = useKeyPress('ArrowDown')
   const back_azerty: boolean = useKeyPress('KeyS')
 
-  const left: boolean = useKeyPress('a')
+  const left: boolean = useKeyPress('a') || 'left' === useSwipe()
   const left_arrow: boolean = useKeyPress('ArrowLeft')
   const left_azerty: boolean = useKeyPress('KeyA')
 
-  const right: boolean = useKeyPress('d')
+  const right: boolean = useKeyPress('d') || 'right' === useSwipe()
   const right_arrow: boolean = useKeyPress('ArrowRight')
   const right_azerty: boolean = useKeyPress('KeyD')
 
@@ -124,7 +125,7 @@ function Player() {
 
   // useHelper(spotLightRef, SpotLightHelper, '#fff')
 
-  //@ HERE ARE ALSO INVISIBLE COLLIDERS FOR THE TRIGGERING FUNCTIONS
+  // HERE ARE ALSO INVISIBLE COLLIDERS FOR THE TRIGGERING FUNCTIONS
   return (
     <>
       <RigidBody colliders={false} type="fixed" position={[-0.37, 0, -10.2]}>

@@ -6,7 +6,7 @@ function AboutMe_section() {
   return (
     <>
       <h4 style={{ fontSize: '2rem' }}>{section_titles[0]}</h4>
-      <Box sx={{ width: '70%' }}>
+      <Box sx={{ width: { xs: '100%', md: '70%' } }}>
         <p style={{ marginTop: '2rem' }}>{paragraph1}</p>
         <p style={{ marginTop: '2rem' }}>{paragraph2}</p>
       </Box>
