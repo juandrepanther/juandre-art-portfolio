@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import useKeyPress from '../../utils/useKeyPress'
+import { isMobile } from 'react-device-detect'
 import * as THREE from 'three'
+import useKeyPress from '../../utils/useKeyPress'
 import useSwipe from '../../hooks/useSwipe'
 
 function Player() {
@@ -30,23 +31,41 @@ function Player() {
   }
 
   // key handlers by using hook
-  const forward: boolean = useKeyPress('w') || 'up' === useSwipe()
-  const forward_arrow: boolean = useKeyPress('ArrowUp')
-  const forward_azerty: boolean = useKeyPress('KeyW')
+  const forward: boolean = isMobile ? 'up' === useSwipe() : useKeyPress('w')
+  const forward_arrow: boolean = isMobile
+    ? 'up' === useSwipe()
+    : useKeyPress('ArrowUp')
+  const forward_azerty: boolean = isMobile
+    ? 'up' === useSwipe()
+    : useKeyPress('KeyW')
 
-  const back: boolean = useKeyPress('s') || 'down' === useSwipe()
-  const back_arrow: boolean = useKeyPress('ArrowDown')
-  const back_azerty: boolean = useKeyPress('KeyS')
+  const back: boolean = isMobile ? 'down' === useSwipe() : useKeyPress('s')
+  const back_arrow: boolean = isMobile
+    ? 'down' === useSwipe()
+    : useKeyPress('ArrowDown')
+  const back_azerty: boolean = isMobile
+    ? 'down' === useSwipe()
+    : useKeyPress('KeyS')
 
-  const left: boolean = useKeyPress('a') || 'left' === useSwipe()
-  const left_arrow: boolean = useKeyPress('ArrowLeft')
-  const left_azerty: boolean = useKeyPress('KeyA')
+  const left: boolean = isMobile ? 'left' === useSwipe() : useKeyPress('a')
+  const left_arrow: boolean = isMobile
+    ? 'left' === useSwipe()
+    : useKeyPress('ArrowLeft')
+  const left_azerty: boolean = isMobile
+    ? 'left' === useSwipe()
+    : useKeyPress('KeyA')
 
-  const right: boolean = useKeyPress('d') || 'right' === useSwipe()
-  const right_arrow: boolean = useKeyPress('ArrowRight')
-  const right_azerty: boolean = useKeyPress('KeyD')
+  const right: boolean = isMobile ? 'right' === useSwipe() : useKeyPress('d')
+  const right_arrow: boolean = isMobile
+    ? 'right' === useSwipe()
+    : useKeyPress('ArrowRight')
+  const right_azerty: boolean = isMobile
+    ? 'right' === useSwipe()
+    : useKeyPress('KeyD')
 
-  const reset_keyPressed: boolean = useKeyPress('r')
+  const reset_keyPressed: boolean = isMobile
+    ? 'reset' === useSwipe()
+    : useKeyPress('r')
 
   useFrame((state, delta) => {
     //default impulse values

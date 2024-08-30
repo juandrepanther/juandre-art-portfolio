@@ -1,6 +1,6 @@
-import { useGLTF } from '@react-three/drei'
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { useGLTF } from '@react-three/drei'
 import { HeightfieldCollider, RigidBody } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
 import { GLTFResult } from '../../types'
@@ -144,7 +144,7 @@ function Maze_Model() {
     }
   })
 
-  //@TEST
+  //TEST
   const heighfield_ref = useRef<any>()
   const heightFieldHeight = 30
   const heightFieldWidth = 30

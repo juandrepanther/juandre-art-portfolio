@@ -9,6 +9,7 @@ import lockedCameraStartPos from '../reducers/lockedCameraStartPos'
 import logoTopIconsReducer from '../reducers/logoTopIconsReducer'
 import sideBarReducer from '../reducers/sideBarReducer'
 import zoomReducer from '../reducers/zoomReducer'
+import alertReducer from '../reducers/alertReducer'
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +22,8 @@ export const store = configureStore({
     initialPopup_Reducer: initialPopupReducer,
     debugger_reducer: debuggerReducer,
     logoTopIconsVisible_Reducer: logoTopIconsReducer,
-    darkMode_reducer: darkModeReducer
+    darkMode_reducer: darkModeReducer,
+    alert_reducer: alertReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
