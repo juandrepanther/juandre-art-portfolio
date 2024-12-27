@@ -1,6 +1,6 @@
-import { useFrame } from '@react-three/fiber'
-import ContentData from '../../data/ContentData'
 import * as THREE from 'three'
+import ContentData from '../../data/ContentData'
+import { useFrame } from '@react-three/fiber'
 import { useSelector } from 'react-redux'
 import { selectID } from '../../redux/selectors/useSelectors'
 

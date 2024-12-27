@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Drawer } from '@mui/material'
-import { useDispatch, useSelector } from 'react-redux'
-import { setSideBar_status } from '../../redux/reducers/sideBarReducer'
 import CloseIcon from '@mui/icons-material/Close'
 import CameraTrigger from './CameraTrigger'
 import ContentData from './../../data/ContentData'
+import { Drawer } from '@mui/material'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSideBar_status } from '../../redux/reducers/sideBarReducer'
 import { selectID } from '../../redux/selectors/useSelectors'
 import { useNavigate } from 'react-router-dom'
 

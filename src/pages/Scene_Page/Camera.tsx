@@ -1,8 +1,8 @@
-import { useFrame, useThree } from '@react-three/fiber'
 import CameraControls from 'camera-controls'
+import * as THREE from 'three'
+import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import * as THREE from 'three'
 import {
   distanceFromCameraToObject,
   lockedCamera_startPosition,

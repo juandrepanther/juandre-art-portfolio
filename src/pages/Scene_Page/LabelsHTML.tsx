@@ -1,8 +1,8 @@
 import React from 'react'
-import { Fab } from '@mui/material'
-import { useDispatch } from 'react-redux'
 import ContentData from '../../data/ContentData'
 import CameraTrigger from './CameraTrigger'
+import { Fab } from '@mui/material'
+import { useDispatch } from 'react-redux'
 
 function LabelsHTML() {
   const dispatch = useDispatch()

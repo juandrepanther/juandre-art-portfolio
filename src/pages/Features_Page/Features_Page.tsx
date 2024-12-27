@@ -1,8 +1,8 @@
-import { Canvas } from '@react-three/fiber'
 import React from 'react'
-import * as THREE from 'three'
-import { Environment, OrbitControls } from '@react-three/drei/core'
 import Stats from '../Scene_Page/Stats'
+import * as THREE from 'three'
+import { Canvas } from '@react-three/fiber'
+import { Environment, OrbitControls } from '@react-three/drei/core'
 
 import Object_1 from './Objects/Object_1/Object_1'
 import Object_2 from './Objects/Object_2/Object_2'

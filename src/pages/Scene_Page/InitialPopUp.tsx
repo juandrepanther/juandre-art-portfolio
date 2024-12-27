@@ -1,8 +1,8 @@
 import React from 'react'
+import rotateImage from '../../assets/images/rotateImg.png'
 import { useDispatch } from 'react-redux'
 import { changeInitialPopupVisibility } from '../../redux/reducers/initialPopupReducer'
 import { setSideBar_status } from '../../redux/reducers/sideBarReducer'
-import rotateImage from '../../assets/images/rotateImg.png'
 import { Box, Divider } from '@mui/material'
 
 function InitialPopUp() {

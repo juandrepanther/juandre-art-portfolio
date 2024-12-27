@@ -4,7 +4,6 @@ import { useGLTF } from '@react-three/drei'
 import { HeightfieldCollider, RigidBody } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
 import { GLTFResult } from '../../types'
-
 import { useControls } from 'leva'
 import { PlaneGeometry } from 'three'
 
@@ -29,9 +28,7 @@ function Maze_Model() {
   const Up_3_Meshes = useRef<any>()
   const Down_3_Meshes = useRef<any>()
 
-  const { nodes } = useGLTF(
-    import.meta.env.VITE_API_URL + 'Maze_full.glb'
-  ) as GLTFResult
+  const { nodes } = useGLTF('/models/Maze.glb') as GLTFResult
 
   // CUSTOM ANIMATIONS SETUP
 
@@ -51,7 +48,7 @@ function Maze_Model() {
   const waves_ref = useRef<any>()
 
   useControls(
-    'Shader Properties: Lever 2',
+    'Shader Properties: Level 2',
     {
       Elevation: 0.51,
       FrequencyX: 0.41,

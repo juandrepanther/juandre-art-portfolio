@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Box, Paper } from '@mui/material'
-import { useSelector } from 'react-redux'
-import { selectDarkMode } from '../../redux/selectors/useSelectors'
-import { DarkModeClassType } from '../../hooks/useDarkMode'
 import Content_part from './parts/Content_Part/Content_part'
 import Header_part from './parts/Header_part'
 import background from '../../assets/images/CV_bgd.png'
 import face from '../../assets/images/photo.png'
+import CV from '../../assets/Janis_Dregeris_CV.pdf'
+import { Box, Paper } from '@mui/material'
+import { useSelector } from 'react-redux'
+import { selectDarkMode } from '../../redux/selectors/useSelectors'
+import { DarkModeClassType } from '../../hooks/useDarkMode'
 
 function CV_Page() {
   const certificateTemplateRef = useRef<any>(null)
@@ -22,11 +23,7 @@ function CV_Page() {
     }
   }, [isDarkMode_store])
 
-  const openCV = () =>
-    window.open(
-      import.meta.env.VITE_API_URL + 'Janis_Dregeris_CV.pdf',
-      '_blank'
-    )
+  const openCV = () => window.open(CV, '_blank')
 
   return (
     <Box
