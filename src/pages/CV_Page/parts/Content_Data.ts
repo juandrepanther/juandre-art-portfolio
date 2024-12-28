@@ -17,7 +17,7 @@ export const paragraph1 = `Full Stack Engineer with wealth of
   delivering high-quality code and
   meeting project deadlines. `
 
-export const paragraph2 = `Overall coding experience 6+ years.
+export const paragraph2 = `
   Whatever time it will take - I will find the
   solution! Addicted from the deep
   learning and passion for the details.`
@@ -76,14 +76,6 @@ export const experienceSteps: IExperienceSteps[] = [
       `
     ]
   }
-  // {
-  //   title: 'FORENSIC DOC EXPERT',
-  //   place: 'State Border Guard HQ - Latvia',
-  //   year: '2009 - 2022',
-  //   responsibilities: [
-  //     'Physical and Electronic Document Component Forensic Investigations. As a Software engineer Developed Full-stack Information System of world Travel documents using HTML, CSS, Vanilla JavaScript, PowerShell, VBA (Excel), XML. '
-  //   ]
-  // }
 ]
 
 // My Skills Section
@@ -109,7 +101,7 @@ export const mySkills: IMySkills[] = [
 ]
 
 export const generalSKills =
-  'Docker | Linux | Nginx | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier | Angular'
+  'Docker | Linux | Nginx | Html | css/scss | git | react/three-fiber | zustand | vite.js | cannon.js | python | Adobe XD | Figma | Express.js | Oclif | Rapier | Angular | Prisma ORM'
 
 // Education & Courses section
 

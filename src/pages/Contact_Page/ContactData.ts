@@ -14,7 +14,7 @@ export const ContactsData: IContact[] = [
   {
     icon: faceBookIcon,
     title: 'FACEBOOK',
-    url: 'https://www.facebook.com/juan.dre.1232'
+    url: 'https://www.facebook.com/janisdregeris1/'
   },
   {
     icon: instagramIcon,
