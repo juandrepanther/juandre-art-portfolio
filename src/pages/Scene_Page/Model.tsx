@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import LabelsDynamic from './LabelsDynamic'
 import { useThree } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
-import { modelScale } from '../../data/ContentData'
+import { modelScale, titleScale } from '../../data/ContentData'
 import { useDispatch } from 'react-redux'
 import { changeInitialPopupVisibility } from '../../redux/reducers/initialPopupReducer'
 import { modelLoader } from '../../utils/modelLoader'
@@ -12,9 +12,8 @@ const Model = () => {
   const canvasData = useThree()
   const dispatch = useDispatch()
   const allIntersectionMeshes = []
-  const titleScale = 0.8
 
-  const gltf = modelLoader('/models/Laptop.glb')
+  const gltf = modelLoader('/models/Room.glb')
 
   gltf.scene.traverse(function (model: any) {
     if (model.isMesh) {
@@ -45,7 +44,7 @@ const Model = () => {
         color="black"
         fillOpacity={0.8}
         position={[0, 4.5, 0.5]}
-        rotation={[0, Math.PI, 0]}
+        rotation={[0, 0, 0]}
       >
         ROTATE ME
       </Text>

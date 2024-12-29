@@ -16,14 +16,11 @@ body {
   background-color: #bbbbbb86;
 }
 .container {
-  /* position: relative; */
   width: 100%;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* pointer-events: none; */
 }
 
 .overlay {
@@ -289,11 +286,6 @@ body {
   display: flex;
   margin-left: 2rem;
 }
-/* .menu-list div:hover {
-  background-color: rgb(112, 112, 112);
-  color: rgb(253, 251, 251);
-  opacity: 0.5;
-} */
 
 .menu-close-icon {
   cursor: pointer;
@@ -339,9 +331,6 @@ body {
 .navigator-container:focus {
   outline: none;
 }
-/* .right-section {
-  justify-content: flex-end;
-} */
 
 .middle-section {
   background-color: whitesmoke;
@@ -391,9 +380,9 @@ STYLES FOR LABELS
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: black;
-  border: 1px solid #ffffff77;
-  color: #ffffff;
+  background: white;
+  border: 3px solid black;
+  color: black;
   font-family: Helvetica, Arial, sans-serif;
   text-align: center;
   line-height: 40px;
@@ -406,8 +395,9 @@ STYLES FOR LABELS
 
 .point:hover .label:hover {
   transform: scale(1.5);
-  color: black;
-  border-color: black;
+  color: white;
+  border-color: white;
+  background: black;
 }
 
 .point.visible .label {
@@ -422,7 +412,6 @@ STYLES FOR LABELS
   padding: 20px;
   border-radius: 4px;
   background: #fffffff3;
-  /* border: 1px solid #ffffff77; */
   color: #000000;
   line-height: 1.3em;
   font-family: Helvetica, Arial, sans-serif;
