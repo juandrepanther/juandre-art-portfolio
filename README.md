@@ -1,5 +1,9 @@
 # Site Portfolio
 
+![Vercel Deploy](https://deploy-badge.vercel.app/vercel/reactions-demo)
+
+https://ee-ze.com via Vercel and custom domain.
+
 ## Development
 
 - `yarn install`
@@ -16,7 +20,3 @@ You can use the `yarn lint:inspect` to debug the linter.
 - compressed
 - geometries joined for less draw calls
 - no textures
-
-## Deployed
-
-https://ee-ze.com via Vercel and custom domain.
