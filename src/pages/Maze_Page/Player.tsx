@@ -1,20 +1,40 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import type { RigidBodyApi } from '@react-three/rapier'
 import { isMobile } from 'react-device-detect'
 import * as THREE from 'three'
+import type { SpotLight } from 'three'
 import useKeyPress from '../../utils/useKeyPress'
 import useSwipe from '../../hooks/useSwipe'
 
 function Player() {
   const [smoothedCameraPosition] = useState(() => new THREE.Vector3(2, 5, 10))
   const [smoothedCameraTarget] = useState(() => new THREE.Vector3())
-  const body = useRef<any>()
-  const spotLightRef = useRef<any>()
+  const body = useRef<RigidBodyApi | null>(null)
+  const spotLightRef = useRef<SpotLight | null>(null)
+  const swipeDirection = useSwipe()
+  const moveForward = useKeyPress('w')
+  const moveForwardArrow = useKeyPress('ArrowUp')
+  const moveForwardAzerty = useKeyPress('KeyW')
+  const moveBack = useKeyPress('s')
+  const moveBackArrow = useKeyPress('ArrowDown')
+  const moveBackAzerty = useKeyPress('KeyS')
+  const moveLeft = useKeyPress('a')
+  const moveLeftArrow = useKeyPress('ArrowLeft')
+  const moveLeftAzerty = useKeyPress('KeyA')
+  const moveRight = useKeyPress('d')
+  const moveRightArrow = useKeyPress('ArrowRight')
+  const moveRightAzerty = useKeyPress('KeyD')
+  const resetKeyPressed = useKeyPress('r')
 
   // reset to initial position function
 
   const reset_game = () => {
+    if (!body.current) {
+      return
+    }
+
     const resetBall_position = new THREE.Quaternion()
     resetBall_position.setFromEuler(new THREE.Euler(0, 0.7, 0))
     body.current.setTranslation(resetBall_position)
@@ -31,43 +51,31 @@ function Player() {
   }
 
   // key handlers by using hook
-  const forward: boolean = isMobile ? 'up' === useSwipe() : useKeyPress('w')
-  const forward_arrow: boolean = isMobile
-    ? 'up' === useSwipe()
-    : useKeyPress('ArrowUp')
-  const forward_azerty: boolean = isMobile
-    ? 'up' === useSwipe()
-    : useKeyPress('KeyW')
+  const forward = isMobile ? swipeDirection === 'up' : moveForward
+  const forward_arrow = isMobile ? swipeDirection === 'up' : moveForwardArrow
+  const forward_azerty = isMobile ? swipeDirection === 'up' : moveForwardAzerty
 
-  const back: boolean = isMobile ? 'down' === useSwipe() : useKeyPress('s')
-  const back_arrow: boolean = isMobile
-    ? 'down' === useSwipe()
-    : useKeyPress('ArrowDown')
-  const back_azerty: boolean = isMobile
-    ? 'down' === useSwipe()
-    : useKeyPress('KeyS')
+  const back = isMobile ? swipeDirection === 'down' : moveBack
+  const back_arrow = isMobile ? swipeDirection === 'down' : moveBackArrow
+  const back_azerty = isMobile ? swipeDirection === 'down' : moveBackAzerty
 
-  const left: boolean = isMobile ? 'left' === useSwipe() : useKeyPress('a')
-  const left_arrow: boolean = isMobile
-    ? 'left' === useSwipe()
-    : useKeyPress('ArrowLeft')
-  const left_azerty: boolean = isMobile
-    ? 'left' === useSwipe()
-    : useKeyPress('KeyA')
+  const left = isMobile ? swipeDirection === 'left' : moveLeft
+  const left_arrow = isMobile ? swipeDirection === 'left' : moveLeftArrow
+  const left_azerty = isMobile ? swipeDirection === 'left' : moveLeftAzerty
 
-  const right: boolean = isMobile ? 'right' === useSwipe() : useKeyPress('d')
-  const right_arrow: boolean = isMobile
-    ? 'right' === useSwipe()
-    : useKeyPress('ArrowRight')
-  const right_azerty: boolean = isMobile
-    ? 'right' === useSwipe()
-    : useKeyPress('KeyD')
+  const right = isMobile ? swipeDirection === 'right' : moveRight
+  const right_arrow = isMobile ? swipeDirection === 'right' : moveRightArrow
+  const right_azerty = isMobile ? swipeDirection === 'right' : moveRightAzerty
 
-  const reset_keyPressed: boolean = isMobile
-    ? 'reset' === useSwipe()
-    : useKeyPress('r')
+  const reset_keyPressed = isMobile
+    ? swipeDirection === 'reset'
+    : resetKeyPressed
 
   useFrame((state, delta) => {
+    if (!body.current || !spotLightRef.current) {
+      return
+    }
+
     //default impulse values
     let impulse = { x: 0, y: 0, z: 0 }
     let torque = { x: 0, y: 0, z: 0 }
@@ -95,8 +103,8 @@ function Player() {
       torque.z += torqueStrength
     }
 
-    body.current && body.current.applyImpulse(impulse)
-    body.current && body.current.applyTorqueImpulse(torque)
+    body.current.applyImpulse(impulse)
+    body.current.applyTorqueImpulse(torque)
 
     // camera settings
 
@@ -127,10 +135,8 @@ function Player() {
     spotLightTarget.copy(bodyPosition)
     spotLightTarget.y += 0.25
 
-    spotLightRef.current &&
-      spotLightRef.current.position.copy(spotLightPosition)
-    spotLightRef.current &&
-      spotLightRef.current.target.position.copy(bodyPosition)
+    spotLightRef.current.position.copy(spotLightPosition)
+    spotLightRef.current.target.position.copy(bodyPosition)
 
     // for light target updating the matrix
     spotLightRef.current.target.updateMatrixWorld()

@@ -1,9 +1,9 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import { useHelper } from '@react-three/drei/core'
-import { SpotLightHelper } from 'three'
+import { SpotLight, SpotLightHelper } from 'three'
 
 function Maze_Lights() {
-  const spotLightRef = useRef()
+  const spotLightRef = useRef<SpotLight>(null)
   useHelper(spotLightRef, SpotLightHelper, '#fff')
   return (
     <>

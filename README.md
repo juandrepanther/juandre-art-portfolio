@@ -6,14 +6,16 @@ https://ee-ze.com via Vercel and custom domain.
 
 ## Development
 
-- `yarn install`
-- `yarn start`
+- `pnpm install`
+- `pnpm start`
 
-## Linter
+## Quality Checks
 
-- `yarn lint`
+- `pnpm lint`
+- `pnpm test`
+- `pnpm build`
 
-You can use the `yarn lint:inspect` to debug the linter.
+The project uses Oxlint for linting and Vitest for render-level tests.
 
 ## 3d Model Export Blender
 

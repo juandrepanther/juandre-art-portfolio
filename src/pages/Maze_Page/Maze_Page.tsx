@@ -1,4 +1,5 @@
-import React from 'react'
+import { Box, Typography } from '@mui/material'
+import { useEffect } from 'react'
 import swal from '@sweetalert/with-react'
 import { isMobile } from 'react-device-detect'
 import { Canvas } from '@react-three/fiber'
@@ -10,19 +11,22 @@ import { Physics, Debug } from '@react-three/rapier'
 import { Leva } from 'leva'
 import Player from './Player'
 import Maze_Title from './Maze_Title'
-import Stats from '../Scene_Page/Stats'
-import { RootState } from '../../redux/store/store'
-import { useDispatch, useSelector } from 'react-redux'
-import { setAlertState } from '../../redux/reducers/alertReducer'
+import MazeStats from './maze-stats'
+import { useMazeStore } from '../../lib/zustand/maze-store'
 
 const isDebugModeEnabled = false
 
 function Maze_Page() {
-  const { isClosed } = useSelector((state: RootState) => state.alert_reducer)
-  const dispatch = useDispatch()
+  const { closeMobileHint, isMobileHintClosed } = useMazeStore()
+  const controlsLabel = isMobile
+    ? 'Swipe to move through the maze. Double-tap to reset your position.'
+    : 'Use W, A, S, D or the arrow keys to move. Press R to reset the game.'
 
-  isMobile &&
-    !isClosed &&
+  useEffect(() => {
+    if (!isMobile || isMobileHintClosed) {
+      return
+    }
+
     swal(
       <div>
         <b style={{ fontSize: '1.5rem' }}>Mobile Navigation</b>
@@ -39,12 +43,40 @@ function Maze_Page() {
         closeOnClickOutside: false,
         button: 'Let`s Go!'
       }
-    ).then((status) => {
-      dispatch(setAlertState(status))
+    ).then(() => {
+      closeMobileHint()
     })
+  }, [closeMobileHint, isMobileHintClosed])
 
   return (
     <>
+      <Box
+        aria-label="Maze controls"
+        role="note"
+        sx={{
+          position: 'fixed',
+          left: 16,
+          bottom: 16,
+          zIndex: 20,
+          maxWidth: { xs: 'calc(100% - 32px)', sm: 420 },
+          px: 2,
+          py: 1.5,
+          borderRadius: 3,
+          border: '1px solid rgba(220, 229, 236, 0.16)',
+          backgroundColor: 'rgba(12, 17, 23, 0.76)',
+          backdropFilter: 'blur(18px)',
+          pointerEvents: 'none'
+        }}
+      >
+        <Typography
+          sx={{ color: 'secondary.main', fontSize: '0.8rem', mb: 0.5 }}
+        >
+          Maze controls
+        </Typography>
+        <Typography sx={{ color: 'common.white', lineHeight: 1.6 }}>
+          {controlsLabel}
+        </Typography>
+      </Box>
       <Leva hidden={isDebugModeEnabled && isLevel_2 ? false : true} />
       <Canvas
         performance={{ current: 1, min: 0.1, max: 1, debounce: 200 }}
@@ -53,7 +85,7 @@ function Maze_Page() {
           antialias: true,
           physicallyCorrectLights: true,
           toneMapping: THREE.ReinhardToneMapping,
-          outputEncoding: THREE.sRGBEncoding,
+          outputColorSpace: THREE.SRGBColorSpace,
           powerPreference: 'high-performance'
         }}
         camera={{
@@ -83,14 +115,13 @@ function Maze_Page() {
           {isDebugModeEnabled && (
             <>
               <OrbitControls />
-              <Stats />
+              <MazeStats />
               <Debug />
             </>
           )}
           <Maze_Model />
-          {((!isMobile && !isDebugModeEnabled) || (isMobile && isClosed)) && (
-            <Player />
-          )}
+          {((!isMobile && !isDebugModeEnabled) ||
+            (isMobile && isMobileHintClosed)) && <Player />}
         </Physics>
       </Canvas>
     </>

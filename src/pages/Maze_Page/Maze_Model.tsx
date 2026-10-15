@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { useGLTF } from '@react-three/drei'
 import { HeightfieldCollider, RigidBody } from '@react-three/rapier'
+import type { RigidBodyApi } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
-import { GLTFResult } from '../../types'
+import type { IGLTFResult } from '../../types'
 import { useControls } from 'leva'
 import { PlaneGeometry } from 'three'
 
@@ -23,12 +24,12 @@ function Maze_Model() {
   const yAxis_3_Up = useRef(0)
   const yAxis_3_Down = useRef(0)
 
-  const Up_2_Meshes = useRef<any>()
-  const Down_2_Meshes = useRef<any>()
-  const Up_3_Meshes = useRef<any>()
-  const Down_3_Meshes = useRef<any>()
+  const Up_2_Meshes = useRef<RigidBodyApi | null>(null)
+  const Down_2_Meshes = useRef<RigidBodyApi | null>(null)
+  const Up_3_Meshes = useRef<RigidBodyApi | null>(null)
+  const Down_3_Meshes = useRef<RigidBodyApi | null>(null)
 
-  const { nodes } = useGLTF('/models/Maze.glb') as GLTFResult
+  const { nodes } = useGLTF('/models/Maze.glb') as IGLTFResult
 
   // CUSTOM ANIMATIONS SETUP
 
@@ -44,8 +45,6 @@ function Maze_Model() {
   }, [])
 
   //* Plane Shader Custom Material
-
-  const waves_ref = useRef<any>()
 
   useControls(
     'Shader Properties: Level 2',
@@ -142,15 +141,14 @@ function Maze_Model() {
   })
 
   //TEST
-  const heighfield_ref = useRef<any>()
   const heightFieldHeight = 30
   const heightFieldWidth = 30
 
-  const heightField = Array.from({
-    length: heightFieldHeight * heightFieldWidth
-  }).map(() => {
-    return Math.random()
-  })
+  const [heightField] = useState(() =>
+    Array.from({ length: heightFieldHeight * heightFieldWidth }, () => {
+      return Math.random()
+    })
+  )
 
   const heightFieldGeometry = new PlaneGeometry(
     heightFieldWidth,

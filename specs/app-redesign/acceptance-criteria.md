@@ -4,6 +4,7 @@
 
 - [ ] Home opens to an immersive 3D landing experience instead of redirecting to the Maze game.
 - [ ] The Maze game remains available at /maze-game and is still playable on desktop and mobile.
+- [ ] TanStack Router is used for the app shell, and the route tree contains only Home and /maze-game.
 - [ ] The Home page includes a working CV download action for the CV document.
 - [ ] The Home page includes clear, working outbound links for all supported contact methods.
 - [ ] All CV data is used in the redesigned app with no omitted sections or stray unused content.
@@ -36,6 +37,8 @@
 ## Verification
 
 - [ ] Manual check: Home and Maze routes work directly from a fresh load.
+- [ ] Automated test check: `pnpm test` passes with Vitest.
+- [ ] Render coverage check: automated tests verify the Home hero, Maze entry CTA, CV download link, core content sections, and the Maze WebGL fallback state.
 - [ ] Build succeeds: the app builds successfully and is considered working, tested, and running with no errors.
 - [ ] Lint succeeds: project lint and type-check gates pass.
 - [ ] Code review check: the implementation reuses components where sensible, stays minimal, and remains easy to maintain.

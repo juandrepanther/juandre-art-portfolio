@@ -14,3 +14,9 @@ Use these files to define the target state before deeper implementation.
 2. Decide scope and exclusions in requirements.
 3. Add measurable acceptance criteria.
 4. Treat open questions as blockers until resolved.
+
+## Keep in sync with implementation
+
+- Update the spec when architecture decisions become concrete, especially router, state, testing, and deployment choices.
+- Treat automated verification as part of the target state, not a later add-on.
+- Keep acceptance criteria aligned with the real quality gates used in the repo, including `pnpm build` and `pnpm test`.
