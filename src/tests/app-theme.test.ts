@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAppTheme } from '../lib/mui/app-theme'
+import { createAppTheme } from 'lib/mui/app-theme'
 
 describe('createAppTheme', () => {
   it('creates the dark palette tokens', () => {

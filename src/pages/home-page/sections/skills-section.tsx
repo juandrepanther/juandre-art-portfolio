@@ -6,11 +6,7 @@ import {
   Stack,
   Typography
 } from '@mui/material'
-import {
-  generalSkills,
-  mySkills,
-  sectionTitles
-} from '../../../data/profile-data'
+import { generalSkills, mySkills, sectionTitles } from 'data/profile-data'
 import SectionShell from './section-shell'
 
 interface ISkillsSection {

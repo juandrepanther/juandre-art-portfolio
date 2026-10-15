@@ -2,11 +2,11 @@ import { fireEvent } from '@testing-library/react'
 import { screen } from 'shadow-dom-testing-library'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useThemeStore } from '../lib/zustand/theme-store'
-import HomePage from '../pages/home-page/home-page'
+import { useThemeStore } from 'lib/zustand/theme-store'
+import HomePage from 'pages/home-page/home-page'
 import { renderWithProviders } from './tests-helpers'
 
-vi.mock('../pages/home-page/glass-background', () => ({
+vi.mock('pages/home-page/glass-background', () => ({
   default: function GlassBackground() {
     return <div data-testid="glass-background" />
   }
@@ -31,11 +31,14 @@ describe('HomePage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /crafted depth for product, code, and play/i
+        name: /crafted depth for product, code, and business/i
       })
     ).toBeInTheDocument()
-    expect(screen.getByText(/interactive cv application/i)).toBeInTheDocument()
-    expect(screen.getByText(/contact details included/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        /a portfolio experience that consolidates the full cv, contact information and art direction\./i
+      )
+    ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /contact/i })).toHaveAttribute(
       'href',
       '#contact-presence'

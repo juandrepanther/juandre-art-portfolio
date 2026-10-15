@@ -8,15 +8,17 @@ import {
   Stack,
   Typography
 } from '@mui/material'
-import photo from '../../../assets/images/photo.png'
-import cvDocument from '../../../assets/Janis_Dregeris_CV.pdf'
-import { aboutParagraphs, contactDetails } from '../../../data/profile-data'
+import photo from 'assets/images/photo.png'
+import cvDocument from 'assets/Janis_Dregeris_CV.pdf'
+import { aboutParagraphs, contactDetails } from 'data/profile-data'
 
 const heroLabels = [
-  'Immersive Home route',
-  'Shader-driven glass layers',
-  'Full CV on one page',
-  'Contact details included'
+  'Clean code and architecture',
+  'AI Driven development',
+  'Work with designers and product teams',
+  'Team spirit and collaboration',
+  'Mentorship and knowledge sharing',
+  'Continuous learning and growth'
 ]
 
 interface IPointerRatio {
@@ -59,7 +61,7 @@ function HeroSection({
       <Grid item xs={12} md={7}>
         <Stack spacing={3}>
           <Typography sx={{ color: 'secondary.main', letterSpacing: '0.14em' }}>
-            INTERACTIVE CV APPLICATION
+            INTERACTIVE WEB
           </Typography>
           <Typography
             variant="h1"
@@ -69,7 +71,7 @@ function HeroSection({
               maxWidth: '10ch'
             }}
           >
-            Crafted depth for product, code, and play.
+            Crafted depth for product, code, and business.
           </Typography>
           <Typography
             sx={{
@@ -79,9 +81,8 @@ function HeroSection({
               lineHeight: 1.8
             }}
           >
-            A rebuilt portfolio experience that consolidates the full CV,
-            contact information, and art direction into one immersive Home
-            route.
+            A portfolio experience that consolidates the full CV, contact
+            information and art direction.
           </Typography>
           <Stack direction="row" flexWrap="wrap" gap={1.5}>
             {heroLabels.map((label) => (

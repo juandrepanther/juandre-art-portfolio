@@ -2,8 +2,8 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import { render } from '@testing-library/react'
 import type { ReactElement, ReactNode } from 'react'
-import { createAppTheme } from '../lib/mui/app-theme'
-import { useThemeStore } from '../lib/zustand/theme-store'
+import { createAppTheme } from 'lib/mui/app-theme'
+import { useThemeStore } from 'lib/zustand/theme-store'
 
 interface ITestProvider {
   children: ReactNode

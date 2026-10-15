@@ -1,5 +1,5 @@
 import { Box, Grid, Link, Stack, Typography } from '@mui/material'
-import { certificatesData, sectionTitles } from '../../../data/profile-data'
+import { certificatesData, sectionTitles } from 'data/profile-data'
 import SectionShell from './section-shell'
 
 interface ICertificatesSection {

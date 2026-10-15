@@ -1,4 +1,4 @@
-# Juandre Art Portfolio
+# Art Portfolio
 
 Interactive portfolio site built with React, Vite, MUI, and shader-driven visuals.
 

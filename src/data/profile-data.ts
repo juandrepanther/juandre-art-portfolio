@@ -1,11 +1,11 @@
-import awsImg from '../assets/icons/aws.png'
-import emailIcon from '../assets/icons/emailIcon.png'
-import faceBookIcon from '../assets/icons/facebookIcon.png'
-import instagramIcon from '../assets/icons/instagramIcon.png'
-import linkedinIcon from '../assets/icons/linkedin.png'
-import reactReduxImg from '../assets/icons/reactRedux.png'
-import threeJsImg from '../assets/icons/threeJsLogo.png'
-import ue5Img from '../assets/icons/ue5.png'
+import awsImg from 'assets/icons/aws.png'
+import emailIcon from 'assets/icons/emailIcon.png'
+import faceBookIcon from 'assets/icons/facebookIcon.png'
+import instagramIcon from 'assets/icons/instagramIcon.png'
+import linkedinIcon from 'assets/icons/linkedin.png'
+import reactReduxImg from 'assets/icons/reactRedux.png'
+import threeJsImg from 'assets/icons/threeJsLogo.png'
+import ue5Img from 'assets/icons/ue5.png'
 
 export const sectionTitles = [
   'ABOUT ME',

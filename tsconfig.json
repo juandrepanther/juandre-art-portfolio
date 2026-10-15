@@ -14,6 +14,16 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "paths": {
+      "assets/*": ["./src/assets/*"],
+      "data/*": ["./src/data/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "lib/*": ["./src/lib/*"],
+      "pages/*": ["./src/pages/*"],
+      "shared/*": ["./src/shared/*"],
+      "tests/*": ["./src/tests/*"],
+      "utils/*": ["./src/utils/*"]
+    },
     "types": ["node", "vite/client"]
   },
   "include": ["src/**/*"],

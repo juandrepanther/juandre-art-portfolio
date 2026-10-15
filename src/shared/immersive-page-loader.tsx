@@ -2,7 +2,7 @@ import { keyframes } from '@emotion/react'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
 import { useEffect, useState } from 'react'
-import useReducedMotion from '../hooks/use-reduced-motion'
+import useReducedMotion from 'hooks/use-reduced-motion'
 
 const loaderLabels = [
   'Preparing gallery atmosphere',

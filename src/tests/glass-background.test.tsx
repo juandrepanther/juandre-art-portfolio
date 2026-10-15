@@ -2,7 +2,7 @@ import { screen } from 'shadow-dom-testing-library'
 import { type ComponentType, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import * as reactDeviceDetect from 'react-device-detect'
-import GlassBackground from '../pages/home-page/glass-background'
+import GlassBackground from 'pages/home-page/glass-background'
 import { renderWithProviders } from './tests-helpers'
 
 vi.mock('shaders/react', () => {

@@ -1,5 +1,5 @@
 import { Box, Divider, Grid, Link, Stack, Typography } from '@mui/material'
-import { contactDetails, contactLinks } from '../../../data/profile-data'
+import { contactDetails, contactLinks } from 'data/profile-data'
 import SectionShell from './section-shell'
 
 interface IContactSection {

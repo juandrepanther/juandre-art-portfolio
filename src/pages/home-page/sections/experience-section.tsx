@@ -1,5 +1,5 @@
 import { Box, Divider, Stack, Typography } from '@mui/material'
-import { experienceSteps, sectionTitles } from '../../../data/profile-data'
+import { experienceSteps, sectionTitles } from 'data/profile-data'
 import SectionShell from './section-shell'
 
 interface IExperienceSection {

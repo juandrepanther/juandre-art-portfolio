@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material'
-import { educationAndCourses, sectionTitles } from '../../../data/profile-data'
+import { educationAndCourses, sectionTitles } from 'data/profile-data'
 import SectionShell from './section-shell'
 
 function EducationSection() {
