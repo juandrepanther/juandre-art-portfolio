@@ -3,13 +3,15 @@ import ContentData from '../../data/ContentData'
 import CameraTrigger from './CameraTrigger'
 import { Fab } from '@mui/material'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function LabelsHTML() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const selectRoomByNumber = (labelIdNumber: number) => {
     if (labelIdNumber === 3) {
-      window.open('/maze-game/', '_blank')
+      navigate('/maze-game/')
     } else {
       const contentDataByLabelIdNumber = ContentData.filter(
         (dataObject) => dataObject.id === labelIdNumber

@@ -1,0 +1,73 @@
+# Copilot Agent Instructions
+
+These instructions are intended for AI agents working in this repository.
+
+- Source-of-truth order for all guidance in this file is: `.oxlintrc.json` and custom Oxlint JS plugins, then `package.json` scripts and `lint-staged`, then `tsconfig.json`/`vite.config.ts`/`vitest.config.ts`/`cspell.json`/`.gitignore`.
+- If any instruction here conflicts with those files, follow the config files.
+- Before presenting results to the user, perform a self code review of all proposed changes: check for logic bugs/regressions, TypeScript and Oxlint compliance, naming/file convention compliance, and tests impacted; fix issues found and clearly report any remaining risks or test gaps.
+- If tests fail after code changes, first investigate whether the changed production code introduced a bug or regression; do not adapt or rewrite tests to match new behavior until the code has been validated as intentionally correct.
+- If failing tests could represent either an unintended regression or an intended behavior change, pause and ask the user to confirm expected behavior before changing tests.
+- Before touching any technology, check the latest official documentation for that library or API.
+- Before touching any property, verify it is not deprecated and that it is available in the current version.
+- Prefer stable public APIs over internal or private implementation details.
+- Use vendor docs and package type definitions as the source of truth before making code changes.
+- Use only functional React components. Do not introduce React class components, `PureComponent`, or class-based UI patterns.
+- Do not use `memo` from React. Rely on React Compiler optimizations unless a maintainer explicitly asks for an exception.
+- Prefer plain functions and typed factories over classes, including for custom error objects, unless a library API strictly requires a class.
+- Avoid class-based test scaffolding in Vitest. Prefer plain functional helpers, object literals, and helper functions instead of `export class` test helpers.
+- For event handler parameters, prefer concise names like `e` instead of verbose names like `event` when the parameter is only used locally.
+- For React contexts, expose a dedicated `useX` hook that reads context via `use(...)` and throws a clear error when used outside its provider.
+- Destructure objects, props, arrays, and function parameters when it improves readability and avoids repeated property access.
+- Avoid destructuring when it makes control flow harder to follow or when property names would become ambiguous.
+- Prefer `switch/case` over long `if/else if` chains for multi-branch conditional logic when it improves readability and behavior is equivalent.
+- Place TanStack query and mutation code under `src/lib/queries-requests/**` using this structure per domain: `queries.ts`, `requests.ts`, and `mutations.ts`.
+- UI code in `src/pages/**`, `src/components/**`, and `src/shared/**` must not call `services/api-client` directly. Use the request/query/mutation modules in `src/lib/queries-requests/**`.
+- Destructure TanStack hook results at call sites (for example: `const { data, isLoading, isSuccess } = useExampleQuery()`) instead of using a single query object.
+- Keep TanStack Query client defaults centralized in `src/lib/queries-requests/settings.ts` and reuse the same settings in app bootstrap and test providers.
+- For reusable data dependencies, prefer feature hooks that encapsulate `useQuery` and user-facing error toasts instead of duplicating query error effects across pages.
+- When adding data transformation logic (for example functions prefixed with `map`), place those mappers in a separate `mappers.ts` file inside the same feature folder instead of defining them inline in React components.
+- When mapping backend state or status values to UI tags, define a typed lookup object in `mappers.ts` (for example `Record<string, PaymentStateTag>`) and expose a small accessor such as `getPaymentStateTag(...)` that normalizes unknown input and falls back to a safe default label/variant instead of scattering inline tag conditionals through components.
+- When adding calculation logic (for example totals, derived numeric values, or reusable formulas), place those helpers in a separate `helpers.ts` file inside the same feature folder instead of defining them inline in React components.
+- When a table feature needs a reusable empty row selection model factory (for example `createEmptyRowSelectionModel`), place it in a sibling `row-selection-model.ts` file instead of defining it inline in the component.
+- If a component reaches roughly 150-200 lines, consider splitting it into smaller imported components and/or extracting logic where it improves readability.
+- Do not use namespaced React types like `React.ReactNode` or `React.FC`; import React types directly (for example: `import type { ReactNode } from 'react'`).
+- Do not use `JSX.Element`, `JSX.IntrinsicElements`, or any other type from the `JSX` namespace in new code. Use React types instead (for example: `ReactElement` instead of `JSX.Element`).
+- For reusable form controls, use `react-hook-form` integration via `useController` and typed generics (`UseControllerProps<T>`) instead of ad-hoc local state wiring.
+- When a shared input needs contextual help, follow the existing `hint` pattern used by `BasicInput`, `DropDownInput`, and `DatepickerComponent`: expose an optional `hint?: ReactNode` prop on the input wrapper and render it through the shared label layer immediately after the label text and required asterisk. If future shared inputs need hint support, implement it the same way instead of creating one-off layouts at feature level.
+- Before adding new styles or style helpers, first check existing utilities in `src/utils/styles.ts` and reuse them when possible. Only add a new utility when no existing helper fits the need.
+- Every time you style UI code, first look for matching helpers in `src/utils/styles.ts` and compose them into `sx` before writing new layout or positioning rules. Treat shared style utilities as the default choice, not an optional cleanup step.
+- When styling is possible, prefer the shared styling utilities from `utils/styles` instead of inline style objects or ad-hoc CSS values.
+- For positioning, prefer the `...absolute` and `...relative` helpers from `utils/styles` rather than hardcoded position values.
+- MUI Box components render as `div` by default. Do not specify `component="div"`. Only use the `component` prop for non-default values (for example: `component="span"`, `component="section"`).
+- Follow the Oxlint restricted imports exactly:
+- Do not import `useMemo` or `useCallback` from `react`.
+- Do not import `useContext` from `react`; use `use` with context objects.
+- Do not use default `React` import.
+- Do not import `screen` from `@testing-library/react`; import `screen` from `shadow-dom-testing-library`.
+- Follow file and folder naming rules enforced by Oxlint:
+- Use kebab-case for folders under `src/**/*`.
+- Use kebab-case filenames in enforced domains: `src/shared/**/*.{ts,tsx}`, `src/lib/**/*.{ts,tsx}`, `src/pages/**/*.{ts,tsx}`, `src/utils/**/*.{ts,tsx}`, and `src/hooks/**/*.{ts,tsx}`.
+- `src/components/**` is not currently kebab-case enforced by Oxlint; preserve existing local naming patterns in that domain unless maintainers request a migration.
+- Do not create `index.ts` or `index.tsx` files.
+- Routing source files are `src/app.tsx` and `src/routes.tsx`. Do not reference non-existent routing files or path constant modules.
+- Prefer lazy loading for route-level pages and layouts in `src/routes.tsx` unless there is a clear reason to eagerly load a module.
+- In server-side grid filter handlers, only dispatch filter state updates when values actually change to avoid unnecessary renders and refetches.
+- For shared table Excel exports, keep workbook styling centralized in `src/shared/table/export-excel-document-formatter.ts` and reuse that formatter through the shared export flow instead of duplicating ExcelJS styling logic in page components.
+- When styling exported Excel headers, prefer mutating only the header row in the shared formatter and keep body rows unstyled unless a feature explicitly requires additional workbook formatting.
+- Testing conventions:
+- Prefer semantic queries first (`getByRole`, `getByLabelText`, `findByRole`, and similar).
+- Add `data-testid` for unstable, dynamic, or hard-to-target elements where semantic queries are insufficient.
+- Reuse test setup and wrappers from `src/tests/setup.tsx` and `src/tests/test-helpers.tsx`.
+- For heavy third-party UI widgets (for example data grids), prefer lightweight role-based test doubles/mocks in unit tests to keep tests deterministic and fast.
+- Dependency and workflow commands:
+- Install dependencies with `npm ci` by default. When adding new dependencies, use `npm install <package> --ignore-scripts`.
+- Use only existing scripts in `package.json` (`dev`, `localbff`, `build`, `lint`, `preview`, `coverage`, `prettier`, `ch`, `cspell`, `ts-check`, `test`, `deps-ch`, `deps-update`, `pre-commit`).
+- `pre-commit` means `npm run cspell && npm run lint && npm run ts-check`.
+- `ch` is the full project check command.
+- Use TypeScript path aliases from `tsconfig.json` in preference to deep relative imports where practical.
+- Never use types as 'any'. Always use the most specific type possible, and if a type is not available, create a new type definition instead of using 'any'.
+- Name newly created variables with a lowercase first letter (for example `newVariable`).
+- Use interfaces instead of types for object shapes, and use types for unions, intersections, and other non-object types.
+- Follow existing interface naming conventions in this codebase and keep the `I` prefix for interface names (for example `IPaymentDetails`, `ITableComponent`).
+- For component props interfaces, do not use the `Props` suffix in the interface name. Prefer names such as `IHint` instead of `IHintProps`.
+- Do not introduce `Readonly<...>` wrappers for component props in new code. Prefer plain props interfaces unless an external library API requires immutability wrappers.
