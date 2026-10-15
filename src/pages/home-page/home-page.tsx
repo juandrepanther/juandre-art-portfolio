@@ -105,7 +105,7 @@ function HomePage() {
               pointerRatio={pointerRatio}
             />
 
-            <Grid container columnSpacing={sectionGap} rowSpacing={sectionGap}>
+            <Grid container rowSpacing={sectionGap}>
               <Grid size={{ xs: 12, md: 7 }}>
                 <ExperienceSection isDarkMode={isDarkMode} />
               </Grid>

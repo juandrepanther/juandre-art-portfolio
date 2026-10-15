@@ -126,6 +126,7 @@ function HeroSection({
       <Grid size={{ xs: 12, md: 5 }}>
         <Box
           sx={{
+            mt: 10,
             borderRadius: '36px',
             border: isDarkMode
               ? '1px solid rgba(220, 229, 236, 0.14)'
