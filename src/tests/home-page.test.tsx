@@ -64,6 +64,12 @@ describe('HomePage', () => {
     expect(screen.getByText('Contact & Presence')).toBeInTheDocument()
     expect(screen.getByText('FACEBOOK')).toBeInTheDocument()
     expect(screen.getByText('EMAIL')).toBeInTheDocument()
+    expect(screen.getByAltText('FACEBOOK')).toHaveStyle({
+      filter: 'brightness(0) invert(1)'
+    })
+    expect(screen.getByAltText('UNREAL ENGINE 5')).toHaveStyle({
+      filter: 'brightness(0) invert(1)'
+    })
     expect(
       screen.getAllByText(/aws certified cloud practitioner/i).length
     ).toBeGreaterThan(0)
@@ -81,12 +87,16 @@ describe('HomePage', () => {
 
     expect(await screen.findByTestId('glass-background')).toBeInTheDocument()
     expect(
-      screen.getByRole('checkbox', { name: /toggle dark mode/i })
+      screen.getByRole('switch', { name: /light mode/i })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: /download cv/i })
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /contact/i })).toBeInTheDocument()
+    expect(screen.getByAltText('FACEBOOK')).toHaveStyle({ filter: 'none' })
+    expect(screen.getByAltText('UNREAL ENGINE 5')).toHaveStyle({
+      filter: 'none'
+    })
   })
 
   it('toggles between dark and light mode from the top app bar', async () => {
@@ -98,9 +108,7 @@ describe('HomePage', () => {
 
     expect(await screen.findByTestId('glass-background')).toBeInTheDocument()
 
-    const toggle = screen.getByRole('checkbox', {
-      name: /toggle dark mode/i
-    })
+    const toggle = screen.getByRole('switch', { name: /dark mode/i })
 
     expect(toggle).toBeChecked()
     expect(screen.getByText('Dark mode')).toBeInTheDocument()
@@ -109,7 +117,7 @@ describe('HomePage', () => {
 
     expect(useThemeStore.getState().isDarkMode).toBe(false)
     expect(
-      screen.getByRole('checkbox', { name: /toggle dark mode/i })
+      screen.getByRole('switch', { name: /light mode/i })
     ).not.toBeChecked()
     expect(screen.getByText('Light mode')).toBeInTheDocument()
   })

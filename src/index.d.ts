@@ -1,7 +1,0 @@
-declare module '*.jpg'
-declare module '*.JPG'
-declare module '*.png'
-declare module '*.PNG'
-declare module '*.glsl'
-declare module '*.frag'
-declare module '*.vert'

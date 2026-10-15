@@ -10,12 +10,15 @@ function ExperienceSection({ isDarkMode }: IExperienceSection) {
   return (
     <SectionShell eyebrow="Profile" title={sectionTitles[1]}>
       <Stack spacing={3}>
-        {experienceSteps.map((experienceStep) => (
-          <Box key={`${experienceStep.title}-${experienceStep.year}`}>
+        {experienceSteps.map((experienceStep, index) => (
+          <Stack
+            key={`${experienceStep.title}-${experienceStep.year}`}
+            spacing={2}
+          >
             <Stack
               direction={{ xs: 'column', md: 'row' }}
-              spacing={1}
-              sx={{ justifyContent: 'space-between', mb: 1 }}
+              spacing={1.5}
+              sx={{ justifyContent: 'space-between' }}
             >
               <Box>
                 <Typography sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
@@ -36,15 +39,16 @@ function ExperienceSection({ isDarkMode }: IExperienceSection) {
                 </Box>
               ))}
             </Stack>
-            <Divider
-              sx={{
-                mt: 3,
-                borderColor: isDarkMode
-                  ? 'rgba(220, 229, 236, 0.1)'
-                  : 'rgba(20, 32, 44, 0.1)'
-              }}
-            />
-          </Box>
+            {index < experienceSteps.length - 1 ? (
+              <Divider
+                sx={{
+                  borderColor: isDarkMode
+                    ? 'rgba(220, 229, 236, 0.1)'
+                    : 'rgba(20, 32, 44, 0.1)'
+                }}
+              />
+            ) : null}
+          </Stack>
         ))}
       </Stack>
     </SectionShell>

@@ -1,5 +1,6 @@
-import { Box, Divider, Grid, Link, Stack, Typography } from '@mui/material'
+import { Box, Divider, Link, Stack, Typography } from '@mui/material'
 import { contactDetails, contactLinks } from 'data/profile-data'
+import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
 import SectionShell from './section-shell'
 
 interface IContactSection {
@@ -9,12 +10,12 @@ interface IContactSection {
 function ContactSection({ isDarkMode }: IContactSection) {
   return (
     <SectionShell eyebrow="Reach Out" title="Contact & Presence">
-      <Stack spacing={2.5}>
+      <Stack spacing={3}>
         {contactDetails.map((detail) => (
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             key={detail.title}
-            spacing={1}
+            spacing={1.5}
             sx={{ justifyContent: 'space-between' }}
           >
             <Typography sx={{ color: 'text.secondary' }}>
@@ -30,50 +31,76 @@ function ContactSection({ isDarkMode }: IContactSection) {
               : 'rgba(20, 32, 44, 0.1)'
           }}
         />
-        <Grid container spacing={2}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+            gap: 2
+          }}
+        >
           {contactLinks.map((contact) => {
             const href = contact.email
               ? `mailto:${contact.email}`
               : (contact.url ?? '#')
 
             return (
-              <Grid item key={contact.title} xs={12} sm={6}>
+              <Box
+                key={contact.title}
+                sx={{ borderRadius: '1rem', overflow: 'hidden' }}
+              >
                 <Link
                   href={href}
                   rel="noreferrer"
-                  sx={{
-                    display: 'flex',
-                    gap: 2,
-                    p: 2,
-                    borderRadius: '20px',
-                    alignItems: 'center',
-                    backgroundColor: isDarkMode
-                      ? 'rgba(220, 229, 236, 0.06)'
-                      : 'rgba(20, 32, 44, 0.05)',
-                    transition:
-                      'transform 180ms ease, background-color 180ms ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      backgroundColor: isDarkMode
-                        ? 'rgba(220, 229, 236, 0.12)'
-                        : 'rgba(20, 32, 44, 0.1)'
+                  sx={[
+                    createInteractiveSurfaceSx({
+                      backgroundOpacity: 0.06,
+                      hoverBackgroundOpacity: 0.12,
+                      borderOpacity: 0,
+                      hoverBorderOpacity: 0.16,
+                      lift: 2,
+                      shadowOpacity: 0.04,
+                      hoverShadowOpacity: 0.14,
+                      enableFocusVisible: true
+                    }),
+                    {
+                      display: 'flex',
+                      p: 2,
+                      gap: 1.5,
+                      border: '1px solid transparent',
+                      alignItems: 'center'
                     }
-                  }}
+                  ]}
                   target={contact.email ? undefined : '_blank'}
                   underline="none"
                 >
                   <Box
-                    alt={contact.title}
-                    component="img"
-                    src={contact.icon}
-                    sx={{ width: 42, height: 42, objectFit: 'contain' }}
-                  />
+                    sx={{
+                      width: 48,
+                      minWidth: 48,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Box
+                      alt={contact.title}
+                      component="img"
+                      src={contact.icon}
+                      sx={{
+                        width: 42,
+                        height: 42,
+                        objectFit: 'contain',
+                        filter: isDarkMode ? 'brightness(0) invert(1)' : 'none'
+                      }}
+                    />
+                  </Box>
                   <Typography>{contact.title}</Typography>
                 </Link>
-              </Grid>
+              </Box>
             )
           })}
-        </Grid>
+        </Box>
       </Stack>
     </SectionShell>
   )

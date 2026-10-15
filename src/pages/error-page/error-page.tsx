@@ -1,6 +1,9 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material'
 import { Prism, Shader } from 'shaders/react'
 
+const errorPageTextColor = '#ffffff'
+const errorPageMutedTextColor = 'rgba(255, 255, 255, 0.78)'
+
 function ErrorPage() {
   return (
     <Box
@@ -12,6 +15,7 @@ function ErrorPage() {
         display: 'grid',
         placeItems: 'center',
         px: 3,
+        color: errorPageTextColor,
         background:
           'radial-gradient(circle at top, rgba(84, 199, 184, 0.16), transparent 34%), linear-gradient(180deg, #0c1117 0%, #101824 42%, #0c1117 100%)'
       }}
@@ -55,7 +59,7 @@ function ErrorPage() {
           label="404 • route unavailable"
           sx={{
             borderRadius: '999px',
-            color: 'secondary.main',
+            color: errorPageTextColor,
             backgroundColor: 'rgba(84, 199, 184, 0.08)',
             border: '1px solid rgba(84, 199, 184, 0.18)'
           }}
@@ -89,7 +93,7 @@ function ErrorPage() {
               fontWeight: 800,
               letterSpacing: '-0.08em',
               textShadow: '0 0 28px rgba(84, 199, 184, 0.25)',
-              color: 'black'
+              color: 'grey.500'
             }}
           >
             404
@@ -99,22 +103,27 @@ function ErrorPage() {
         <Stack spacing={1.5} sx={{ maxWidth: '52ch' }}>
           <Typography
             variant="h1"
-            sx={{ fontSize: { xs: '2rem', md: '3rem' } }}
+            sx={{
+              color: errorPageTextColor,
+              fontSize: { xs: '2rem', md: '3rem' }
+            }}
           >
             This page drifted out of orbit.
           </Typography>
-          <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+          <Typography sx={{ color: errorPageMutedTextColor, lineHeight: 1.8 }}>
             The route you tried to open does not exist. Return to the portfolio
             home page to keep exploring the work, visuals, and contact details.
           </Typography>
         </Stack>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <Button component="a" href="/" variant="contained">
+          <Button
+            component="a"
+            href="/"
+            sx={{ color: errorPageTextColor }}
+            variant="contained"
+          >
             Back to home
-          </Button>
-          <Button color="secondary" component="a" href="/" variant="text">
-            Recover route
           </Button>
         </Stack>
       </Stack>

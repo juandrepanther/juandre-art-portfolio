@@ -5,12 +5,12 @@ import SectionShell from './section-shell'
 function EducationSection() {
   return (
     <SectionShell eyebrow="Credentials" title={sectionTitles[3]}>
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         {educationAndCourses.map((educationItem) => (
           <Stack
-            direction="row"
+            direction={{ xs: 'column', sm: 'row' }}
             key={`${educationItem.title}-${educationItem.year}`}
-            spacing={2}
+            spacing={1.5}
             sx={{
               justifyContent: 'space-between',
               alignItems: 'flex-start'

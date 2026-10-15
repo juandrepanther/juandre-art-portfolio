@@ -18,6 +18,9 @@ function SectionShell({ title, eyebrow, children }: ISectionShell) {
       aria-labelledby={sectionId}
       component="section"
       sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         border: (theme) =>
           theme.palette.mode === 'dark'
             ? '1px solid rgba(220, 229, 236, 0.14)'
@@ -31,29 +34,27 @@ function SectionShell({ title, eyebrow, children }: ISectionShell) {
         p: { xs: 3, md: 4 }
       }}
     >
-      {eyebrow ? (
+      <Box sx={{ display: 'grid', gap: 1 }}>
+        {eyebrow ? (
+          <Typography
+            sx={{
+              color: 'secondary.main',
+              fontSize: '0.8rem',
+              letterSpacing: '0.16em'
+            }}
+          >
+            {eyebrow}
+          </Typography>
+        ) : null}
         <Typography
-          sx={{
-            color: 'secondary.main',
-            fontSize: '0.8rem',
-            letterSpacing: '0.16em',
-            mb: 1
-          }}
+          id={sectionId}
+          variant="h2"
+          sx={{ fontSize: { xs: '1.65rem', md: '2.3rem' } }}
         >
-          {eyebrow}
+          {title}
         </Typography>
-      ) : null}
-      <Typography
-        id={sectionId}
-        variant="h2"
-        sx={{
-          fontSize: { xs: '1.65rem', md: '2.3rem' },
-          mb: 3
-        }}
-      >
-        {title}
-      </Typography>
-      {children}
+      </Box>
+      <Box sx={{ mt: { xs: 2.5, md: 3 }, flex: 1 }}>{children}</Box>
     </Box>
   )
 }

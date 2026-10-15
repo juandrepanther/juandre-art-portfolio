@@ -14,7 +14,7 @@ import { aboutParagraphs, contactDetails } from 'data/profile-data'
 
 const heroLabels = [
   'Clean code and architecture',
-  'AI Driven development',
+  'Spec Driven development',
   'Work with designers and product teams',
   'Team spirit and collaboration',
   'Mentorship and knowledge sharing',
@@ -51,14 +51,12 @@ function HeroSection({
       sx={{
         position: 'relative',
         zIndex: 1,
-        width: 'min(1200px, calc(100% - 32px))',
-        mx: 'auto',
         minHeight: '100vh',
         py: { xs: 10, md: 14 },
         alignItems: 'center'
       }}
     >
-      <Grid item xs={12} md={7}>
+      <Grid size={{ xs: 12, md: 7 }}>
         <Stack spacing={3}>
           <Typography sx={{ color: 'secondary.main', letterSpacing: '0.14em' }}>
             INTERACTIVE WEB
@@ -84,7 +82,12 @@ function HeroSection({
             A portfolio experience that consolidates the full CV, contact
             information and art direction.
           </Typography>
-          <Stack direction="row" flexWrap="wrap" gap={1.5}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            useFlexGap
+            sx={{ flexWrap: 'wrap' }}
+          >
             {heroLabels.map((label) => (
               <Chip
                 key={label}
@@ -120,7 +123,7 @@ function HeroSection({
           </Stack>
         </Stack>
       </Grid>
-      <Grid item xs={12} md={5}>
+      <Grid size={{ xs: 12, md: 5 }}>
         <Box
           sx={{
             borderRadius: '36px',

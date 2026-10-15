@@ -4,17 +4,6 @@ import { afterEach } from 'vitest'
 
 window.scrollTo = () => undefined
 
-if (!window.matchMedia) {
-  window.matchMedia = (query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-    dispatchEvent: () => false
-  })
-}
-
 afterEach(() => {
   cleanup()
   localStorage.clear()

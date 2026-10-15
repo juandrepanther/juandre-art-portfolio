@@ -1,12 +1,6 @@
-import {
-  Box,
-  Chip,
-  Divider,
-  LinearProgress,
-  Stack,
-  Typography
-} from '@mui/material'
+import { Chip, Divider, Stack } from '@mui/material'
 import { generalSkills, mySkills, sectionTitles } from 'data/profile-data'
+import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
 import SectionShell from './section-shell'
 
 interface ISkillsSection {
@@ -16,31 +10,30 @@ interface ISkillsSection {
 function SkillsSection({ isDarkMode }: ISkillsSection) {
   return (
     <SectionShell eyebrow="Capabilities" title={sectionTitles[2]}>
-      <Stack spacing={2.5}>
-        {mySkills.map((skill) => (
-          <Box key={skill.tech}>
-            <Stack
-              direction="row"
-              sx={{ justifyContent: 'space-between', mb: 1 }}
-            >
-              <Typography>{skill.tech}</Typography>
-              <Typography sx={{ color: 'secondary.main' }}>
-                {skill.level}%
-              </Typography>
-            </Stack>
-            <LinearProgress
-              sx={{
-                height: 10,
-                borderRadius: '999px',
-                backgroundColor: isDarkMode
-                  ? 'rgba(220, 229, 236, 0.08)'
-                  : 'rgba(20, 32, 44, 0.08)'
-              }}
-              value={skill.level}
-              variant="determinate"
+      <Stack spacing={3}>
+        <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+          {mySkills.map((skill) => (
+            <Chip
+              key={skill.tech}
+              label={skill.tech}
+              variant="outlined"
+              sx={[
+                createInteractiveSurfaceSx({
+                  borderOpacity: 0.12,
+                  hoverBackgroundOpacity: 0.05,
+                  hoverBorderOpacity: 0.2,
+                  lift: 1,
+                  hoverShadowOpacity: 0.1
+                }),
+                {
+                  borderRadius: '999px',
+                  px: 0.5,
+                  py: 0.25
+                }
+              ]}
             />
-          </Box>
-        ))}
+          ))}
+        </Stack>
         <Divider
           sx={{
             borderColor: isDarkMode
@@ -48,16 +41,22 @@ function SkillsSection({ isDarkMode }: ISkillsSection) {
               : 'rgba(20, 32, 44, 0.1)'
           }}
         />
-        <Stack direction="row" flexWrap="wrap" gap={1}>
+        <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
           {generalSkills.split('|').map((skill) => (
             <Chip
               key={skill}
               label={skill.trim()}
-              sx={{
-                backgroundColor: isDarkMode
-                  ? 'rgba(220, 229, 236, 0.08)'
-                  : 'rgba(20, 32, 44, 0.08)'
-              }}
+              sx={[
+                createInteractiveSurfaceSx({
+                  backgroundOpacity: 0.08,
+                  hoverBackgroundOpacity: 0.14,
+                  lift: 1,
+                  hoverShadowOpacity: 0.08
+                }),
+                {
+                  borderRadius: '999px'
+                }
+              ]}
             />
           ))}
         </Stack>

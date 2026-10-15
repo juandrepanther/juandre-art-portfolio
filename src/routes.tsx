@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router'
-import ImmersivePageLoader from 'shared/immersive-page-loader'
+import ImmersivePageLoader from 'shared/page-loader'
 
 const HomePage = lazy(() => import('pages/home-page/home-page'))
 const ErrorPage = lazy(() => import('pages/error-page/error-page'))

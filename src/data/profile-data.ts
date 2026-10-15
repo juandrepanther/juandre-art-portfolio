@@ -81,22 +81,23 @@ export const experienceSteps: IExperienceStep[] = [
 
 interface IMySkill {
   tech: string
-  level: number
 }
 
 export const mySkills: IMySkill[] = [
-  { tech: 'JAVASCRIPT', level: 90 },
-  { tech: 'REACT', level: 88 },
-  { tech: 'TYPESCRIPT', level: 80 },
-  { tech: 'REDUX (RTK)', level: 85 },
-  { tech: 'MATERIAL UI', level: 91 },
-  { tech: 'STYLED COMPONENTS', level: 91 },
-  { tech: 'THREE.JS', level: 70 },
-  { tech: 'MONGODB', level: 70 },
-  { tech: 'POSTGRESQL', level: 70 },
-  { tech: 'NODE', level: 50 },
-  { tech: 'BLENDER', level: 50 },
-  { tech: 'UE 5', level: 45 }
+  { tech: 'JAVASCRIPT' },
+  { tech: 'REACT' },
+  { tech: 'TYPESCRIPT' },
+  { tech: 'SPEC DRIVEN DEVELOPMENT' },
+  { tech: 'COPILOT' },
+  { tech: 'REDUX (RTK)' },
+  { tech: 'MATERIAL UI' },
+  { tech: 'STYLED COMPONENTS' },
+  { tech: 'THREE.JS' },
+  { tech: 'MONGODB' },
+  { tech: 'POSTGRESQL' },
+  { tech: 'NODE' },
+  { tech: 'BLENDER' },
+  { tech: 'UE 5' }
 ]
 
 export const generalSkills =

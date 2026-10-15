@@ -57,7 +57,6 @@ function HomePageHeader({ isDarkMode, onToggleDarkMode }: IHomePageHeader) {
               <Switch
                 checked={isDarkMode}
                 color="secondary"
-                inputProps={{ 'aria-label': 'toggle dark mode' }}
                 onChange={onToggleDarkMode}
               />
             }
