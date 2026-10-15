@@ -34,13 +34,10 @@ describe('HomePage', () => {
       })
     ).toBeInTheDocument()
     expect(screen.getByText(/interactive cv application/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /maze game/i })).toHaveAttribute(
+    expect(screen.getByText(/contact details included/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /contact/i })).toHaveAttribute(
       'href',
-      '/maze-game'
-    )
-    expect(screen.getByRole('link', { name: /launch maze/i })).toHaveAttribute(
-      'href',
-      '/maze-game'
+      '#contact-presence'
     )
     expect(screen.getByRole('link', { name: /download cv/i })).toHaveAttribute(
       'href',
@@ -85,8 +82,6 @@ describe('HomePage', () => {
     expect(
       screen.getByRole('link', { name: /download cv/i })
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: /launch maze/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /contact/i })).toBeInTheDocument()
   })
 })

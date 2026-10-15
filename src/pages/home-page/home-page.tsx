@@ -1,8 +1,3 @@
-import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded'
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
-import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded'
-import SportsEsportsRoundedIcon from '@mui/icons-material/SportsEsportsRounded'
 import {
   Avatar,
   Box,
@@ -16,7 +11,6 @@ import {
   Stack,
   Typography
 } from '@mui/material'
-import { useNavigate } from 'react-router'
 import { Suspense, lazy, useState } from 'react'
 import type { MouseEvent } from 'react'
 import photo from '../../assets/images/photo.png'
@@ -41,13 +35,12 @@ const heroLabels = [
   'Immersive Home route',
   'Shader-driven glass layers',
   'Full CV on one page',
-  'Maze preserved separately'
+  'Contact details included'
 ]
 
 function HomePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const isReducedMotion = useReducedMotion()
-  const navigate = useNavigate()
   const [pointerRatio, setPointerRatio] = useState({ x: 0, y: 0 })
 
   const email =
@@ -72,11 +65,6 @@ function HomePage() {
 
   const handlePointerLeave = () => {
     setPointerRatio({ x: 0, y: 0 })
-  }
-
-  const handleMazeNavigate = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    navigate('/maze-game')
   }
 
   return (
@@ -119,23 +107,11 @@ function HomePage() {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button
-              color="secondary"
-              component="a"
-              // endIcon={<SportsEsportsRoundedIcon />}
-              href="/maze-game"
-              onClick={handleMazeNavigate}
-              variant="outlined"
-            >
-              Maze Game
-            </Button>
             <IconButton
               aria-label="toggle dark mode"
               color="secondary"
               onClick={toggleDarkMode}
-            >
-              {/* {isDarkMode ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />} */}
-            </IconButton>
+            ></IconButton>
           </Stack>
         </Stack>
       </Box>
@@ -201,9 +177,9 @@ function HomePage() {
                   lineHeight: 1.8
                 }}
               >
-                A rebuilt portfolio experience that keeps the Maze game intact
-                while consolidating the full CV, contact information, and art
-                direction into one immersive Home route.
+                A rebuilt portfolio experience that consolidates the full CV,
+                contact information, and art direction into one immersive Home
+                route.
               </Typography>
               <Stack direction="row" flexWrap="wrap" gap={1.5}>
                 {heroLabels.map((label) => (
@@ -223,7 +199,6 @@ function HomePage() {
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Button
                   component="a"
-                  // endIcon={<DownloadRoundedIcon />}
                   href={cvDocument}
                   rel="noreferrer"
                   target="_blank"
@@ -234,12 +209,10 @@ function HomePage() {
                 <Button
                   color="secondary"
                   component="a"
-                  // endIcon={<ArrowOutwardRoundedIcon />}
-                  href="/maze-game"
-                  onClick={handleMazeNavigate}
+                  href="#contact-presence"
                   variant="text"
                 >
-                  Launch Maze
+                  Contact
                 </Button>
               </Stack>
             </Stack>
