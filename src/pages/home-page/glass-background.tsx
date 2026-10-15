@@ -1,94 +1,12 @@
 import { Box } from '@mui/material'
-import { useEffect, useState } from 'react'
-import type { ComponentType } from 'react'
-
-type IShadersReactModule = Pick<
-  typeof import('shaders/react'),
-  'Shader' | 'Swirl' | 'ChromaFlow' | 'FlutedGlass'
->
+import { ChromaFlow, FlutedGlass, Shader, Swirl } from 'shaders/react'
 
 interface IGlassBackground {
   isReducedMotion?: boolean
 }
 
-function isRenderableComponent(
-  value: unknown
-): value is ComponentType<unknown> {
-  return (
-    typeof value === 'function' ||
-    (typeof value === 'object' && value !== null && '$$typeof' in value)
-  )
-}
-
-function canRenderAnimatedShader() {
-  return typeof window !== 'undefined' && 'IntersectionObserver' in window
-}
-
-function StaticGlassBackground() {
-  return (
-    <Box
-      aria-label="Static visual fallback"
-      sx={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        background:
-          'radial-gradient(circle at top left, rgba(84, 199, 184, 0.22), transparent 34%), radial-gradient(circle at top right, rgba(217, 139, 79, 0.18), transparent 28%), linear-gradient(180deg, rgba(12, 17, 23, 0.18) 0%, rgba(12, 17, 23, 0.82) 68%, rgba(12, 17, 23, 0.98) 100%)'
-      }}
-    />
-  )
-}
-
 function GlassBackground({ isReducedMotion = false }: IGlassBackground) {
-  const [shadersModule, setShadersModule] =
-    useState<IShadersReactModule | null>(null)
-
-  useEffect(() => {
-    let isMounted = true
-
-    if (isReducedMotion || !canRenderAnimatedShader()) {
-      return () => {
-        isMounted = false
-      }
-    }
-
-    void import('shaders/react')
-      .then((module) => {
-        if (!isMounted) {
-          return
-        }
-
-        const { ChromaFlow, FlutedGlass, Shader, Swirl } = module
-
-        if (
-          !isRenderableComponent(Shader) ||
-          !isRenderableComponent(Swirl) ||
-          !isRenderableComponent(ChromaFlow) ||
-          !isRenderableComponent(FlutedGlass)
-        ) {
-          setShadersModule(null)
-
-          return
-        }
-
-        setShadersModule({ ChromaFlow, FlutedGlass, Shader, Swirl })
-      })
-      .catch(() => {
-        if (isMounted) {
-          setShadersModule(null)
-        }
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [isReducedMotion])
-
-  if (!shadersModule) {
-    return <StaticGlassBackground />
-  }
-
-  const { ChromaFlow, FlutedGlass, Shader, Swirl } = shadersModule
+  void isReducedMotion
 
   return (
     <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
