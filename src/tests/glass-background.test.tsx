@@ -1,6 +1,7 @@
 import { screen } from 'shadow-dom-testing-library'
 import { type ComponentType, type ReactNode } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import * as reactDeviceDetect from 'react-device-detect'
 import GlassBackground from '../pages/home-page/glass-background'
 import { renderWithProviders } from './tests-helpers'
 
@@ -24,7 +25,13 @@ vi.mock('shaders/react', () => {
 })
 
 describe('GlassBackground', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders the shader stack on desktop', () => {
+    vi.spyOn(reactDeviceDetect, 'isMobile', 'get').mockReturnValue(false)
+
     renderWithProviders(<GlassBackground />)
 
     expect(screen.getByLabelText('Shader')).toBeInTheDocument()
@@ -34,16 +41,22 @@ describe('GlassBackground', () => {
   })
 
   it('renders the static fallback on mobile devices', () => {
-    renderWithProviders(<GlassBackground isMobileDevice />)
+    vi.spyOn(reactDeviceDetect, 'isMobile', 'get').mockReturnValue(true)
+
+    renderWithProviders(<GlassBackground />)
 
     expect(screen.getByTestId('static-glass-background')).toBeInTheDocument()
     expect(screen.queryByLabelText('Shader')).not.toBeInTheDocument()
   })
 
-  it('renders the static fallback when reduced motion is enabled', () => {
-    renderWithProviders(<GlassBackground isReducedMotion />)
+  it('keeps the shader stack on desktop without mobile detection', () => {
+    vi.spyOn(reactDeviceDetect, 'isMobile', 'get').mockReturnValue(false)
 
-    expect(screen.getByTestId('static-glass-background')).toBeInTheDocument()
-    expect(screen.queryByLabelText('Shader')).not.toBeInTheDocument()
+    renderWithProviders(<GlassBackground />)
+
+    expect(screen.getByLabelText('Shader')).toBeInTheDocument()
+    expect(
+      screen.queryByTestId('static-glass-background')
+    ).not.toBeInTheDocument()
   })
 })

@@ -59,8 +59,6 @@ These instructions are intended for AI agents working in this repository.
 - Add `data-testid` for unstable, dynamic, or hard-to-target elements where semantic queries are insufficient.
 - Reuse test setup and wrappers from `src/tests/setup.tsx` and `src/tests/test-helpers.tsx`.
 - For heavy third-party UI widgets (for example data grids), prefer lightweight role-based test doubles/mocks in unit tests to keep tests deterministic and fast.
-- Dependency and workflow commands:
-- Install dependencies with `npm ci` by default. When adding new dependencies, use `npm install <package> --ignore-scripts`.
 - Use only existing scripts in `package.json` (`dev`, `localbff`, `build`, `lint`, `preview`, `coverage`, `prettier`, `ch`, `cspell`, `ts-check`, `test`, `deps-ch`, `deps-update`, `pre-commit`).
 - `pre-commit` means `npm run cspell && npm run lint && npm run ts-check`.
 - `ch` is the full project check command.

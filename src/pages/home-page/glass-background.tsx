@@ -1,25 +1,6 @@
 import { Box } from '@mui/material'
+import { isMobile } from 'react-device-detect'
 import { ChromaFlow, FlutedGlass, Shader, Swirl } from 'shaders/react'
-import { useEffect, useState } from 'react'
-
-interface IGlassBackground {
-  isReducedMotion?: boolean
-  isMobileDevice?: boolean
-}
-
-function getInitialIsMobileDevice() {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  if (window.matchMedia) {
-    return window.matchMedia(
-      '(max-width: 900px), (hover: none) and (pointer: coarse)'
-    ).matches
-  }
-
-  return window.innerWidth <= 900
-}
 
 function StaticGlassBackground() {
   return (
@@ -82,46 +63,8 @@ function StaticGlassBackground() {
   )
 }
 
-function GlassBackground({
-  isReducedMotion = false,
-  isMobileDevice
-}: IGlassBackground) {
-  const [detectedIsMobileDevice, setDetectedIsMobileDevice] = useState(
-    getInitialIsMobileDevice
-  )
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined
-    }
-
-    const mediaQuery = window.matchMedia
-      ? window.matchMedia(
-          '(max-width: 900px), (hover: none) and (pointer: coarse)'
-        )
-      : undefined
-
-    const updateIsMobileDevice = () => {
-      setDetectedIsMobileDevice(
-        mediaQuery ? mediaQuery.matches : window.innerWidth <= 900
-      )
-    }
-
-    updateIsMobileDevice()
-
-    mediaQuery?.addEventListener('change', updateIsMobileDevice)
-    window.addEventListener('resize', updateIsMobileDevice)
-
-    return () => {
-      mediaQuery?.removeEventListener('change', updateIsMobileDevice)
-      window.removeEventListener('resize', updateIsMobileDevice)
-    }
-  }, [])
-
-  const shouldUseStaticBackground =
-    isReducedMotion || (isMobileDevice ?? detectedIsMobileDevice)
-
-  if (shouldUseStaticBackground) {
+function GlassBackground() {
+  if (isMobile) {
     return <StaticGlassBackground />
   }
 
