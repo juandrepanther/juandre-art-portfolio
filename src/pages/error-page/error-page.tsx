@@ -1,31 +1,7 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material'
-import { keyframes } from '@mui/material/styles'
-import useReducedMotion from '../../hooks/use-reduced-motion'
-
-const floatOrb = keyframes`
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(0, -18px, 0) scale(1.05);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-`
-
-const spinRing = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`
+import { Prism, Shader } from 'shaders/react'
 
 function ErrorPage() {
-  const isReducedMotion = useReducedMotion()
-
   return (
     <Box
       component="main"
@@ -45,29 +21,23 @@ function ErrorPage() {
         sx={{
           position: 'absolute',
           inset: 0,
-          background:
-            'radial-gradient(circle at 20% 20%, rgba(217, 139, 79, 0.16), transparent 0 20%), radial-gradient(circle at 80% 35%, rgba(84, 199, 184, 0.18), transparent 0 22%), radial-gradient(circle at 55% 78%, rgba(220, 229, 236, 0.08), transparent 0 24%)',
-          filter: 'blur(18px)'
+          pointerEvents: 'none'
         }}
-      />
+      >
+        <Shader className="shader-fill">
+          <Prism intensity={1.6} />
+        </Shader>
+      </Box>
+
       <Box
         aria-hidden="true"
         sx={{
           position: 'absolute',
-          width: { xs: 220, md: 320 },
-          height: { xs: 220, md: 320 },
-          borderRadius: '50%',
-          border: '1px solid rgba(84, 199, 184, 0.35)',
-          animation: isReducedMotion
-            ? 'none'
-            : `${spinRing} 16s linear infinite`,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 10,
-            borderRadius: 'inherit',
-            border: '1px dashed rgba(217, 139, 79, 0.28)'
-          }
+          inset: 0,
+          pointerEvents: 'none',
+          background:
+            'radial-gradient(circle at 20% 20%, rgba(217, 139, 79, 0.16), transparent 0 20%), radial-gradient(circle at 80% 35%, rgba(84, 199, 184, 0.18), transparent 0 22%), radial-gradient(circle at 55% 78%, rgba(220, 229, 236, 0.08), transparent 0 24%)',
+          filter: 'blur(18px)'
         }}
       />
 
@@ -108,10 +78,7 @@ function ErrorPage() {
               borderRadius: '50%',
               background:
                 'radial-gradient(circle at 30% 30%, rgba(84, 199, 184, 0.45), rgba(84, 199, 184, 0.06) 46%, transparent 70%)',
-              filter: 'blur(1px)',
-              animation: isReducedMotion
-                ? 'none'
-                : `${floatOrb} 6s ease-in-out infinite`
+              filter: 'blur(1px)'
             }}
           />
           <Typography
@@ -121,7 +88,8 @@ function ErrorPage() {
               fontSize: { xs: '5rem', md: '7rem' },
               fontWeight: 800,
               letterSpacing: '-0.08em',
-              textShadow: '0 0 28px rgba(84, 199, 184, 0.25)'
+              textShadow: '0 0 28px rgba(84, 199, 184, 0.25)',
+              color: 'black'
             }}
           >
             404

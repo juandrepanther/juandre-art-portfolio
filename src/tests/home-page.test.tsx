@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react'
 import { screen } from 'shadow-dom-testing-library'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -77,11 +78,36 @@ describe('HomePage', () => {
 
     expect(await screen.findByTestId('glass-background')).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /toggle dark mode/i })
+      screen.getByRole('checkbox', { name: /toggle dark mode/i })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: /download cv/i })
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /contact/i })).toBeInTheDocument()
+  })
+
+  it('toggles between dark and light mode from the top app bar', async () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
+    )
+
+    expect(await screen.findByTestId('glass-background')).toBeInTheDocument()
+
+    const toggle = screen.getByRole('checkbox', {
+      name: /toggle dark mode/i
+    })
+
+    expect(toggle).toBeChecked()
+    expect(screen.getByText('Dark mode')).toBeInTheDocument()
+
+    fireEvent.click(toggle)
+
+    expect(useThemeStore.getState().isDarkMode).toBe(false)
+    expect(
+      screen.getByRole('checkbox', { name: /toggle dark mode/i })
+    ).not.toBeChecked()
+    expect(screen.getByText('Light mode')).toBeInTheDocument()
   })
 })

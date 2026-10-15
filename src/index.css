@@ -10,9 +10,6 @@ html {
 
 body {
   overflow-x: hidden;
-  background-color: #0c1117;
-  color: #dce5ec;
-  font-family: 'Montserrat', 'Segoe UI', sans-serif;
 }
 
 :focus-visible {
@@ -64,10 +61,6 @@ ol {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-::selection {
-  background-color: #bbbbbb86;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -134,21 +127,6 @@ ol {
   }
   100% {
     width: 0%;
-  }
-}
-
-.dark-mode-switch {
-  position: absolute;
-  top: 2.3rem;
-  right: 8rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-@media screen and (max-width: 768px) {
-  .dark-mode-switch {
-    top: 0.9rem;
-    right: 5rem;
   }
 }
 

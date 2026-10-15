@@ -1,14 +1,17 @@
 import {
+  AppBar,
   Avatar,
   Box,
   Button,
   Chip,
   Divider,
+  FormControlLabel,
   Grid,
-  IconButton,
   Link,
   LinearProgress,
   Stack,
+  Switch,
+  Toolbar,
   Typography
 } from '@mui/material'
 import { Suspense, lazy, useState } from 'react'
@@ -72,10 +75,12 @@ function HomePage() {
       <Box className="skip-link" component="a" href="#main-content">
         Skip to main content
       </Box>
-      <Box
+      <AppBar
+        color="transparent"
         component="header"
+        elevation={0}
+        position="sticky"
         sx={{
-          position: 'sticky',
           top: 0,
           zIndex: 10,
           backdropFilter: 'blur(18px)',
@@ -87,13 +92,13 @@ function HomePage() {
             : '1px solid rgba(20, 32, 44, 0.12)'
         }}
       >
-        <Stack
-          direction="row"
-          spacing={2}
+        <Toolbar
+          disableGutters
           sx={{
             width: 'min(1200px, calc(100% - 32px))',
             mx: 'auto',
             py: 2,
+            minHeight: 'unset',
             alignItems: 'center',
             justifyContent: 'space-between'
           }}
@@ -106,15 +111,32 @@ function HomePage() {
               FULL STACK ENGINEER
             </Typography>
           </Box>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <IconButton
-              aria-label="toggle dark mode"
-              color="secondary"
-              onClick={toggleDarkMode}
-            ></IconButton>
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isDarkMode}
+                  color="secondary"
+                  inputProps={{ 'aria-label': 'toggle dark mode' }}
+                  onChange={() => {
+                    toggleDarkMode()
+                  }}
+                />
+              }
+              label={isDarkMode ? 'Dark mode' : 'Light mode'}
+              labelPlacement="start"
+              sx={{
+                m: 0,
+                gap: 1,
+                '.MuiFormControlLabel-label': {
+                  color: 'text.secondary',
+                  fontSize: '0.875rem'
+                }
+              }}
+            />
           </Stack>
-        </Stack>
-      </Box>
+        </Toolbar>
+      </AppBar>
 
       <Box
         component="main"
