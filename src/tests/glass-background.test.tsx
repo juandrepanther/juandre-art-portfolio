@@ -24,12 +24,26 @@ vi.mock('shaders/react', () => {
 })
 
 describe('GlassBackground', () => {
-  it('renders the shader stack', () => {
+  it('renders the shader stack on desktop', () => {
     renderWithProviders(<GlassBackground />)
 
     expect(screen.getByLabelText('Shader')).toBeInTheDocument()
     expect(screen.getByLabelText('Swirl')).toBeInTheDocument()
     expect(screen.getByLabelText('ChromaFlow')).toBeInTheDocument()
     expect(screen.getByLabelText('FlutedGlass')).toBeInTheDocument()
+  })
+
+  it('renders the static fallback on mobile devices', () => {
+    renderWithProviders(<GlassBackground isMobileDevice />)
+
+    expect(screen.getByTestId('static-glass-background')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Shader')).not.toBeInTheDocument()
+  })
+
+  it('renders the static fallback when reduced motion is enabled', () => {
+    renderWithProviders(<GlassBackground isReducedMotion />)
+
+    expect(screen.getByTestId('static-glass-background')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Shader')).not.toBeInTheDocument()
   })
 })
