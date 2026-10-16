@@ -3,7 +3,7 @@ export type TDifficultyLevel = 'Easy' | 'Pro' | 'Survivor'
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
 export interface IDifficultyConfig {
-  bananaSpeed: number
+  axeSpeed: number
   label: TDifficultyLevel
   monkeyThrowInterval: number
 }
@@ -27,7 +27,7 @@ export const MONKEY_DAMAGE = 5
 export const HEART_HEAL = 20
 export const START_RUN_COUNTDOWN_SECONDS = 2
 export const SURVIVAL_TIME_SECONDS = 60
-export const PLAYER_BANANA_SPEED = 22
+export const PLAYER_AXE_SPEED = 22
 export const PLAYER_MOVE_SPEED = 8
 export const PROJECTILE_LIFETIME_SECONDS = 3.2
 export const HEART_RESPAWN_SECONDS = 10
@@ -59,17 +59,17 @@ export const TREE_LAYOUTS: ITreeLayout[] = [
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
   Easy: {
     label: 'Easy',
-    bananaSpeed: 8,
+    axeSpeed: 8,
     monkeyThrowInterval: 2.6
   },
   Pro: {
     label: 'Pro',
-    bananaSpeed: 13,
+    axeSpeed: 13,
     monkeyThrowInterval: 1.95
   },
   Survivor: {
     label: 'Survivor',
-    bananaSpeed: 18,
+    axeSpeed: 18,
     monkeyThrowInterval: 1.3
   }
 }

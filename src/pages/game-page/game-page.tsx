@@ -154,7 +154,7 @@ function GamePage() {
               DESKTOP EXPERIENCE
             </Typography>
             <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
-              Banana Run is tuned for desktop controls only.
+              Viking Run is tuned for desktop controls only.
             </Typography>
             <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
               Open this route on a desktop-sized viewport to play the
@@ -254,13 +254,13 @@ function GamePage() {
                 <Chip
                   label={
                     gameStatus === 'playing'
-                      ? 'Survive the monkey rain'
+                      ? 'Survive the axe storm'
                       : gameStatus === 'countdown'
                         ? `Run starts in ${countdownSeconds}`
                         : gameStatus === 'won'
                           ? 'You survived the minute'
                           : gameStatus === 'lost'
-                            ? 'The troop got you'
+                            ? 'The raiding party got you'
                             : 'Choose a difficulty'
                   }
                   variant="outlined"
@@ -300,17 +300,17 @@ function GamePage() {
                 </Box>
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                    Monkey speed
+                    Axe speed
                   </Typography>
                   <Typography variant="h5">
-                    {difficultyConfig.bananaSpeed.toFixed(0)}
+                    {difficultyConfig.axeSpeed.toFixed(0)}
                   </Typography>
                 </Box>
               </Stack>
 
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                 <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                  Monkey hits
+                  Viking hits
                 </Typography>
                 <Typography variant="h5">{monkeyHits}</Typography>
               </Stack>
@@ -435,9 +435,9 @@ function GamePage() {
                     : 'Hold the grove for sixty seconds.'}
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                  Monkeys fire bananas with a slight aiming variance, hearts
-                  appear randomly near the trees, heal +20%, and each hit
-                  removes 5% health. Easy starts slow, Survivor is relentless.
+                  Vikings hurl axes with a slight aiming variance, hearts appear
+                  randomly near the trees, heal +20%, and each hit removes 5%
+                  health. Easy starts slow, Survivor is relentless.
                 </Typography>
               </Stack>
             ) : null}
@@ -470,10 +470,10 @@ function GamePage() {
               <DialogContent sx={{ px: 4, pb: 1.5 }}>
                 <Stack spacing={1.5}>
                   <Typography sx={{ color: 'text.secondary' }}>
-                    The monkeys drained your health to 0%.
+                    The raiders drained your health to 0%.
                   </Typography>
                   <Typography variant="body2">
-                    Monkey hits landed: {monkeyHits}
+                    Raider hits landed: {monkeyHits}
                   </Typography>
                 </Stack>
               </DialogContent>

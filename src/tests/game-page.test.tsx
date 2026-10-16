@@ -56,7 +56,7 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /easy/i })).toBeInTheDocument()
     expect(screen.getByText('01:00')).toBeInTheDocument()
-    expect(screen.getByText(/monkey hits/i)).toBeInTheDocument()
+    expect(screen.getByText(/viking hits/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
   })
 
@@ -71,7 +71,7 @@ describe('GamePage', () => {
 
     expect(screen.queryByTestId('game-scene')).not.toBeInTheDocument()
     expect(
-      screen.getByText(/banana run is tuned for desktop controls only/i)
+      screen.getByText(/viking run is tuned for desktop controls only/i)
     ).toBeInTheDocument()
   })
 
@@ -102,7 +102,7 @@ describe('GamePage', () => {
     })
 
     expect(screen.queryByText('PREPARE')).not.toBeInTheDocument()
-    expect(screen.getByText(/survive the monkey rain/i)).toBeInTheDocument()
+    expect(screen.getByText(/survive the axe storm/i)).toBeInTheDocument()
   })
 
   it('shows a game over modal with replay when health reaches zero', async () => {

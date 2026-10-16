@@ -21,7 +21,7 @@ import {
   MAX_HEALTH,
   MONKEY_DAMAGE,
   MONKEY_RESPAWN_SECONDS,
-  PLAYER_BANANA_SPEED,
+  PLAYER_AXE_SPEED,
   PLAYER_MOVE_SPEED,
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
@@ -338,31 +338,127 @@ function CinematicLights() {
   )
 }
 
-function TreeCluster() {
-  return (
-    <group>
-      {TREE_LAYOUTS.map(({ treePosition }, index) => (
-        <group key={`tree-${index}`} position={treePosition}>
-          <mesh castShadow position={[0, 1.7, 0]} receiveShadow>
-            <cylinderGeometry args={[0.35, 0.55, 3.4, 8]} />
-            <meshStandardMaterial color="#8c6141" roughness={0.88} />
+function EvergreenTree({ variant }: { variant: 0 | 1 | 2 }) {
+  switch (variant) {
+    case 0:
+      return (
+        <>
+          <mesh castShadow position={[0, 1.75, 0]} receiveShadow>
+            <cylinderGeometry args={[0.35, 0.58, 3.5, 8]} />
+            <meshStandardMaterial color="#8c6141" roughness={0.9} />
           </mesh>
-          <mesh castShadow position={[0, 3.85, 0]} receiveShadow>
-            <coneGeometry args={[1.9, 3.5, 12]} />
+          <mesh castShadow position={[0, 4.2, 0]} receiveShadow>
+            <coneGeometry args={[2.1, 4.2, 12]} />
             <AnimatedSurfaceMaterial
               accentColor="#c8f2d7"
               amplitude={0.08}
               baseColor="#78bb89"
             />
           </mesh>
-          <mesh castShadow position={[0.45, 3.1, 0.45]} receiveShadow>
-            <sphereGeometry args={[1.1, 18, 18]} />
+          <mesh castShadow position={[0.52, 3.45, 0.4]} receiveShadow>
+            <sphereGeometry args={[1.08, 16, 16]} />
             <AnimatedSurfaceMaterial
               accentColor="#cdebc0"
               amplitude={0.06}
               baseColor="#6ba86f"
             />
           </mesh>
+        </>
+      )
+    case 1:
+      return (
+        <>
+          <mesh
+            castShadow
+            position={[0, 1.55, 0]}
+            rotation={[0.08, 0, -0.08]}
+            receiveShadow
+          >
+            <cylinderGeometry args={[0.26, 0.52, 3.1, 7]} />
+            <meshStandardMaterial color="#8a6040" roughness={0.94} />
+          </mesh>
+          <mesh
+            castShadow
+            position={[0.18, 3.15, 0]}
+            rotation={[0.06, 0.16, 0.04]}
+            receiveShadow
+          >
+            <coneGeometry args={[1.55, 2.3, 10]} />
+            <AnimatedSurfaceMaterial
+              accentColor="#d0efcb"
+              amplitude={0.07}
+              baseColor="#77af7d"
+            />
+          </mesh>
+          <mesh
+            castShadow
+            position={[-0.35, 4.2, -0.1]}
+            rotation={[-0.08, 0.4, -0.06]}
+            receiveShadow
+          >
+            <coneGeometry args={[1.18, 1.95, 10]} />
+            <AnimatedSurfaceMaterial
+              accentColor="#d7efc9"
+              amplitude={0.05}
+              baseColor="#8ec387"
+            />
+          </mesh>
+          <mesh
+            castShadow
+            position={[0.52, 2.7, 0.12]}
+            rotation={[0.4, 0.1, 0.86]}
+          >
+            <cylinderGeometry args={[0.07, 0.09, 1.15, 6]} />
+            <meshStandardMaterial color="#8c6141" roughness={0.95} />
+          </mesh>
+        </>
+      )
+    default:
+      return (
+        <>
+          <mesh castShadow position={[0, 1.9, 0]} receiveShadow>
+            <cylinderGeometry args={[0.42, 0.68, 3.8, 9]} />
+            <meshStandardMaterial color="#8e6648" roughness={0.9} />
+          </mesh>
+          <mesh castShadow position={[0, 4.1, 0]} receiveShadow>
+            <sphereGeometry args={[1.5, 18, 18]} />
+            <AnimatedSurfaceMaterial
+              accentColor="#c4ecd0"
+              amplitude={0.05}
+              baseColor="#74b07d"
+            />
+          </mesh>
+          <mesh castShadow position={[-0.9, 3.72, 0.24]} receiveShadow>
+            <sphereGeometry args={[0.92, 16, 16]} />
+            <AnimatedSurfaceMaterial
+              accentColor="#d1eec3"
+              amplitude={0.04}
+              baseColor="#6ba86f"
+            />
+          </mesh>
+          <mesh castShadow position={[0.88, 3.54, -0.08]} receiveShadow>
+            <sphereGeometry args={[1, 16, 16]} />
+            <AnimatedSurfaceMaterial
+              accentColor="#c8f2d7"
+              amplitude={0.04}
+              baseColor="#78bb89"
+            />
+          </mesh>
+        </>
+      )
+  }
+}
+
+function TreeCluster() {
+  return (
+    <group>
+      {TREE_LAYOUTS.map(({ treePosition }, index) => (
+        <group
+          key={`tree-${index}`}
+          position={treePosition}
+          rotation={[0, (index % 2 === 0 ? 1 : -1) * 0.18 * (index + 1), 0]}
+        >
+          <EvergreenTree variant={(index % 3) as 0 | 1 | 2} />
         </group>
       ))}
     </group>
@@ -432,7 +528,7 @@ function HeartPickup({
   )
 }
 
-function MonkeyTroop({
+function VikingTroop({
   monkeyStateRef
 }: {
   monkeyStateRef: RefObject<IMonkeyState[]>
@@ -440,7 +536,7 @@ function MonkeyTroop({
   return (
     <group>
       {TREE_LAYOUTS.map((_, index) => (
-        <MonkeyEnemy
+        <VikingEnemy
           index={index}
           key={`monkey-${index}`}
           monkeyStateRef={monkeyStateRef}
@@ -450,7 +546,7 @@ function MonkeyTroop({
   )
 }
 
-function MonkeyEnemy({
+function VikingEnemy({
   index,
   monkeyStateRef
 }: {
@@ -478,32 +574,60 @@ function MonkeyEnemy({
       <mesh castShadow position={[0, 0.85, 0]}>
         <capsuleGeometry args={[0.42, 0.8, 8, 12]} />
         <AnimatedSurfaceMaterial
-          accentColor="#f5d3a4"
+          accentColor="#d8dbe0"
           amplitude={0.05}
-          baseColor="#90623d"
+          baseColor="#6d737b"
         />
       </mesh>
       <mesh castShadow position={[0, 1.7, 0.12]}>
         <sphereGeometry args={[0.34, 18, 18]} />
         <AnimatedSurfaceMaterial
-          accentColor="#f8dcb2"
+          accentColor="#ecd2b0"
           amplitude={0.04}
-          baseColor="#7d5030"
+          baseColor="#d7a06b"
         />
+      </mesh>
+      <mesh castShadow position={[0, 2.05, 0.08]} rotation={[0, 0, 0.05]}>
+        <cylinderGeometry args={[0.42, 0.48, 0.42, 10]} />
+        <meshStandardMaterial
+          color="#8b9298"
+          metalness={0.55}
+          roughness={0.32}
+        />
+      </mesh>
+      <mesh castShadow position={[0.46, 2.1, 0.1]} rotation={[0, 0, -0.65]}>
+        <coneGeometry args={[0.12, 0.64, 8]} />
+        <meshStandardMaterial
+          color="#cfd6dc"
+          metalness={0.45}
+          roughness={0.38}
+        />
+      </mesh>
+      <mesh castShadow position={[-0.46, 2.1, 0.1]} rotation={[0, 0, 0.65]}>
+        <coneGeometry args={[0.12, 0.64, 8]} />
+        <meshStandardMaterial
+          color="#cfd6dc"
+          metalness={0.45}
+          roughness={0.38}
+        />
+      </mesh>
+      <mesh castShadow position={[0, 1.28, 0.22]} rotation={[0, 0, 0.2]}>
+        <coneGeometry args={[0.24, 0.48, 8]} />
+        <meshStandardMaterial color="#6f4a2e" roughness={0.9} />
       </mesh>
       <mesh castShadow position={[0.35, 1.75, 0.38]}>
         <sphereGeometry args={[0.08, 10, 10]} />
-        <meshStandardMaterial color="#f6e8cf" />
+        <meshStandardMaterial color="#241b18" />
       </mesh>
       <mesh castShadow position={[-0.35, 1.75, 0.38]}>
         <sphereGeometry args={[0.08, 10, 10]} />
-        <meshStandardMaterial color="#f6e8cf" />
+        <meshStandardMaterial color="#241b18" />
       </mesh>
     </group>
   )
 }
 
-function BananaProjectiles({
+function AxeProjectiles({
   projectilesRef
 }: {
   projectilesRef: RefObject<IProjectileState[]>
@@ -511,9 +635,9 @@ function BananaProjectiles({
   return (
     <group>
       {Array.from({ length: projectilePoolSize }, (_, index) => (
-        <BananaProjectile
+        <AxeProjectile
           index={index}
-          key={`banana-${index}`}
+          key={`axe-${index}`}
           projectilesRef={projectilesRef}
         />
       ))}
@@ -521,43 +645,82 @@ function BananaProjectiles({
   )
 }
 
-function BananaProjectile({
+function AxeProjectile({
   index,
   projectilesRef
 }: {
   index: number
   projectilesRef: RefObject<IProjectileState[]>
 }) {
-  const bananaRef = useRef<Group | null>(null)
-  const materialRef = useRef<ThreeMeshStandardMaterial | null>(null)
+  const axeRef = useRef<Group | null>(null)
+  const handleMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
+  const bladeMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
+  const bladeEdgeMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
 
   useFrame(() => {
     const projectileState = projectilesRef.current[index]
 
-    if (!bananaRef.current || !materialRef.current || !projectileState) {
+    if (
+      !axeRef.current ||
+      !handleMaterialRef.current ||
+      !bladeMaterialRef.current ||
+      !bladeEdgeMaterialRef.current ||
+      !projectileState
+    ) {
       return
     }
 
-    bananaRef.current.visible = projectileState.active
-    bananaRef.current.position.copy(projectileState.position)
-    materialRef.current.color.set(
-      projectileState.owner === 'player' ? '#df6b6b' : '#f6c85f'
+    axeRef.current.visible = projectileState.active
+    axeRef.current.position.copy(projectileState.position)
+    handleMaterialRef.current.color.set(
+      projectileState.owner === 'player' ? '#7b5534' : '#543625'
+    )
+    bladeMaterialRef.current.color.set(
+      projectileState.owner === 'player' ? '#d9e4ea' : '#b2bcc3'
+    )
+    bladeEdgeMaterialRef.current.color.set(
+      projectileState.owner === 'player' ? '#eaf0f4' : '#c1c9d0'
     )
 
     if (projectileState.velocity.lengthSq() > 0) {
-      bananaRef.current.rotation.z += 0.18
+      axeRef.current.rotation.z += 0.18
     }
   })
 
   return (
-    <group ref={bananaRef}>
-      <mesh castShadow rotation={[0.25, 0, -0.6]}>
-        <torusGeometry args={[0.35, 0.11, 12, 18, 2.4]} />
+    <group ref={axeRef}>
+      <mesh castShadow position={[0, 0, 0]} rotation={[0, 0, 0.12]}>
+        <cylinderGeometry args={[0.045, 0.055, 0.92, 8]} />
         <meshStandardMaterial
-          ref={materialRef}
-          color="#f6c85f"
-          metalness={0.08}
-          roughness={0.42}
+          ref={handleMaterialRef}
+          color="#7b5534"
+          roughness={0.86}
+        />
+      </mesh>
+      <mesh castShadow position={[0.2, 0.18, 0]} rotation={[0, 0, 0.22]}>
+        <boxGeometry args={[0.34, 0.14, 0.08]} />
+        <meshStandardMaterial
+          ref={bladeMaterialRef}
+          color="#d9e4ea"
+          metalness={0.72}
+          roughness={0.22}
+        />
+      </mesh>
+      <mesh castShadow position={[0.34, 0.28, 0]} rotation={[0, 0, 0.72]}>
+        <coneGeometry args={[0.1, 0.34, 8]} />
+        <meshStandardMaterial
+          ref={bladeEdgeMaterialRef}
+          color="#d9e4ea"
+          metalness={0.72}
+          roughness={0.22}
+        />
+      </mesh>
+      <mesh castShadow position={[-0.12, -0.18, 0]} rotation={[0, 0, -0.7]}>
+        <coneGeometry args={[0.06, 0.22, 8]} />
+        <meshStandardMaterial
+          color="#b7c0c8"
+          metalness={0.66}
+          roughness={0.26}
         />
       </mesh>
     </group>
@@ -567,53 +730,139 @@ function BananaProjectile({
 function PlayerAvatar({ playerRef }: { playerRef: RefObject<Group | null> }) {
   return (
     <group ref={playerRef}>
-      <mesh castShadow position={[0, 1.2, 0]}>
-        <capsuleGeometry args={[0.55, 1.45, 10, 18]} />
+      <mesh castShadow position={[0, 1.18, 0]}>
+        <capsuleGeometry args={[0.52, 1.3, 10, 18]} />
         <AnimatedSurfaceMaterial
-          accentColor="#ffe7d1"
+          accentColor="#c6d1d8"
           amplitude={0.04}
-          baseColor="#f1a46d"
+          baseColor="#5a6771"
         />
       </mesh>
-      <mesh castShadow position={[0, 2.45, 0.12]}>
-        <sphereGeometry args={[0.42, 20, 20]} />
+      <mesh castShadow position={[0, 1.28, 0.3]}>
+        <boxGeometry args={[0.88, 0.7, 0.14]} />
+        <meshStandardMaterial color="#8a5a33" roughness={0.92} />
+      </mesh>
+      <mesh castShadow position={[0, 2.42, 0.12]}>
+        <sphereGeometry args={[0.38, 20, 20]} />
         <AnimatedSurfaceMaterial
           accentColor="#f8e8cf"
           amplitude={0.03}
           baseColor="#f0bf97"
         />
       </mesh>
-      <mesh castShadow position={[0.52, 1.65, 0]} rotation={[0, 0, -0.4]}>
-        <capsuleGeometry args={[0.13, 0.8, 5, 8]} />
+      <mesh castShadow position={[0, 2.78, 0.03]}>
+        <cylinderGeometry args={[0.42, 0.48, 0.28, 12]} />
+        <meshStandardMaterial
+          color="#8b9298"
+          metalness={0.56}
+          roughness={0.28}
+        />
+      </mesh>
+      <mesh castShadow position={[0.44, 2.88, 0.04]} rotation={[0, 0, -0.82]}>
+        <coneGeometry args={[0.1, 0.52, 8]} />
+        <meshStandardMaterial
+          color="#d7dde2"
+          metalness={0.46}
+          roughness={0.36}
+        />
+      </mesh>
+      <mesh castShadow position={[-0.44, 2.88, 0.04]} rotation={[0, 0, 0.82]}>
+        <coneGeometry args={[0.1, 0.52, 8]} />
+        <meshStandardMaterial
+          color="#d7dde2"
+          metalness={0.46}
+          roughness={0.36}
+        />
+      </mesh>
+      <mesh castShadow position={[0, 2.03, 0.34]} rotation={[0.16, 0, 0]}>
+        <coneGeometry args={[0.24, 0.56, 10]} />
+        <meshStandardMaterial color="#b26a34" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[0.58, 1.62, 0.02]} rotation={[0, 0, -0.56]}>
+        <capsuleGeometry args={[0.12, 0.88, 5, 8]} />
         <AnimatedSurfaceMaterial
-          accentColor="#ffe7d1"
+          accentColor="#f5d7b9"
           amplitude={0.04}
-          baseColor="#f1a46d"
+          baseColor="#db9d71"
         />
       </mesh>
-      <mesh castShadow position={[-0.52, 1.65, 0]} rotation={[0, 0, 0.4]}>
-        <capsuleGeometry args={[0.13, 0.8, 5, 8]} />
+      <mesh castShadow position={[-0.54, 1.6, 0.02]} rotation={[0, 0, 0.52]}>
+        <capsuleGeometry args={[0.12, 0.88, 5, 8]} />
         <AnimatedSurfaceMaterial
-          accentColor="#ffe7d1"
+          accentColor="#f5d7b9"
           amplitude={0.04}
-          baseColor="#f1a46d"
+          baseColor="#db9d71"
         />
       </mesh>
-      <mesh castShadow position={[0.24, 0.18, 0]}>
-        <capsuleGeometry args={[0.16, 1.1, 5, 8]} />
+      <group position={[0.94, 1.92, 0.04]} rotation={[0, 0, 0.26]}>
+        <mesh castShadow position={[0, -0.8, 0]}>
+          <sphereGeometry args={[0.08, 12, 12]} />
+          <meshStandardMaterial
+            color="#8d969e"
+            metalness={0.64}
+            roughness={0.26}
+          />
+        </mesh>
+        <mesh castShadow position={[0, -0.5, 0]}>
+          <cylinderGeometry args={[0.042, 0.052, 0.58, 10]} />
+          <meshStandardMaterial color="#6c4728" roughness={0.84} />
+        </mesh>
+        <mesh castShadow position={[0, -0.16, 0]}>
+          <boxGeometry args={[0.38, 0.08, 0.12]} />
+          <meshStandardMaterial
+            color="#8c949b"
+            metalness={0.58}
+            roughness={0.3}
+          />
+        </mesh>
+        <mesh castShadow position={[0, 0.42, 0]}>
+          <boxGeometry args={[0.11, 1.08, 0.05]} />
+          <meshStandardMaterial
+            color="#d6dfe6"
+            metalness={0.8}
+            roughness={0.18}
+          />
+        </mesh>
+        <mesh castShadow position={[0, 0.42, 0.02]}>
+          <boxGeometry args={[0.032, 0.86, 0.012]} />
+          <meshStandardMaterial
+            color="#f3f7fa"
+            metalness={0.86}
+            roughness={0.12}
+          />
+        </mesh>
+        <mesh castShadow position={[0, 1.03, 0]}>
+          <coneGeometry args={[0.055, 0.22, 8]} />
+          <meshStandardMaterial
+            color="#e6edf2"
+            metalness={0.86}
+            roughness={0.14}
+          />
+        </mesh>
+      </group>
+      <mesh castShadow position={[0.26, 0.24, 0]}>
+        <capsuleGeometry args={[0.15, 1.08, 5, 8]} />
         <AnimatedSurfaceMaterial
-          accentColor="#fed5ad"
+          accentColor="#7f512c"
           amplitude={0.02}
-          baseColor="#d98758"
+          baseColor="#5e371e"
         />
       </mesh>
-      <mesh castShadow position={[-0.24, 0.18, 0]}>
-        <capsuleGeometry args={[0.16, 1.1, 5, 8]} />
+      <mesh castShadow position={[-0.26, 0.24, 0]}>
+        <capsuleGeometry args={[0.15, 1.08, 5, 8]} />
         <AnimatedSurfaceMaterial
-          accentColor="#fed5ad"
+          accentColor="#7f512c"
           amplitude={0.02}
-          baseColor="#d98758"
+          baseColor="#5e371e"
         />
+      </mesh>
+      <mesh castShadow position={[0.26, -0.54, 0.08]}>
+        <boxGeometry args={[0.3, 0.2, 0.42]} />
+        <meshStandardMaterial color="#3d2416" roughness={0.92} />
+      </mesh>
+      <mesh castShadow position={[-0.26, -0.54, 0.08]}>
+        <boxGeometry args={[0.3, 0.2, 0.42]} />
+        <meshStandardMaterial color="#3d2416" roughness={0.92} />
       </mesh>
     </group>
   )
@@ -716,7 +965,7 @@ function RoundStage({
         .add(new Vector3(0, 1.35, 0))
       const velocity = cameraLookDirectionRef.current
         .clone()
-        .multiplyScalar(PLAYER_BANANA_SPEED)
+        .multiplyScalar(PLAYER_AXE_SPEED)
 
       spawnProjectile(origin, velocity, 'player')
     }
@@ -1007,7 +1256,7 @@ function RoundStage({
 
         spawnProjectile(
           origin,
-          direction.multiplyScalar(difficultyConfig.bananaSpeed),
+          direction.multiplyScalar(difficultyConfig.axeSpeed),
           'monkey'
         )
 
@@ -1129,8 +1378,8 @@ function RoundStage({
 
       <TreeCluster />
       <HeartPickups heartStateRef={heartStateRef} />
-      <MonkeyTroop monkeyStateRef={monkeyStateRef} />
-      <BananaProjectiles projectilesRef={projectilesRef} />
+      <VikingTroop monkeyStateRef={monkeyStateRef} />
+      <AxeProjectiles projectilesRef={projectilesRef} />
       <PlayerAvatar playerRef={playerRef} />
 
       <Billboard
@@ -1157,7 +1406,7 @@ function RoundStage({
           >
             Click the scene to lock the pointer. Move relative to the camera
             with WASD or the arrow keys, aim with the mouse, and click or press
-            Space to throw a banana through the center reticle.
+            Space to hurl an axe through the center reticle.
           </div>
         </Html>
       </Billboard>
