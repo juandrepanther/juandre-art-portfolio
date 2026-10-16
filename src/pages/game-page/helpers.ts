@@ -23,7 +23,7 @@ export interface ITreeLayout {
 
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_HEALTH = 100
-export const MONKEY_DAMAGE = 5
+export const MONKEY_DAMAGE = 15
 export const HEART_HEAL = 20
 export const START_RUN_COUNTDOWN_SECONDS = 2
 export const SURVIVAL_TIME_SECONDS = 60

@@ -63,6 +63,7 @@ These instructions are intended for AI agents working in this repository.
 - `pre-commit` means `npm run cspell && npm run lint && npm run ts-check`.
 - `ch` is the full project check command.
 - Use TypeScript path aliases from `tsconfig.json` in preference to deep relative imports where practical.
+- Prefer alias-based imports from `assets/*`, `data/*`, `hooks/*`, `lib/*`, `pages/*`, `shared/*`, `tests/*`, and `utils/*` instead of long relative paths when the alias exists.
 - Never use types as 'any'. Always use the most specific type possible, and if a type is not available, create a new type definition instead of using 'any'.
 - Name newly created variables with a lowercase first letter (for example `newVariable`).
 - Use interfaces instead of types for object shapes, and use types for unions, intersections, and other non-object types.

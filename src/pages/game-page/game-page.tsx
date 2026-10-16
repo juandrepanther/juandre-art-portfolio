@@ -455,7 +455,7 @@ function GamePage() {
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
                   Vikings hurl axes with a slight aiming variance, hearts appear
-                  randomly near the trees, heal +20%, and each hit removes 5%
+                  randomly near the trees, heal +20%, and each hit removes 15%
                   health. Easy starts slow, Survivor is relentless.
                 </Typography>
               </Stack>

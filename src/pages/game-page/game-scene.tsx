@@ -1,6 +1,6 @@
 import { Billboard, Html } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 import {
   AdditiveBlending,
@@ -36,6 +36,7 @@ import {
   particleFragmentShader,
   particleVertexShader
 } from './shaders'
+import VikingAvatar from './viking-avatar'
 
 interface IAnimatedSurfaceMaterial {
   accentColor: string
@@ -727,147 +728,6 @@ function AxeProjectile({
   )
 }
 
-function PlayerAvatar({ playerRef }: { playerRef: RefObject<Group | null> }) {
-  return (
-    <group ref={playerRef}>
-      <mesh castShadow position={[0, 1.18, 0]}>
-        <capsuleGeometry args={[0.52, 1.3, 10, 18]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#c6d1d8"
-          amplitude={0.04}
-          baseColor="#5a6771"
-        />
-      </mesh>
-      <mesh castShadow position={[0, 1.28, 0.3]}>
-        <boxGeometry args={[0.88, 0.7, 0.14]} />
-        <meshStandardMaterial color="#8a5a33" roughness={0.92} />
-      </mesh>
-      <mesh castShadow position={[0, 2.42, 0.12]}>
-        <sphereGeometry args={[0.38, 20, 20]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#f8e8cf"
-          amplitude={0.03}
-          baseColor="#f0bf97"
-        />
-      </mesh>
-      <mesh castShadow position={[0, 2.78, 0.03]}>
-        <cylinderGeometry args={[0.42, 0.48, 0.28, 12]} />
-        <meshStandardMaterial
-          color="#8b9298"
-          metalness={0.56}
-          roughness={0.28}
-        />
-      </mesh>
-      <mesh castShadow position={[0.44, 2.88, 0.04]} rotation={[0, 0, -0.82]}>
-        <coneGeometry args={[0.1, 0.52, 8]} />
-        <meshStandardMaterial
-          color="#d7dde2"
-          metalness={0.46}
-          roughness={0.36}
-        />
-      </mesh>
-      <mesh castShadow position={[-0.44, 2.88, 0.04]} rotation={[0, 0, 0.82]}>
-        <coneGeometry args={[0.1, 0.52, 8]} />
-        <meshStandardMaterial
-          color="#d7dde2"
-          metalness={0.46}
-          roughness={0.36}
-        />
-      </mesh>
-      <mesh castShadow position={[0, 2.03, 0.34]} rotation={[0.16, 0, 0]}>
-        <coneGeometry args={[0.24, 0.56, 10]} />
-        <meshStandardMaterial color="#b26a34" roughness={0.84} />
-      </mesh>
-      <mesh castShadow position={[0.58, 1.62, 0.02]} rotation={[0, 0, -0.56]}>
-        <capsuleGeometry args={[0.12, 0.88, 5, 8]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#f5d7b9"
-          amplitude={0.04}
-          baseColor="#db9d71"
-        />
-      </mesh>
-      <mesh castShadow position={[-0.54, 1.6, 0.02]} rotation={[0, 0, 0.52]}>
-        <capsuleGeometry args={[0.12, 0.88, 5, 8]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#f5d7b9"
-          amplitude={0.04}
-          baseColor="#db9d71"
-        />
-      </mesh>
-      <group position={[0.94, 1.92, 0.04]} rotation={[0, 0, 0.26]}>
-        <mesh castShadow position={[0, -0.8, 0]}>
-          <sphereGeometry args={[0.08, 12, 12]} />
-          <meshStandardMaterial
-            color="#8d969e"
-            metalness={0.64}
-            roughness={0.26}
-          />
-        </mesh>
-        <mesh castShadow position={[0, -0.5, 0]}>
-          <cylinderGeometry args={[0.042, 0.052, 0.58, 10]} />
-          <meshStandardMaterial color="#6c4728" roughness={0.84} />
-        </mesh>
-        <mesh castShadow position={[0, -0.16, 0]}>
-          <boxGeometry args={[0.38, 0.08, 0.12]} />
-          <meshStandardMaterial
-            color="#8c949b"
-            metalness={0.58}
-            roughness={0.3}
-          />
-        </mesh>
-        <mesh castShadow position={[0, 0.42, 0]}>
-          <boxGeometry args={[0.11, 1.08, 0.05]} />
-          <meshStandardMaterial
-            color="#d6dfe6"
-            metalness={0.8}
-            roughness={0.18}
-          />
-        </mesh>
-        <mesh castShadow position={[0, 0.42, 0.02]}>
-          <boxGeometry args={[0.032, 0.86, 0.012]} />
-          <meshStandardMaterial
-            color="#f3f7fa"
-            metalness={0.86}
-            roughness={0.12}
-          />
-        </mesh>
-        <mesh castShadow position={[0, 1.03, 0]}>
-          <coneGeometry args={[0.055, 0.22, 8]} />
-          <meshStandardMaterial
-            color="#e6edf2"
-            metalness={0.86}
-            roughness={0.14}
-          />
-        </mesh>
-      </group>
-      <mesh castShadow position={[0.26, 0.24, 0]}>
-        <capsuleGeometry args={[0.15, 1.08, 5, 8]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#7f512c"
-          amplitude={0.02}
-          baseColor="#5e371e"
-        />
-      </mesh>
-      <mesh castShadow position={[-0.26, 0.24, 0]}>
-        <capsuleGeometry args={[0.15, 1.08, 5, 8]} />
-        <AnimatedSurfaceMaterial
-          accentColor="#7f512c"
-          amplitude={0.02}
-          baseColor="#5e371e"
-        />
-      </mesh>
-      <mesh castShadow position={[0.26, -0.54, 0.08]}>
-        <boxGeometry args={[0.3, 0.2, 0.42]} />
-        <meshStandardMaterial color="#3d2416" roughness={0.92} />
-      </mesh>
-      <mesh castShadow position={[-0.26, -0.54, 0.08]}>
-        <boxGeometry args={[0.3, 0.2, 0.42]} />
-        <meshStandardMaterial color="#3d2416" roughness={0.92} />
-      </mesh>
-    </group>
-  )
-}
-
 function RoundStage({
   difficulty,
   isActive,
@@ -1380,7 +1240,9 @@ function RoundStage({
       <HeartPickups heartStateRef={heartStateRef} />
       <VikingTroop monkeyStateRef={monkeyStateRef} />
       <AxeProjectiles projectilesRef={projectilesRef} />
-      <PlayerAvatar playerRef={playerRef} />
+      <Suspense fallback={null}>
+        <VikingAvatar playerRef={playerRef} />
+      </Suspense>
 
       <Billboard
         follow
