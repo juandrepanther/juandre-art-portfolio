@@ -3,10 +3,15 @@ import {
   Html,
   KeyboardControls,
   PointerLockControls,
-  useKeyboardControls,
-  type KeyboardControlsEntry
+  useKeyboardControls
 } from '@react-three/drei'
-import { CuboidCollider, Physics, RigidBody } from '@react-three/rapier'
+import {
+  CapsuleCollider,
+  CuboidCollider,
+  Physics,
+  RapierRigidBody,
+  RigidBody
+} from '@react-three/rapier'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { RefObject } from 'react'
@@ -23,16 +28,12 @@ import {
   ShaderMaterial,
   Vector3
 } from 'three'
-import {
-  findHighestCrateTopUnderCircle,
-  isPointInsideAnyCrate
-} from './world-collision'
+import { isPointInsideAnyCrate } from './world-collision'
 import {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
   ARENA_BOUNDARY_COLLIDER_THICKNESS,
-  BOX_LAYOUTS,
+  createRandomBoxLayouts,
   DIFFICULTY_CONFIGS,
-  GAME_ARENA_HALF_SIZE,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
@@ -47,6 +48,7 @@ import {
   PROJECTILE_LIFETIME_SECONDS,
   TREE_TRUNK_COLLIDER_ARGS,
   TREE_LAYOUTS,
+  type ICrateLayout,
   type IGameSceneProps
 } from './helpers'
 import {
@@ -57,6 +59,40 @@ import {
   particleFragmentShader,
   particleVertexShader
 } from './shaders'
+import {
+  arenaHalfSize,
+  atmosphereParticleCount,
+  gameControlMap,
+  hardcoreMonkeyFlightHeightMax,
+  hardcoreMonkeyFlightHeightMin,
+  hardcoreMonkeyFlightProximity,
+  hardcoreMonkeyFlightSpeed,
+  heartPickupRadius,
+  heartSpawnHeight,
+  heartSpawnPlacementAttempts,
+  monkeyAimPrecision,
+  monkeyHitRadius,
+  monkeyHitboxOffset,
+  playerBodyGroundOffset,
+  playerCameraAimPitch,
+  playerCameraDistance,
+  playerCameraHeight,
+  playerColliderHalfHeight,
+  playerFacingTurnSpeed,
+  playerHitFlashDurationMs,
+  playerHitRadius,
+  playerHitboxOffset,
+  playerJumpGravity,
+  playerJumpVelocity,
+  playerCollisionRadius,
+  pointerLockMaxPolarAngle,
+  pointerLockMinPolarAngle,
+  pointerLockSelector,
+  pointerLockSpeed,
+  projectilePoolSize,
+  type TGameControl,
+  worldUp
+} from './settings'
 import VikingAvatar from './viking-avatar'
 
 interface IAnimatedSurfaceMaterial {
@@ -89,7 +125,6 @@ interface IHeartState {
   animationOffset: number
   position: Vector3
   respawnAt: number
-  treeIndex: number
 }
 
 interface IControlsState {
@@ -98,47 +133,6 @@ interface IControlsState {
   right: boolean
   forward: boolean
 }
-
-type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
-
-const arenaHalfSize = GAME_ARENA_HALF_SIZE
-const monkeyAimPrecision = 0.1
-const atmosphereParticleCount = 180
-const projectilePoolSize = 40
-const monkeyHitRadius = 1.45
-const monkeyHitboxOffset = new Vector3(0, 0.95, 0)
-const playerCrateEdgeClearance = 0.12
-const survivorMonkeyFlightHeightMax = 6.1
-const survivorMonkeyFlightHeightMin = 2.2
-const survivorMonkeyFlightProximity = 0.7
-const survivorMonkeyFlightSpeed = 4.2
-const heartSpawnRadiusMin = 1.8
-const heartSpawnRadiusMax = 3.1
-const playerHitRadius = 1.35
-const playerFacingTurnSpeed = 10
-const playerJumpGravity = 26
-const playerJumpVelocity = 11
-const pointerLookSensitivity = 0.0022
-const pointerMaxPitch = Math.PI / 3.1
-const pointerMinPitch = -Math.PI / 4.2
-const pointerLockSelector = '#game-scene-canvas'
-const playerCameraDistance = 6.5
-const playerCameraHeight = 3.3
-const playerGroundY = PLAYER_START_POSITION[1]
-const playerHitboxOffset = new Vector3(0, 1.2, 0)
-const playerCollisionRadius = 0.58
-const worldUp = new Vector3(0, 1, 0)
-const gameControlMap: KeyboardControlsEntry<TGameControl>[] = [
-  { keys: ['ArrowUp', 'KeyW'], name: 'forward' },
-  { keys: ['ArrowDown', 'KeyS'], name: 'backward' },
-  { keys: ['ArrowLeft', 'KeyA'], name: 'left' },
-  { keys: ['ArrowRight', 'KeyD'], name: 'right' },
-  { keys: ['Space'], name: 'jump' }
-]
-const pointerLockMinPolarAngle = Math.PI / 2 - pointerMaxPitch
-const pointerLockMaxPolarAngle = Math.PI / 2 - pointerMinPitch
-const pointerLockSpeed = pointerLookSensitivity / 0.002
-const playerHitFlashDurationMs = 125
 
 function createLookDirection(yaw: number, pitch: number) {
   const cosPitch = Math.cos(pitch)
@@ -179,9 +173,9 @@ function createAtmosphereParticleData() {
 function createRandomMonkeyFlightPosition() {
   return new Vector3(
     clampToArena((Math.random() - 0.5) * arenaHalfSize * 2),
-    survivorMonkeyFlightHeightMin +
+    hardcoreMonkeyFlightHeightMin +
       Math.random() *
-        (survivorMonkeyFlightHeightMax - survivorMonkeyFlightHeightMin),
+        (hardcoreMonkeyFlightHeightMax - hardcoreMonkeyFlightHeightMin),
     clampToArena((Math.random() - 0.5) * arenaHalfSize * 2)
   )
 }
@@ -199,27 +193,47 @@ function createMonkeyState() {
   }))
 }
 
-function createHeartState() {
-  return TREE_LAYOUTS.map(({ treePosition }, index) => ({
-    active: true,
-    animationOffset: index * 0.45,
-    position: createRandomHeartPosition(treePosition),
-    respawnAt: 0,
-    treeIndex: index
-  }))
+function createHeartState(crateLayouts: ICrateLayout[]) {
+  const initialHeartIndex = Math.floor(Math.random() * TREE_LAYOUTS.length)
+
+  return TREE_LAYOUTS.map((_, index) => {
+    const isActive = index === initialHeartIndex
+
+    return {
+      active: isActive,
+      animationOffset: index * 0.45,
+      position: createRandomHeartPosition(crateLayouts),
+      respawnAt: isActive ? 0 : Math.random() * HEART_RESPAWN_SECONDS
+    }
+  })
 }
 
-function createRandomHeartPosition(treePosition: [number, number, number]) {
-  const angle = Math.random() * Math.PI * 2
-  const radius =
-    heartSpawnRadiusMin +
-    Math.random() * (heartSpawnRadiusMax - heartSpawnRadiusMin)
+function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
+  const spawnRange = arenaHalfSize - heartPickupRadius
 
-  return new Vector3(
-    clampToArena(treePosition[0] + Math.cos(angle) * radius),
-    0.9,
-    clampToArena(treePosition[2] + Math.sin(angle) * radius)
-  )
+  for (
+    let attemptIndex = 0;
+    attemptIndex < heartSpawnPlacementAttempts;
+    attemptIndex += 1
+  ) {
+    const position = new Vector3(
+      (Math.random() - 0.5) * spawnRange * 2,
+      heartSpawnHeight,
+      (Math.random() - 0.5) * spawnRange * 2
+    )
+
+    if (
+      !isPointInsideAnyCrate(
+        [position.x, position.y, position.z],
+        crateLayouts
+      ) &&
+      !isPointInsideTreeTrunk(position)
+    ) {
+      return position
+    }
+  }
+
+  return new Vector3(0, heartSpawnHeight, 0)
 }
 
 function clampToArena(value: number) {
@@ -238,52 +252,6 @@ function isPointInsideTreeTrunk(point: Vector3) {
       point.y <= TREE_TRUNK_COLLIDER_ARGS[1] * 2 + 0.2
     )
   })
-}
-
-function doesPlayerCollideWithTree(position: Vector3) {
-  const treeCollisionRadius =
-    Math.max(TREE_TRUNK_COLLIDER_ARGS[0], TREE_TRUNK_COLLIDER_ARGS[2]) +
-    playerCollisionRadius * 0.8
-
-  return TREE_LAYOUTS.some(({ treePosition }) => {
-    const deltaX = position.x - treePosition[0]
-    const deltaZ = position.z - treePosition[2]
-
-    return (
-      deltaX * deltaX + deltaZ * deltaZ <=
-      treeCollisionRadius * treeCollisionRadius
-    )
-  })
-}
-
-function getPlayerFeetHeight(position: Vector3) {
-  return position.y - playerGroundY
-}
-
-function getPlayerSupportHeight(position: Vector3) {
-  const crateTopHeight = findHighestCrateTopUnderCircle(
-    { x: position.x, z: position.z },
-    playerCollisionRadius,
-    BOX_LAYOUTS,
-    0.02
-  )
-
-  return playerGroundY + (crateTopHeight ?? 0)
-}
-
-function canMovePlayerTo(position: Vector3) {
-  const playerFeetHeight = getPlayerFeetHeight(position)
-  const blockingCrateTopHeight = findHighestCrateTopUnderCircle(
-    { x: position.x, z: position.z },
-    playerCollisionRadius,
-    BOX_LAYOUTS,
-    0.08
-  )
-  const canClearCrateSide =
-    blockingCrateTopHeight === null ||
-    playerFeetHeight >= blockingCrateTopHeight - playerCrateEdgeClearance
-
-  return canClearCrateSide && !doesPlayerCollideWithTree(position)
 }
 
 function AnimatedSurfaceMaterial({
@@ -572,10 +540,10 @@ function TreeCluster() {
   )
 }
 
-function CrateField() {
+function CrateField({ crateLayouts }: { crateLayouts: ICrateLayout[] }) {
   return (
     <group>
-      {BOX_LAYOUTS.map((crateLayout, index) => (
+      {crateLayouts.map((crateLayout, index) => (
         <CrateObstacle
           crateLayout={crateLayout}
           index={index}
@@ -590,7 +558,7 @@ function CrateObstacle({
   crateLayout,
   index
 }: {
-  crateLayout: (typeof BOX_LAYOUTS)[number]
+  crateLayout: ICrateLayout
   index: number
 }) {
   const [width, height, depth] = crateLayout.size
@@ -942,7 +910,11 @@ function RoundStage({
   const [subscribeToKeyboard, getKeyboardState] =
     useKeyboardControls<TGameControl>()
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
+  const [crateLayouts] = useState<ICrateLayout[]>(() =>
+    createRandomBoxLayouts()
+  )
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
+  const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
   const controlsRef = useRef<IControlsState>({
     backward: false,
@@ -950,15 +922,20 @@ function RoundStage({
     left: false,
     right: false
   })
-  const playerPositionRef = useRef(new Vector3(...PLAYER_START_POSITION))
+  const playerPositionRef = useRef(
+    new Vector3(
+      PLAYER_START_POSITION[0],
+      playerBodyGroundOffset,
+      PLAYER_START_POSITION[2]
+    )
+  )
   const playerVelocityRef = useRef(new Vector3())
-  const playerVerticalVelocityRef = useRef(0)
   const playerDirectionRef = useRef(new Vector3(0, 0, -1))
   const projectilesRef = useRef(
     Array.from({ length: projectilePoolSize }, createProjectileState)
   )
   const monkeyStateRef = useRef(createMonkeyState())
-  const heartStateRef = useRef(createHeartState())
+  const heartStateRef = useRef(createHeartState(crateLayouts))
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
@@ -992,11 +969,26 @@ function RoundStage({
   }
 
   const triggerPlayerJump = useEffectEvent(() => {
-    if (!isActive || playerPositionRef.current.y > playerGroundY + 0.01) {
+    const playerBody = playerBodyRef.current
+
+    if (!isActive || !playerBody) {
       return
     }
 
-    playerVerticalVelocityRef.current = playerJumpVelocity
+    const currentVelocity = playerBody.linvel()
+
+    if (Math.abs(currentVelocity.y) > 0.1) {
+      return
+    }
+
+    playerBody.setLinvel(
+      {
+        x: currentVelocity.x,
+        y: playerJumpVelocity,
+        z: currentVelocity.z
+      },
+      true
+    )
   })
 
   useEffect(() => {
@@ -1137,15 +1129,20 @@ function RoundStage({
   }, [getKeyboardState, gl, isActive, subscribeToKeyboard])
 
   useEffect(() => {
-    playerPositionRef.current.set(...PLAYER_START_POSITION)
+    playerPositionRef.current.set(
+      PLAYER_START_POSITION[0],
+      playerBodyGroundOffset,
+      PLAYER_START_POSITION[2]
+    )
     playerVelocityRef.current.set(0, 0, 0)
-    playerVerticalVelocityRef.current = 0
     playerDirectionRef.current.set(0, 0, -1)
     desiredFacingRef.current.set(0, 0, -1)
     isPointerLockedRef.current = document.pointerLockElement === gl.domElement
     pendingPointerShotRef.current = false
-    camera.quaternion.setFromEuler(new Euler(-0.24, 0, 0, 'YXZ'))
-    cameraLookDirectionRef.current.copy(createLookDirection(0, -0.24))
+    camera.quaternion.setFromEuler(new Euler(playerCameraAimPitch, 0, 0, 'YXZ'))
+    cameraLookDirectionRef.current.copy(
+      createLookDirection(0, playerCameraAimPitch)
+    )
     cameraForwardRef.current.set(0, 0, -1)
     cameraRightRef.current.set(1, 0, 0)
     controlsRef.current.forward = false
@@ -1153,7 +1150,17 @@ function RoundStage({
     controlsRef.current.left = false
     controlsRef.current.right = false
     monkeyStateRef.current = createMonkeyState()
-    heartStateRef.current = createHeartState()
+    heartStateRef.current = createHeartState(crateLayouts)
+
+    playerBodyRef.current?.setTranslation(
+      {
+        x: PLAYER_START_POSITION[0],
+        y: playerBodyGroundOffset,
+        z: PLAYER_START_POSITION[2]
+      },
+      true
+    )
+    playerBodyRef.current?.setLinvel({ x: 0, y: 0, z: 0 }, true)
 
     cameraPosition
       .set(...PLAYER_START_POSITION)
@@ -1174,11 +1181,19 @@ function RoundStage({
     lastDamageAtRef.current = -10
     healthRef.current = MAX_HEALTH
     onHealthChangeRef.current(MAX_HEALTH)
-  }, [camera, cameraPosition, difficulty, gl, roundKey])
+  }, [camera, cameraPosition, crateLayouts, difficulty, gl, roundKey])
 
   useFrame((_, delta) => {
-    if (playerRef.current) {
-      playerRef.current.position.copy(playerPositionRef.current)
+    const playerBody = playerBodyRef.current
+
+    if (playerBody) {
+      const playerTranslation = playerBody.translation()
+
+      playerPositionRef.current.set(
+        playerTranslation.x,
+        playerTranslation.y,
+        playerTranslation.z
+      )
     }
 
     camera.getWorldDirection(cameraLookDirectionRef.current)
@@ -1199,9 +1214,7 @@ function RoundStage({
       .clone()
       .add(new Vector3(0, playerCameraHeight, 0))
       .add(
-        cameraLookDirectionRef.current
-          .clone()
-          .multiplyScalar(-playerCameraDistance)
+        cameraForwardRef.current.clone().multiplyScalar(-playerCameraDistance)
       )
 
     camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-delta * 10))
@@ -1235,52 +1248,26 @@ function RoundStage({
       1 - Math.exp(-delta * playerFacingTurnSpeed)
     )
 
-    const nextPlayerPosition = playerPositionRef.current.clone()
+    if (playerBody) {
+      const currentVelocity = playerBody.linvel()
 
-    if (isActive) {
-      const supportHeight = getPlayerSupportHeight(nextPlayerPosition)
-      const movementStep = playerVelocityRef.current
-        .clone()
-        .multiplyScalar(delta)
+      playerBody.setLinvel(
+        {
+          x: isActive ? playerVelocityRef.current.x : 0,
+          y: currentVelocity.y,
+          z: isActive ? playerVelocityRef.current.z : 0
+        },
+        true
+      )
 
-      if (movementStep.x !== 0) {
-        const candidateX = nextPlayerPosition.clone()
+      const nextPlayerTranslation = playerBody.translation()
 
-        candidateX.x = clampToArena(candidateX.x + movementStep.x)
-
-        if (canMovePlayerTo(candidateX)) {
-          nextPlayerPosition.x = candidateX.x
-        }
-      }
-
-      if (movementStep.z !== 0) {
-        const candidateZ = nextPlayerPosition.clone()
-
-        candidateZ.z = clampToArena(candidateZ.z + movementStep.z)
-
-        if (canMovePlayerTo(candidateZ)) {
-          nextPlayerPosition.z = candidateZ.z
-        }
-      }
-
-      if (
-        playerVerticalVelocityRef.current !== 0 ||
-        nextPlayerPosition.y > supportHeight
-      ) {
-        playerVerticalVelocityRef.current -= playerJumpGravity * delta
-        nextPlayerPosition.y += playerVerticalVelocityRef.current * delta
-
-        if (nextPlayerPosition.y <= supportHeight) {
-          nextPlayerPosition.y = supportHeight
-          playerVerticalVelocityRef.current = 0
-        }
-      }
-    } else {
-      nextPlayerPosition.y = playerGroundY
-      playerVerticalVelocityRef.current = 0
+      playerPositionRef.current.set(
+        nextPlayerTranslation.x,
+        nextPlayerTranslation.y,
+        nextPlayerTranslation.z
+      )
     }
-
-    playerPositionRef.current.copy(nextPlayerPosition)
 
     playerRef.current.rotation.y = Math.atan2(
       playerDirectionRef.current.x,
@@ -1297,20 +1284,20 @@ function RoundStage({
       .add(playerHitboxOffset)
 
     for (const monkeyState of monkeyStateRef.current) {
-      if (difficulty === 'Survivor') {
+      if (difficulty === 'Hardcore') {
         const travelToTarget = monkeyState.targetPosition
           .clone()
           .sub(monkeyState.position)
 
         if (
           travelToTarget.lengthSq() <=
-          survivorMonkeyFlightProximity * survivorMonkeyFlightProximity
+          hardcoreMonkeyFlightProximity * hardcoreMonkeyFlightProximity
         ) {
           monkeyState.targetPosition.copy(createRandomMonkeyFlightPosition())
         } else {
           monkeyState.position.addScaledVector(
             travelToTarget.normalize(),
-            delta * survivorMonkeyFlightSpeed
+            delta * hardcoreMonkeyFlightSpeed
           )
         }
       } else {
@@ -1328,7 +1315,7 @@ function RoundStage({
       if (!monkeyState.active) {
         if (now >= monkeyState.respawnAt) {
           monkeyState.active = true
-          if (difficulty === 'Survivor') {
+          if (difficulty === 'Hardcore') {
             monkeyState.position.copy(createRandomMonkeyFlightPosition())
             monkeyState.targetPosition.copy(createRandomMonkeyFlightPosition())
           } else {
@@ -1378,7 +1365,7 @@ function RoundStage({
       if (
         isPointInsideAnyCrate(
           [projectile.position.x, projectile.position.y, projectile.position.z],
-          BOX_LAYOUTS
+          crateLayouts
         ) ||
         isPointInsideTreeTrunk(projectile.position)
       ) {
@@ -1427,18 +1414,16 @@ function RoundStage({
       if (!heartState.active) {
         if (now >= heartState.respawnAt) {
           heartState.active = true
-          heartState.position.copy(
-            createRandomHeartPosition(
-              TREE_LAYOUTS[heartState.treeIndex]?.treePosition ??
-                TREE_LAYOUTS[0].treePosition
-            )
-          )
+          heartState.position.copy(createRandomHeartPosition(crateLayouts))
         }
 
         continue
       }
 
-      if (playerPositionRef.current.distanceTo(heartState.position) <= 1.55) {
+      if (
+        playerPositionRef.current.distanceTo(heartState.position) <=
+        heartPickupRadius
+      ) {
         heartState.active = false
         heartState.respawnAt = now + HEART_RESPAWN_SECONDS
         setHealth(Math.min(MAX_HEALTH, healthRef.current + HEART_HEAL))
@@ -1478,6 +1463,10 @@ function RoundStage({
         <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
         <meshStandardMaterial color="#c6e2cf" roughness={0.94} />
       </mesh>
+      <CuboidCollider
+        args={[GAME_GROUND_SIZE / 2, 0.1, GAME_GROUND_SIZE / 2]}
+        position={[0, -0.1, 0]}
+      />
 
       <mesh
         position={[0, 0.05, 0]}
@@ -1489,16 +1478,34 @@ function RoundStage({
       </mesh>
 
       <TreeCluster />
-      <CrateField />
+      <CrateField crateLayouts={crateLayouts} />
       <HeartPickups heartStateRef={heartStateRef} />
       <VikingTroop monkeyStateRef={monkeyStateRef} />
       <AxeProjectiles projectilesRef={projectilesRef} />
-      <Suspense fallback={null}>
-        <VikingAvatar
-          isHitFlashing={isPlayerHitFlashing}
-          playerRef={playerRef}
+      <RigidBody
+        canSleep={false}
+        colliders={false}
+        lockRotations
+        position={[
+          PLAYER_START_POSITION[0],
+          playerBodyGroundOffset,
+          PLAYER_START_POSITION[2]
+        ]}
+        ref={playerBodyRef}
+        type="dynamic"
+      >
+        <CapsuleCollider
+          args={[playerColliderHalfHeight, playerCollisionRadius]}
+          friction={0.8}
         />
-      </Suspense>
+        <Suspense fallback={null}>
+          <VikingAvatar
+            groundOffset={playerBodyGroundOffset}
+            isHitFlashing={isPlayerHitFlashing}
+            playerRef={playerRef}
+          />
+        </Suspense>
+      </RigidBody>
 
       <Billboard
         follow
@@ -1559,7 +1566,11 @@ function GameScene({
         shadows
       >
         <Suspense fallback={null}>
-          <Physics colliders={false} gravity={[0, 0, 0]}>
+          <Physics
+            colliders={false}
+            debug={import.meta.env.DEV}
+            gravity={[0, -playerJumpGravity, 0]}
+          >
             <RoundStage
               difficulty={difficulty}
               isActive={isActive}

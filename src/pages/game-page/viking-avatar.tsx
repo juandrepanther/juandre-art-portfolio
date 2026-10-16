@@ -14,6 +14,7 @@ import {
 import type { Group } from 'three'
 
 interface IVikingAvatar {
+  groundOffset: number
   isHitFlashing: boolean
   playerRef: RefObject<Group | null>
 }
@@ -24,12 +25,15 @@ const lowPolyVikingModelUrl = new URL(
 ).href
 
 const vikingModelScale = 1
-const vikingModelHeightOffset = 1.651
 const playerHitFlashColor = new Color('#ff3b30')
 
 useGLTF.preload(lowPolyVikingModelUrl)
 
-function VikingAvatar({ isHitFlashing, playerRef }: IVikingAvatar) {
+function VikingAvatar({
+  groundOffset,
+  isHitFlashing,
+  playerRef
+}: IVikingAvatar) {
   const { scene } = useGLTF(lowPolyVikingModelUrl)
   const modelRef = useRef<Group | null>(null)
   const baseMaterialColorsRef = useRef(new WeakMap<Material, Color>())
@@ -92,8 +96,12 @@ function VikingAvatar({ isHitFlashing, playerRef }: IVikingAvatar) {
 
     bounds.getCenter(center)
 
-    modelRef.current.position.set(-center.x, -bounds.min.y, -center.z)
-  }, [scene])
+    modelRef.current.position.set(
+      -center.x,
+      -bounds.min.y - groundOffset,
+      -center.z
+    )
+  }, [groundOffset, scene])
 
   useEffect(() => {
     syncMaterialColors(isHitFlashing)
@@ -104,11 +112,7 @@ function VikingAvatar({ isHitFlashing, playerRef }: IVikingAvatar) {
   }, [isHitFlashing, scene])
 
   return (
-    <group
-      ref={playerRef}
-      position={[0, vikingModelHeightOffset, 0]}
-      scale={vikingModelScale}
-    >
+    <group ref={playerRef} position={[0, -2, 0]} scale={vikingModelScale}>
       <group ref={modelRef} rotation={[-Math.PI / 2, 0, 0]}>
         <primitive object={scene} />
       </group>

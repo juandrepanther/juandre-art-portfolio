@@ -11,6 +11,14 @@ export interface ICrateLayout {
   size: [number, number, number]
 }
 
+interface ICrateStackLayout {
+  positionX: number
+  positionZ: number
+  rotationY: number
+  size: ICrateLayout['size']
+  stackHeight: number
+}
+
 export const GAME_ARENA_HALF_SIZE = 38
 export const GAME_GROUND_SIZE = 104
 export const GAME_FOG_NEAR = 22
@@ -236,3 +244,178 @@ export const BOX_LAYOUTS: ICrateLayout[] = [
     size: [2, 1.6, 2]
   }
 ]
+
+const crateSizePresets: ICrateLayout['size'][] = [
+  [1.8, 1.5, 1.8],
+  [1.9, 1.5, 1.9],
+  [2, 1.6, 2],
+  [2.1, 1.7, 1.9],
+  [2.1, 1.7, 2.1],
+  [2.2, 1.7, 2],
+  [2.2, 1.7, 2.2],
+  [2.4, 1.8, 2],
+  [2.4, 1.8, 2.1],
+  [2.4, 1.9, 2.2],
+  [2.4, 1.9, 2.3],
+  [2.5, 1.9, 2.4]
+]
+
+const crateLayoutCount = BOX_LAYOUTS.length
+const cratePlacementAttempts = 240
+const crateFootprintPadding = 0.45
+const cratePlacementMargin = 1.25
+const crateStackHeightMax = 3
+const playerStartCrateExclusionRadius = 6.5
+
+function cloneCrateSize(size: ICrateLayout['size']): ICrateLayout['size'] {
+  return [size[0], size[1], size[2]]
+}
+
+function cloneCrateLayout(crateLayout: ICrateLayout): ICrateLayout {
+  return {
+    position: [
+      crateLayout.position[0],
+      crateLayout.position[1],
+      crateLayout.position[2]
+    ],
+    rotationY: crateLayout.rotationY,
+    size: cloneCrateSize(crateLayout.size)
+  }
+}
+
+function getCrateFootprintRadius(size: ICrateLayout['size']) {
+  return Math.hypot(size[0], size[2]) / 2 + crateFootprintPadding
+}
+
+function doesStackOverlapTrees(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number
+) {
+  const treeCollisionRadius =
+    Math.max(TREE_TRUNK_COLLIDER_ARGS[0], TREE_TRUNK_COLLIDER_ARGS[2]) +
+    footprintRadius
+
+  return TREE_LAYOUTS.some(({ treePosition }) => {
+    const deltaX = positionX - treePosition[0]
+    const deltaZ = positionZ - treePosition[2]
+
+    return (
+      deltaX * deltaX + deltaZ * deltaZ <=
+      treeCollisionRadius * treeCollisionRadius
+    )
+  })
+}
+
+function doesStackOverlapPlayerStart(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number
+) {
+  const deltaX = positionX - PLAYER_START_POSITION[0]
+  const deltaZ = positionZ - PLAYER_START_POSITION[2]
+  const collisionRadius = playerStartCrateExclusionRadius + footprintRadius
+
+  return deltaX * deltaX + deltaZ * deltaZ <= collisionRadius * collisionRadius
+}
+
+function doesStackOverlapOtherStacks(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number,
+  stacks: ICrateStackLayout[]
+) {
+  return stacks.some((stack) => {
+    const deltaX = positionX - stack.positionX
+    const deltaZ = positionZ - stack.positionZ
+    const collisionRadius =
+      footprintRadius + getCrateFootprintRadius(stack.size)
+
+    return (
+      deltaX * deltaX + deltaZ * deltaZ <= collisionRadius * collisionRadius
+    )
+  })
+}
+
+function createRandomCrateStack(
+  existingStacks: ICrateStackLayout[],
+  remainingCrates: number
+) {
+  const size = cloneCrateSize(
+    crateSizePresets[Math.floor(Math.random() * crateSizePresets.length)] ??
+      crateSizePresets[0]
+  )
+  const stackHeight =
+    1 +
+    Math.floor(Math.random() * Math.min(crateStackHeightMax, remainingCrates))
+  const rotationY = (Math.random() - 0.5) * Math.PI
+  const footprintRadius = getCrateFootprintRadius(size)
+  const spawnRange =
+    GAME_ARENA_HALF_SIZE - footprintRadius - cratePlacementMargin
+
+  for (
+    let attemptIndex = 0;
+    attemptIndex < cratePlacementAttempts;
+    attemptIndex += 1
+  ) {
+    const positionX = (Math.random() - 0.5) * spawnRange * 2
+    const positionZ = (Math.random() - 0.5) * spawnRange * 2
+
+    if (
+      doesStackOverlapTrees(positionX, positionZ, footprintRadius) ||
+      doesStackOverlapPlayerStart(positionX, positionZ, footprintRadius) ||
+      doesStackOverlapOtherStacks(
+        positionX,
+        positionZ,
+        footprintRadius,
+        existingStacks
+      )
+    ) {
+      continue
+    }
+
+    return {
+      positionX,
+      positionZ,
+      rotationY,
+      size,
+      stackHeight
+    }
+  }
+
+  return null
+}
+
+export function createRandomBoxLayouts(): ICrateLayout[] {
+  const stackLayouts: ICrateStackLayout[] = []
+  let remainingCrates = crateLayoutCount
+
+  while (remainingCrates > 0) {
+    const stackLayout = createRandomCrateStack(stackLayouts, remainingCrates)
+
+    if (!stackLayout) {
+      return BOX_LAYOUTS.map(cloneCrateLayout)
+    }
+
+    stackLayouts.push(stackLayout)
+    remainingCrates -= stackLayout.stackHeight
+  }
+
+  return stackLayouts.flatMap((stackLayout) => {
+    const [, crateHeight] = stackLayout.size
+
+    return Array.from({ length: stackLayout.stackHeight }, (_, levelIndex) => {
+      const position: TWorldPosition = [
+        stackLayout.positionX,
+        crateHeight / 2 + crateHeight * levelIndex,
+        stackLayout.positionZ
+      ]
+
+      return {
+        position,
+        rotationY: stackLayout.rotationY,
+        size: cloneCrateSize(stackLayout.size)
+      }
+    })
+  })
+}

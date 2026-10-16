@@ -1,4 +1,4 @@
-export type TDifficultyLevel = 'Easy' | 'Pro' | 'Survivor'
+export type TDifficultyLevel = 'Easy' | 'Pro' | 'Hardcore'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
@@ -8,6 +8,7 @@ export {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
   ARENA_BOUNDARY_COLLIDER_THICKNESS,
   BOX_LAYOUTS,
+  createRandomBoxLayouts,
   GAME_ARENA_HALF_SIZE,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
@@ -54,8 +55,8 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     axeSpeed: 13,
     monkeyThrowInterval: 1.95
   },
-  Survivor: {
-    label: 'Survivor',
+  Hardcore: {
+    label: 'Hardcore',
     axeSpeed: 18,
     monkeyThrowInterval: 1.3
   }

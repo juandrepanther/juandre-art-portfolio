@@ -455,8 +455,8 @@ function GamePage() {
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
                   Vikings hurl axes with a slight aiming variance, hearts appear
-                  randomly near the trees, heal +20%, and each hit removes 15%
-                  health. Easy starts slow, Survivor is relentless.
+                  randomly across the arena floor, heal +20%, and each hit
+                  removes 15% health. Easy starts slow, Hardcore is relentless.
                 </Typography>
               </Stack>
             ) : null}
@@ -468,7 +468,7 @@ function GamePage() {
               slotProps={{
                 paper: {
                   sx: {
-                    borderRadius: 5,
+                    borderRadius: 2,
                     p: 1,
                     background: isDarkMode
                       ? 'linear-gradient(180deg, rgba(23, 33, 43, 0.98) 0%, rgba(12, 17, 23, 0.98) 100%)'
