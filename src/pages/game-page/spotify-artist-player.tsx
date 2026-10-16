@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 interface ISpotifyArtistPlayer {
   artistEmbedUrl: string
@@ -29,18 +29,6 @@ function SpotifyArtistPlayer({
           : '0 22px 60px rgba(20, 32, 44, 0.14)'
       }}
     >
-      <Typography
-        sx={{
-          mb: 1,
-          px: 0.5,
-          color: 'secondary.main',
-          fontSize: '0.75rem',
-          letterSpacing: '0.16em'
-        }}
-      >
-        SOUNDTRACK
-      </Typography>
-
       <Box
         component="iframe"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
