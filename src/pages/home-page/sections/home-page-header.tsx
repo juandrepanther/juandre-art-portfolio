@@ -1,19 +1,28 @@
 import {
   AppBar,
   Box,
+  Button,
   FormControlLabel,
   Stack,
   Switch,
   Toolbar,
   Typography
 } from '@mui/material'
+import { Link as RouterLink } from 'react-router'
 
 interface IHomePageHeader {
+  actionHref: string
+  actionLabel: string
   isDarkMode: boolean
   onToggleDarkMode: () => void
 }
 
-function HomePageHeader({ isDarkMode, onToggleDarkMode }: IHomePageHeader) {
+function HomePageHeader({
+  actionHref,
+  actionLabel,
+  isDarkMode,
+  onToggleDarkMode
+}: IHomePageHeader) {
   return (
     <AppBar
       color="transparent"
@@ -61,6 +70,30 @@ function HomePageHeader({ isDarkMode, onToggleDarkMode }: IHomePageHeader) {
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+          <Button
+            color="secondary"
+            component={RouterLink}
+            to={actionHref}
+            variant="outlined"
+            sx={{
+              borderColor: isDarkMode
+                ? 'rgba(84, 199, 184, 0.42)'
+                : 'rgba(31, 138, 122, 0.32)',
+              borderRadius: '999px',
+              px: 2.25,
+              py: 1,
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              '&:hover': {
+                borderColor: 'secondary.main',
+                backgroundColor: isDarkMode
+                  ? 'rgba(84, 199, 184, 0.08)'
+                  : 'rgba(31, 138, 122, 0.08)'
+              }
+            }}
+          >
+            {actionLabel}
+          </Button>
           <FormControlLabel
             control={
               <Switch

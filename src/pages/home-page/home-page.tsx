@@ -68,6 +68,8 @@ function HomePage() {
         Skip to main content
       </Link>
       <HomePageHeader
+        actionHref="/game"
+        actionLabel="Play Banana Run"
         isDarkMode={isDarkMode}
         onToggleDarkMode={toggleDarkMode}
       />

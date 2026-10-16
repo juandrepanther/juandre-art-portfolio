@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router'
 import ImmersivePageLoader from 'shared/page-loader'
 
 const HomePage = lazy(() => import('pages/home-page/home-page'))
+const GamePage = lazy(() => import('pages/game-page/game-page'))
 const ErrorPage = lazy(() => import('pages/error-page/error-page'))
 
 export function AppRoutes() {
@@ -10,6 +11,7 @@ export function AppRoutes() {
     <Suspense fallback={<ImmersivePageLoader />}>
       <Routes>
         <Route element={<HomePage />} path="/" />
+        <Route element={<GamePage />} path="/game" />
         <Route element={<ErrorPage />} path="*" />
       </Routes>
     </Suspense>

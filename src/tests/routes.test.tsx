@@ -9,6 +9,12 @@ vi.mock('../pages/home-page/home-page', () => ({
   }
 }))
 
+vi.mock('../pages/game-page/game-page', () => ({
+  default: function MockGamePage() {
+    return <div>Mock Game Route</div>
+  }
+}))
+
 vi.mock('../pages/error-page/error-page', () => ({
   default: function MockErrorPage() {
     return <div>Mock Error Route</div>
@@ -46,5 +52,17 @@ describe('routes', () => {
     )
 
     expect(await screen.findByText('Mock Error Route')).toBeInTheDocument()
+  })
+
+  it('renders the game route at /game', async () => {
+    const { AppRoutes } = await importRouter()
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/game']}>
+        <AppRoutes />
+      </MemoryRouter>
+    )
+
+    expect(await screen.findByText('Mock Game Route')).toBeInTheDocument()
   })
 })
