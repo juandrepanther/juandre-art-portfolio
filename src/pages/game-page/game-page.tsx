@@ -15,6 +15,7 @@ import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import HomePageHeader from 'pages/home-page/sections/home-page-header'
 import GameScene from './game-scene'
+import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
@@ -26,6 +27,9 @@ import {
   type TGameStatus,
   type TDifficultyLevel
 } from './helpers'
+
+const SPOTIFY_ARTIST_EMBED_URL =
+  'https://open.spotify.com/embed/artist/3ygNOpBpgEmQsKBdcO68li?utm_source=generator&si=38260154709a4925'
 
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
@@ -362,6 +366,21 @@ function GamePage() {
                 </Button>
               </Stack>
             </Stack>
+
+            <Box
+              sx={{
+                position: 'absolute',
+                left: 24,
+                bottom: 24,
+                zIndex: 2,
+                pointerEvents: 'auto'
+              }}
+            >
+              <SpotifyArtistPlayer
+                artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
+                isDarkMode={isDarkMode}
+              />
+            </Box>
 
             {isCountingDown ? (
               <Stack

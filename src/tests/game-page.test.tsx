@@ -58,6 +58,11 @@ describe('GamePage', () => {
     expect(screen.getByText('01:00')).toBeInTheDocument()
     expect(screen.getByText(/viking hits/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.getByTestId('spotify-artist-player')).toBeInTheDocument()
+    expect(screen.getByTitle(/spotify artist player/i)).toHaveAttribute(
+      'src',
+      expect.stringContaining('/embed/artist/3ygNOpBpgEmQsKBdcO68li')
+    )
   })
 
   it('shows the desktop-only fallback on small viewports', () => {
@@ -70,6 +75,9 @@ describe('GamePage', () => {
     )
 
     expect(screen.queryByTestId('game-scene')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('spotify-artist-player')
+    ).not.toBeInTheDocument()
     expect(
       screen.getByText(/viking run is tuned for desktop controls only/i)
     ).toBeInTheDocument()
