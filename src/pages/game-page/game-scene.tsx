@@ -1,19 +1,21 @@
-import { Billboard, Html } from '@react-three/drei'
 import {
-  CapsuleCollider,
-  CuboidCollider,
-  Physics,
-  RapierRigidBody,
-  RigidBody
-} from '@react-three/rapier'
+  Billboard,
+  Html,
+  KeyboardControls,
+  PointerLockControls,
+  useKeyboardControls,
+  type KeyboardControlsEntry
+} from '@react-three/drei'
+import { CuboidCollider, Physics, RigidBody } from '@react-three/rapier'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import {
   AdditiveBlending,
   BackSide,
   BufferGeometry,
   Color,
+  Euler,
   Float32BufferAttribute,
   Group,
   MeshStandardMaterial as ThreeMeshStandardMaterial,
@@ -21,7 +23,10 @@ import {
   ShaderMaterial,
   Vector3
 } from 'three'
-import { isPointInsideAnyCrate } from './world-collision'
+import {
+  findHighestCrateTopUnderCircle,
+  isPointInsideAnyCrate
+} from './world-collision'
 import {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
   ARENA_BOUNDARY_COLLIDER_THICKNESS,
@@ -94,12 +99,15 @@ interface IControlsState {
   forward: boolean
 }
 
+type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
+
 const arenaHalfSize = GAME_ARENA_HALF_SIZE
 const monkeyAimPrecision = 0.1
 const atmosphereParticleCount = 180
 const projectilePoolSize = 40
 const monkeyHitRadius = 1.45
 const monkeyHitboxOffset = new Vector3(0, 0.95, 0)
+const playerCrateEdgeClearance = 0.12
 const survivorMonkeyFlightHeightMax = 6.1
 const survivorMonkeyFlightHeightMin = 2.2
 const survivorMonkeyFlightProximity = 0.7
@@ -108,15 +116,29 @@ const heartSpawnRadiusMin = 1.8
 const heartSpawnRadiusMax = 3.1
 const playerHitRadius = 1.35
 const playerFacingTurnSpeed = 10
+const playerJumpGravity = 26
+const playerJumpVelocity = 11
 const pointerLookSensitivity = 0.0022
 const pointerMaxPitch = Math.PI / 3.1
 const pointerMinPitch = -Math.PI / 4.2
+const pointerLockSelector = '#game-scene-canvas'
 const playerCameraDistance = 6.5
 const playerCameraHeight = 3.3
+const playerGroundY = PLAYER_START_POSITION[1]
 const playerHitboxOffset = new Vector3(0, 1.2, 0)
-const playerColliderHalfHeight = 0.65
-const playerColliderRadius = 0.58
+const playerCollisionRadius = 0.58
 const worldUp = new Vector3(0, 1, 0)
+const gameControlMap: KeyboardControlsEntry<TGameControl>[] = [
+  { keys: ['ArrowUp', 'KeyW'], name: 'forward' },
+  { keys: ['ArrowDown', 'KeyS'], name: 'backward' },
+  { keys: ['ArrowLeft', 'KeyA'], name: 'left' },
+  { keys: ['ArrowRight', 'KeyD'], name: 'right' },
+  { keys: ['Space'], name: 'jump' }
+]
+const pointerLockMinPolarAngle = Math.PI / 2 - pointerMaxPitch
+const pointerLockMaxPolarAngle = Math.PI / 2 - pointerMinPitch
+const pointerLockSpeed = pointerLookSensitivity / 0.002
+const playerHitFlashDurationMs = 125
 
 function createLookDirection(yaw: number, pitch: number) {
   const cosPitch = Math.cos(pitch)
@@ -216,6 +238,52 @@ function isPointInsideTreeTrunk(point: Vector3) {
       point.y <= TREE_TRUNK_COLLIDER_ARGS[1] * 2 + 0.2
     )
   })
+}
+
+function doesPlayerCollideWithTree(position: Vector3) {
+  const treeCollisionRadius =
+    Math.max(TREE_TRUNK_COLLIDER_ARGS[0], TREE_TRUNK_COLLIDER_ARGS[2]) +
+    playerCollisionRadius * 0.8
+
+  return TREE_LAYOUTS.some(({ treePosition }) => {
+    const deltaX = position.x - treePosition[0]
+    const deltaZ = position.z - treePosition[2]
+
+    return (
+      deltaX * deltaX + deltaZ * deltaZ <=
+      treeCollisionRadius * treeCollisionRadius
+    )
+  })
+}
+
+function getPlayerFeetHeight(position: Vector3) {
+  return position.y - playerGroundY
+}
+
+function getPlayerSupportHeight(position: Vector3) {
+  const crateTopHeight = findHighestCrateTopUnderCircle(
+    { x: position.x, z: position.z },
+    playerCollisionRadius,
+    BOX_LAYOUTS,
+    0.02
+  )
+
+  return playerGroundY + (crateTopHeight ?? 0)
+}
+
+function canMovePlayerTo(position: Vector3) {
+  const playerFeetHeight = getPlayerFeetHeight(position)
+  const blockingCrateTopHeight = findHighestCrateTopUnderCircle(
+    { x: position.x, z: position.z },
+    playerCollisionRadius,
+    BOX_LAYOUTS,
+    0.08
+  )
+  const canClearCrateSide =
+    blockingCrateTopHeight === null ||
+    playerFeetHeight >= blockingCrateTopHeight - playerCrateEdgeClearance
+
+  return canClearCrateSide && !doesPlayerCollideWithTree(position)
 }
 
 function AnimatedSurfaceMaterial({
@@ -493,7 +561,10 @@ function TreeCluster() {
           rotation={[0, (index % 2 === 0 ? 1 : -1) * 0.18 * (index + 1), 0]}
           type="fixed"
         >
-          <CuboidCollider args={TREE_TRUNK_COLLIDER_ARGS} position={[0, 1.95, 0]} />
+          <CuboidCollider
+            args={TREE_TRUNK_COLLIDER_ARGS}
+            position={[0, 1.95, 0]}
+          />
           <EvergreenTree variant={(index % 3) as 0 | 1 | 2} />
         </RigidBody>
       ))}
@@ -505,7 +576,11 @@ function CrateField() {
   return (
     <group>
       {BOX_LAYOUTS.map((crateLayout, index) => (
-        <CrateObstacle crateLayout={crateLayout} index={index} key={`crate-${index}`} />
+        <CrateObstacle
+          crateLayout={crateLayout}
+          index={index}
+          key={`crate-${index}`}
+        />
       ))}
     </group>
   )
@@ -539,15 +614,27 @@ function CrateObstacle({
         <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
         <meshStandardMaterial color="#c59b63" roughness={0.84} />
       </mesh>
-      <mesh castShadow position={[0, height * 0.1, -depth * 0.38]} receiveShadow>
+      <mesh
+        castShadow
+        position={[0, height * 0.1, -depth * 0.38]}
+        receiveShadow
+      >
         <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
         <meshStandardMaterial color="#c59b63" roughness={0.84} />
       </mesh>
-      <mesh castShadow position={[width * 0.38, height * 0.08, 0]} receiveShadow>
+      <mesh
+        castShadow
+        position={[width * 0.38, height * 0.08, 0]}
+        receiveShadow
+      >
         <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
         <meshStandardMaterial color="#c59b63" roughness={0.84} />
       </mesh>
-      <mesh castShadow position={[-width * 0.38, height * 0.08, 0]} receiveShadow>
+      <mesh
+        castShadow
+        position={[-width * 0.38, height * 0.08, 0]}
+        receiveShadow
+      >
         <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
         <meshStandardMaterial color="#c59b63" roughness={0.84} />
       </mesh>
@@ -852,9 +939,11 @@ function RoundStage({
   roundKey
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
+  const [subscribeToKeyboard, getKeyboardState] =
+    useKeyboardControls<TGameControl>()
+  const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
   const playerRef = useRef<Group | null>(null)
-  const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const controlsRef = useRef<IControlsState>({
     backward: false,
     forward: false,
@@ -863,6 +952,7 @@ function RoundStage({
   })
   const playerPositionRef = useRef(new Vector3(...PLAYER_START_POSITION))
   const playerVelocityRef = useRef(new Vector3())
+  const playerVerticalVelocityRef = useRef(0)
   const playerDirectionRef = useRef(new Vector3(0, 0, -1))
   const projectilesRef = useRef(
     Array.from({ length: projectilePoolSize }, createProjectileState)
@@ -873,19 +963,41 @@ function RoundStage({
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
   const onMonkeyHitRef = useRef(onMonkeyHit)
+  const pendingPointerShotRef = useRef(false)
+  const shootPlayerProjectileRef = useRef<() => void>(() => {})
   const cameraPosition = camera.position
-  const cameraYawRef = useRef(0)
-  const cameraPitchRef = useRef(-0.24)
   const isPointerLockedRef = useRef(false)
   const cameraLookDirectionRef = useRef(new Vector3(0, 0, -1))
   const cameraForwardRef = useRef(new Vector3(0, 0, -1))
   const cameraRightRef = useRef(new Vector3(1, 0, 0))
   const desiredFacingRef = useRef(new Vector3(0, 0, -1))
+  const hitFlashTimeoutRef = useRef<number | null>(null)
 
   const setHealth = (health: number) => {
     healthRef.current = health
     onHealthChangeRef.current(health)
   }
+
+  const triggerPlayerHitFlash = () => {
+    setIsPlayerHitFlashing(true)
+
+    if (hitFlashTimeoutRef.current !== null) {
+      window.clearTimeout(hitFlashTimeoutRef.current)
+    }
+
+    hitFlashTimeoutRef.current = window.setTimeout(() => {
+      setIsPlayerHitFlashing(false)
+      hitFlashTimeoutRef.current = null
+    }, playerHitFlashDurationMs)
+  }
+
+  const triggerPlayerJump = useEffectEvent(() => {
+    if (!isActive || playerPositionRef.current.y > playerGroundY + 0.01) {
+      return
+    }
+
+    playerVerticalVelocityRef.current = playerJumpVelocity
+  })
 
   useEffect(() => {
     onHealthChangeRef.current = onHealthChange
@@ -894,6 +1006,45 @@ function RoundStage({
   useEffect(() => {
     onMonkeyHitRef.current = onMonkeyHit
   }, [onMonkeyHit])
+
+  useEffect(() => {
+    return () => {
+      if (hitFlashTimeoutRef.current !== null) {
+        window.clearTimeout(hitFlashTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    shootPlayerProjectileRef.current = () => {
+      if (!isActive) {
+        return
+      }
+
+      const origin = playerPositionRef.current
+        .clone()
+        .add(new Vector3(0, 1.35, 0))
+      const velocity = cameraLookDirectionRef.current
+        .clone()
+        .multiplyScalar(PLAYER_AXE_SPEED)
+
+      spawnProjectile(origin, velocity, 'player')
+    }
+  }, [isActive])
+
+  const handlePointerLock = () => {
+    isPointerLockedRef.current = true
+
+    if (pendingPointerShotRef.current) {
+      pendingPointerShotRef.current = false
+      shootPlayerProjectileRef.current()
+    }
+  }
+
+  const handlePointerUnlock = () => {
+    isPointerLockedRef.current = false
+    pendingPointerShotRef.current = false
+  }
 
   const spawnProjectile = (
     origin: Vector3,
@@ -916,6 +1067,15 @@ function RoundStage({
   }
 
   useEffect(() => {
+    const syncControls = () => {
+      const keyboardState = getKeyboardState()
+
+      controlsRef.current.forward = keyboardState.forward
+      controlsRef.current.backward = keyboardState.backward
+      controlsRef.current.left = keyboardState.left
+      controlsRef.current.right = keyboardState.right
+    }
+
     const clearControls = () => {
       controlsRef.current.forward = false
       controlsRef.current.backward = false
@@ -923,143 +1083,69 @@ function RoundStage({
       controlsRef.current.right = false
     }
 
-    const requestPointerLock = async () => {
-      if (document.pointerLockElement === gl.domElement) {
-        return true
-      }
-
-      await gl.domElement.requestPointerLock()
-      return document.pointerLockElement === gl.domElement
-    }
-
-    const handleShoot = () => {
-      if (!isActive) {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) {
         return
       }
 
-      const origin = playerPositionRef.current
-        .clone()
-        .add(new Vector3(0, 1.35, 0))
-      const velocity = cameraLookDirectionRef.current
-        .clone()
-        .multiplyScalar(PLAYER_AXE_SPEED)
-
-      spawnProjectile(origin, velocity, 'player')
-    }
-
-    const handleKeyChange = (isPressed: boolean) => (event: KeyboardEvent) => {
-      switch (event.code) {
-        case 'KeyW':
-        case 'ArrowUp':
-          event.preventDefault()
-          controlsRef.current.forward = isPressed
-          break
-        case 'KeyS':
-        case 'ArrowDown':
-          event.preventDefault()
-          controlsRef.current.backward = isPressed
-          break
-        case 'KeyA':
-        case 'ArrowLeft':
-          event.preventDefault()
-          controlsRef.current.left = isPressed
-          break
-        case 'KeyD':
-        case 'ArrowRight':
-          event.preventDefault()
-          controlsRef.current.right = isPressed
-          break
-        default:
-          break
+      if (isPointerLockedRef.current) {
+        shootPlayerProjectileRef.current()
+        return
       }
-    }
 
-    const handlePointerDown = (event: PointerEvent) => {
       const target = event.target
 
       if (target instanceof HTMLCanvasElement) {
-        void requestPointerLock().then((isLocked) => {
-          if (isLocked) {
-            handleShoot()
-          }
-        })
+        pendingPointerShotRef.current = isActive
       }
     }
 
     const handleBlur = () => {
       clearControls()
+      pendingPointerShotRef.current = false
     }
 
-    const handlePointerLockChange = () => {
-      isPointerLockedRef.current = document.pointerLockElement === gl.domElement
-    }
+    syncControls()
 
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isPointerLockedRef.current) {
-        return
-      }
-
-      cameraYawRef.current += event.movementX * pointerLookSensitivity
-      cameraPitchRef.current = Math.max(
-        pointerMinPitch,
-        Math.min(
-          pointerMaxPitch,
-          cameraPitchRef.current - event.movementY * pointerLookSensitivity
-        )
-      )
-    }
-
-    const handleMovementKeyDown = handleKeyChange(true)
-    const handleKeyUp = handleKeyChange(false)
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space') {
-        event.preventDefault()
-
-        if (!event.repeat) {
-          handleShoot()
+    const unsubscribeControls = subscribeToKeyboard((keyboardState) => {
+      controlsRef.current.forward = keyboardState.forward
+      controlsRef.current.backward = keyboardState.backward
+      controlsRef.current.left = keyboardState.left
+      controlsRef.current.right = keyboardState.right
+    })
+    const unsubscribeJump = subscribeToKeyboard(
+      (keyboardState) => keyboardState.jump,
+      (isPressed) => {
+        if (isPressed) {
+          triggerPlayerJump()
         }
-
-        return
       }
+    )
 
-      handleMovementKeyDown(event)
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
     window.addEventListener('pointerdown', handlePointerDown)
     window.addEventListener('blur', handleBlur)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('pointerlockchange', handlePointerLockChange)
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
+      unsubscribeControls()
+      unsubscribeJump()
       window.removeEventListener('pointerdown', handlePointerDown)
       window.removeEventListener('blur', handleBlur)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('pointerlockchange', handlePointerLockChange)
-
-      if (document.pointerLockElement === gl.domElement) {
-        document.exitPointerLock()
-      }
 
       clearControls()
+      pendingPointerShotRef.current = false
     }
-  }, [gl, isActive])
+  }, [getKeyboardState, gl, isActive, subscribeToKeyboard])
 
   useEffect(() => {
     playerPositionRef.current.set(...PLAYER_START_POSITION)
     playerVelocityRef.current.set(0, 0, 0)
+    playerVerticalVelocityRef.current = 0
     playerDirectionRef.current.set(0, 0, -1)
     desiredFacingRef.current.set(0, 0, -1)
-    cameraYawRef.current = 0
-    cameraPitchRef.current = -0.24
     isPointerLockedRef.current = document.pointerLockElement === gl.domElement
-    cameraLookDirectionRef.current.copy(
-      createLookDirection(cameraYawRef.current, cameraPitchRef.current)
-    )
+    pendingPointerShotRef.current = false
+    camera.quaternion.setFromEuler(new Euler(-0.24, 0, 0, 'YXZ'))
+    cameraLookDirectionRef.current.copy(createLookDirection(0, -0.24))
     cameraForwardRef.current.set(0, 0, -1)
     cameraRightRef.current.set(1, 0, 0)
     controlsRef.current.forward = false
@@ -1068,16 +1154,6 @@ function RoundStage({
     controlsRef.current.right = false
     monkeyStateRef.current = createMonkeyState()
     heartStateRef.current = createHeartState()
-
-    playerBodyRef.current?.setTranslation(
-      {
-        x: PLAYER_START_POSITION[0],
-        y: PLAYER_START_POSITION[1],
-        z: PLAYER_START_POSITION[2]
-      },
-      true
-    )
-    playerBodyRef.current?.setLinvel({ x: 0, y: 0, z: 0 }, true)
 
     cameraPosition
       .set(...PLAYER_START_POSITION)
@@ -1101,23 +1177,11 @@ function RoundStage({
   }, [camera, cameraPosition, difficulty, gl, roundKey])
 
   useFrame((_, delta) => {
-    const playerBodyTranslation = playerBodyRef.current?.translation()
-
-    if (playerBodyTranslation) {
-      playerPositionRef.current.set(
-        playerBodyTranslation.x,
-        PLAYER_START_POSITION[1],
-        playerBodyTranslation.z
-      )
-    }
-
     if (playerRef.current) {
       playerRef.current.position.copy(playerPositionRef.current)
     }
 
-    cameraLookDirectionRef.current.copy(
-      createLookDirection(cameraYawRef.current, cameraPitchRef.current)
-    )
+    camera.getWorldDirection(cameraLookDirectionRef.current)
     cameraForwardRef.current.copy(cameraLookDirectionRef.current)
     cameraForwardRef.current.y = 0
 
@@ -1141,12 +1205,6 @@ function RoundStage({
       )
 
     camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-delta * 10))
-    camera.lookAt(
-      playerPositionRef.current
-        .clone()
-        .add(new Vector3(0, playerCameraHeight - 0.5, 0))
-        .add(cameraLookDirectionRef.current.clone().multiplyScalar(18))
-    )
 
     if (!playerRef.current) {
       return
@@ -1177,20 +1235,52 @@ function RoundStage({
       1 - Math.exp(-delta * playerFacingTurnSpeed)
     )
 
-    if (playerBodyRef.current) {
-      playerBodyRef.current.setLinvel(
-        {
-          x: isActive ? playerVelocityRef.current.x : 0,
-          y: 0,
-          z: isActive ? playerVelocityRef.current.z : 0
-        },
-        true
-      )
+    const nextPlayerPosition = playerPositionRef.current.clone()
+
+    if (isActive) {
+      const supportHeight = getPlayerSupportHeight(nextPlayerPosition)
+      const movementStep = playerVelocityRef.current
+        .clone()
+        .multiplyScalar(delta)
+
+      if (movementStep.x !== 0) {
+        const candidateX = nextPlayerPosition.clone()
+
+        candidateX.x = clampToArena(candidateX.x + movementStep.x)
+
+        if (canMovePlayerTo(candidateX)) {
+          nextPlayerPosition.x = candidateX.x
+        }
+      }
+
+      if (movementStep.z !== 0) {
+        const candidateZ = nextPlayerPosition.clone()
+
+        candidateZ.z = clampToArena(candidateZ.z + movementStep.z)
+
+        if (canMovePlayerTo(candidateZ)) {
+          nextPlayerPosition.z = candidateZ.z
+        }
+      }
+
+      if (
+        playerVerticalVelocityRef.current !== 0 ||
+        nextPlayerPosition.y > supportHeight
+      ) {
+        playerVerticalVelocityRef.current -= playerJumpGravity * delta
+        nextPlayerPosition.y += playerVerticalVelocityRef.current * delta
+
+        if (nextPlayerPosition.y <= supportHeight) {
+          nextPlayerPosition.y = supportHeight
+          playerVerticalVelocityRef.current = 0
+        }
+      }
     } else {
-      playerPositionRef.current.addScaledVector(playerVelocityRef.current, delta)
-      playerPositionRef.current.x = clampToArena(playerPositionRef.current.x)
-      playerPositionRef.current.z = clampToArena(playerPositionRef.current.z)
+      nextPlayerPosition.y = playerGroundY
+      playerVerticalVelocityRef.current = 0
     }
+
+    playerPositionRef.current.copy(nextPlayerPosition)
 
     playerRef.current.rotation.y = Math.atan2(
       playerDirectionRef.current.x,
@@ -1328,6 +1418,7 @@ function RoundStage({
       ) {
         lastDamageAtRef.current = now
         projectile.active = false
+        triggerPlayerHitFlash()
         setHealth(Math.max(0, healthRef.current - MONKEY_DAMAGE))
       }
     }
@@ -1359,23 +1450,6 @@ function RoundStage({
     <>
       <color args={['#d8efe8']} attach="background" />
       <fog args={['#d8efe8', GAME_FOG_NEAR, GAME_FOG_FAR]} attach="fog" />
-
-      <RigidBody
-        canSleep={false}
-        ccd
-        colliders={false}
-        enabledRotations={[false, false, false]}
-        enabledTranslations={[true, false, true]}
-        gravityScale={0}
-        linearDamping={10}
-        position={PLAYER_START_POSITION}
-        ref={playerBodyRef}
-      >
-        <CapsuleCollider
-          args={[playerColliderHalfHeight, playerColliderRadius]}
-          position={[0, 1.25, 0]}
-        />
-      </RigidBody>
 
       <ArenaBounds />
 
@@ -1420,7 +1494,10 @@ function RoundStage({
       <VikingTroop monkeyStateRef={monkeyStateRef} />
       <AxeProjectiles projectilesRef={projectilesRef} />
       <Suspense fallback={null}>
-        <VikingAvatar playerRef={playerRef} />
+        <VikingAvatar
+          isHitFlashing={isPlayerHitFlashing}
+          playerRef={playerRef}
+        />
       </Suspense>
 
       <Billboard
@@ -1446,11 +1523,21 @@ function RoundStage({
             }}
           >
             Click the scene to lock the pointer. Move relative to the camera
-            with WASD or the arrow keys, aim with the mouse, and click or press
-            Space to hurl an axe through the center reticle.
+            with WASD or the arrow keys, jump with Space, aim with the mouse,
+            and click to hurl an axe through the center reticle.
           </div>
         </Html>
       </Billboard>
+
+      <PointerLockControls
+        makeDefault
+        maxPolarAngle={pointerLockMaxPolarAngle}
+        minPolarAngle={pointerLockMinPolarAngle}
+        onLock={handlePointerLock}
+        onUnlock={handlePointerUnlock}
+        pointerSpeed={pointerLockSpeed}
+        selector={pointerLockSelector}
+      />
     </>
   )
 }
@@ -1463,24 +1550,28 @@ function GameScene({
   roundKey
 }: IGameSceneProps) {
   return (
-    <Canvas
-      camera={{ far: 140, fov: 42, near: 0.1, position: [0, 5, 14] }}
-      dpr={[1, 1.8]}
-      fallback={<div>WebGL is unavailable.</div>}
-      shadows
-    >
-      <Suspense fallback={null}>
-        <Physics colliders={false} gravity={[0, 0, 0]}>
-          <RoundStage
-            difficulty={difficulty}
-            isActive={isActive}
-            onHealthChange={onHealthChange}
-            onMonkeyHit={onMonkeyHit}
-            roundKey={roundKey}
-          />
-        </Physics>
-      </Suspense>
-    </Canvas>
+    <KeyboardControls map={gameControlMap}>
+      <Canvas
+        camera={{ far: 140, fov: 42, near: 0.1, position: [0, 5, 14] }}
+        dpr={[1, 1.8]}
+        fallback={<div>WebGL is unavailable.</div>}
+        id="game-scene-canvas"
+        shadows
+      >
+        <Suspense fallback={null}>
+          <Physics colliders={false} gravity={[0, 0, 0]}>
+            <RoundStage
+              difficulty={difficulty}
+              isActive={isActive}
+              onHealthChange={onHealthChange}
+              onMonkeyHit={onMonkeyHit}
+              key={`${difficulty}-${roundKey}`}
+              roundKey={roundKey}
+            />
+          </Physics>
+        </Suspense>
+      </Canvas>
+    </KeyboardControls>
   )
 }
 

@@ -2,11 +2,7 @@ export type TDifficultyLevel = 'Easy' | 'Pro' | 'Survivor'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
-export type {
-  ICrateLayout,
-  ITreeLayout,
-  TWorldPosition
-} from './world-layout'
+export type { ICrateLayout, ITreeLayout, TWorldPosition } from './world-layout'
 
 export {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,

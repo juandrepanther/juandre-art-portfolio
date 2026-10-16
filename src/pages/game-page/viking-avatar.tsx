@@ -1,11 +1,20 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect } from 'react'
+import { useEffectEvent } from 'react'
 import { useRef } from 'react'
 import type { RefObject } from 'react'
-import { Box3, Mesh, Vector3 } from 'three'
+import {
+  Box3,
+  Color,
+  Material,
+  Mesh,
+  MeshStandardMaterial,
+  Vector3
+} from 'three'
 import type { Group } from 'three'
 
 interface IVikingAvatar {
+  isHitFlashing: boolean
   playerRef: RefObject<Group | null>
 }
 
@@ -16,18 +25,59 @@ const lowPolyVikingModelUrl = new URL(
 
 const vikingModelScale = 1
 const vikingModelHeightOffset = 1.651
+const playerHitFlashColor = new Color('#ff3b30')
 
 useGLTF.preload(lowPolyVikingModelUrl)
 
-function VikingAvatar({ playerRef }: IVikingAvatar) {
+function VikingAvatar({ isHitFlashing, playerRef }: IVikingAvatar) {
   const { scene } = useGLTF(lowPolyVikingModelUrl)
   const modelRef = useRef<Group | null>(null)
+  const baseMaterialColorsRef = useRef(new WeakMap<Material, Color>())
+
+  const syncMaterialColors = useEffectEvent((isFlashing: boolean) => {
+    scene.traverse((object) => {
+      if (!(object instanceof Mesh)) {
+        return
+      }
+
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material]
+
+      for (const material of materials) {
+        if (!(material instanceof MeshStandardMaterial)) {
+          continue
+        }
+
+        const baseColor = baseMaterialColorsRef.current.get(material)
+
+        if (!baseColor) {
+          continue
+        }
+
+        material.color.copy(isFlashing ? playerHitFlashColor : baseColor)
+      }
+    })
+  })
 
   useEffect(() => {
     scene.traverse((object) => {
       if (object instanceof Mesh) {
         object.castShadow = false
         object.receiveShadow = false
+
+        const materials = Array.isArray(object.material)
+          ? object.material
+          : [object.material]
+
+        for (const material of materials) {
+          if (
+            material instanceof MeshStandardMaterial &&
+            !baseMaterialColorsRef.current.has(material)
+          ) {
+            baseMaterialColorsRef.current.set(material, material.color.clone())
+          }
+        }
       }
     })
   }, [scene])
@@ -44,6 +94,14 @@ function VikingAvatar({ playerRef }: IVikingAvatar) {
 
     modelRef.current.position.set(-center.x, -bounds.min.y, -center.z)
   }, [scene])
+
+  useEffect(() => {
+    syncMaterialColors(isHitFlashing)
+
+    return () => {
+      syncMaterialColors(false)
+    }
+  }, [isHitFlashing, scene])
 
   return (
     <group

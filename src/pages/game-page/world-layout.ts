@@ -17,7 +17,9 @@ export const GAME_FOG_NEAR = 22
 export const GAME_FOG_FAR = 88
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8
 export const ARENA_BOUNDARY_COLLIDER_THICKNESS = 2
-export const TREE_TRUNK_COLLIDER_ARGS: [number, number, number] = [0.85, 1.95, 0.85]
+export const TREE_TRUNK_COLLIDER_ARGS: [number, number, number] = [
+  0.85, 1.95, 0.85
+]
 
 export const PLAYER_START_POSITION: TWorldPosition = [0, 1.1, 23]
 
@@ -132,5 +134,105 @@ export const BOX_LAYOUTS: ICrateLayout[] = [
     position: [27, 0.85, 26],
     rotationY: -0.28,
     size: [2.2, 1.7, 2.2]
+  },
+  {
+    position: [-2.8, 0.85, -5.5],
+    rotationY: 0,
+    size: [2.2, 1.7, 2]
+  },
+  {
+    position: [-0.2, 0.85, -5.5],
+    rotationY: 0,
+    size: [2.2, 1.7, 2]
+  },
+  {
+    position: [2.4, 0.85, -5.5],
+    rotationY: 0,
+    size: [2.2, 1.7, 2]
+  },
+  {
+    position: [5, 0.85, -5.5],
+    rotationY: 0,
+    size: [2.2, 1.7, 2]
+  },
+  {
+    position: [-17.5, 0.85, 10.5],
+    rotationY: 0.2,
+    size: [2.1, 1.7, 2.1]
+  },
+  {
+    position: [-17.5, 0.85, 13.1],
+    rotationY: 0.2,
+    size: [2.1, 1.7, 2.1]
+  },
+  {
+    position: [-17.5, 0.85, 15.7],
+    rotationY: 0.2,
+    size: [2.1, 1.7, 2.1]
+  },
+  {
+    position: [15.4, 0.8, 11.8],
+    rotationY: 0.42,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [17.7, 0.8, 13.1],
+    rotationY: 0.42,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [20, 0.8, 14.4],
+    rotationY: 0.42,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [22.3, 0.8, 15.7],
+    rotationY: 0.42,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [-30, 0.8, -15],
+    rotationY: -0.24,
+    size: [1.9, 1.5, 1.9]
+  },
+  {
+    position: [-26.8, 0.8, -18.2],
+    rotationY: 0.14,
+    size: [2.1, 1.6, 1.9]
+  },
+  {
+    position: [13.8, 0.95, -24],
+    rotationY: -0.3,
+    size: [2.4, 1.9, 2.3]
+  },
+  {
+    position: [18.8, 0.85, -27.2],
+    rotationY: 0.28,
+    size: [2.2, 1.7, 2.1]
+  },
+  {
+    position: [-4.5, 0.75, 15.5],
+    rotationY: -0.18,
+    size: [1.8, 1.5, 1.8]
+  },
+  {
+    position: [-0.8, 0.95, 18.7],
+    rotationY: 0.3,
+    size: [2.4, 1.9, 2.2]
+  },
+  {
+    position: [4.2, 0.8, 30.2],
+    rotationY: 0.08,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [7, 0.8, 30.2],
+    rotationY: 0.08,
+    size: [2, 1.6, 2]
+  },
+  {
+    position: [9.8, 0.8, 30.2],
+    rotationY: 0.08,
+    size: [2, 1.6, 2]
   }
 ]
