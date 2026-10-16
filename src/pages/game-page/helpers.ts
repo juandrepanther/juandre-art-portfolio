@@ -2,6 +2,25 @@ export type TDifficultyLevel = 'Easy' | 'Pro' | 'Survivor'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
+export type {
+  ICrateLayout,
+  ITreeLayout,
+  TWorldPosition
+} from './world-layout'
+
+export {
+  ARENA_BOUNDARY_COLLIDER_HEIGHT,
+  ARENA_BOUNDARY_COLLIDER_THICKNESS,
+  BOX_LAYOUTS,
+  GAME_ARENA_HALF_SIZE,
+  GAME_FOG_FAR,
+  GAME_FOG_NEAR,
+  GAME_GROUND_SIZE,
+  PLAYER_START_POSITION,
+  TREE_LAYOUTS,
+  TREE_TRUNK_COLLIDER_ARGS
+} from './world-layout'
+
 export interface IDifficultyConfig {
   axeSpeed: number
   label: TDifficultyLevel
@@ -16,11 +35,6 @@ export interface IGameSceneProps {
   roundKey: number
 }
 
-export interface ITreeLayout {
-  monkeyPosition: [number, number, number]
-  treePosition: [number, number, number]
-}
-
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_HEALTH = 100
 export const MONKEY_DAMAGE = 15
@@ -32,29 +46,6 @@ export const PLAYER_MOVE_SPEED = 8
 export const PROJECTILE_LIFETIME_SECONDS = 3.2
 export const HEART_RESPAWN_SECONDS = 10
 export const MONKEY_RESPAWN_SECONDS = 5
-export const PLAYER_START_POSITION: [number, number, number] = [0, 1.1, 8]
-export const TREE_LAYOUTS: ITreeLayout[] = [
-  {
-    treePosition: [-10, 0, -10],
-    monkeyPosition: [-10.5, 2.5, -11]
-  },
-  {
-    treePosition: [10, 0, -9],
-    monkeyPosition: [9.4, 2.3, -10.2]
-  },
-  {
-    treePosition: [-12, 0, 7],
-    monkeyPosition: [-12.8, 2.6, 6.4]
-  },
-  {
-    treePosition: [11.5, 0, 8.5],
-    monkeyPosition: [10.6, 2.3, 7.8]
-  },
-  {
-    treePosition: [0, 0, -14],
-    monkeyPosition: [0.2, 2.5, -15]
-  }
-]
 
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
   Easy: {

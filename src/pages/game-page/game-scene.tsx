@@ -1,4 +1,11 @@
 import { Billboard, Html } from '@react-three/drei'
+import {
+  CapsuleCollider,
+  CuboidCollider,
+  Physics,
+  RapierRigidBody,
+  RigidBody
+} from '@react-three/rapier'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
@@ -14,8 +21,16 @@ import {
   ShaderMaterial,
   Vector3
 } from 'three'
+import { isPointInsideAnyCrate } from './world-collision'
 import {
+  ARENA_BOUNDARY_COLLIDER_HEIGHT,
+  ARENA_BOUNDARY_COLLIDER_THICKNESS,
+  BOX_LAYOUTS,
   DIFFICULTY_CONFIGS,
+  GAME_ARENA_HALF_SIZE,
+  GAME_FOG_FAR,
+  GAME_FOG_NEAR,
+  GAME_GROUND_SIZE,
   HEART_HEAL,
   HEART_RESPAWN_SECONDS,
   MAX_HEALTH,
@@ -25,6 +40,7 @@ import {
   PLAYER_MOVE_SPEED,
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
+  TREE_TRUNK_COLLIDER_ARGS,
   TREE_LAYOUTS,
   type IGameSceneProps
 } from './helpers'
@@ -78,10 +94,10 @@ interface IControlsState {
   forward: boolean
 }
 
-const arenaHalfSize = 16
+const arenaHalfSize = GAME_ARENA_HALF_SIZE
 const monkeyAimPrecision = 0.1
 const atmosphereParticleCount = 180
-const projectilePoolSize = 24
+const projectilePoolSize = 40
 const monkeyHitRadius = 1.45
 const monkeyHitboxOffset = new Vector3(0, 0.95, 0)
 const survivorMonkeyFlightHeightMax = 6.1
@@ -98,6 +114,8 @@ const pointerMinPitch = -Math.PI / 4.2
 const playerCameraDistance = 6.5
 const playerCameraHeight = 3.3
 const playerHitboxOffset = new Vector3(0, 1.2, 0)
+const playerColliderHalfHeight = 0.65
+const playerColliderRadius = 0.58
 const worldUp = new Vector3(0, 1, 0)
 
 function createLookDirection(yaw: number, pitch: number) {
@@ -184,6 +202,20 @@ function createRandomHeartPosition(treePosition: [number, number, number]) {
 
 function clampToArena(value: number) {
   return Math.max(-arenaHalfSize, Math.min(arenaHalfSize, value))
+}
+
+function isPointInsideTreeTrunk(point: Vector3) {
+  return TREE_LAYOUTS.some(({ treePosition }) => {
+    const deltaX = Math.abs(point.x - treePosition[0])
+    const deltaZ = Math.abs(point.z - treePosition[2])
+
+    return (
+      deltaX <= TREE_TRUNK_COLLIDER_ARGS[0] + 0.08 &&
+      deltaZ <= TREE_TRUNK_COLLIDER_ARGS[2] + 0.08 &&
+      point.y >= 0 &&
+      point.y <= TREE_TRUNK_COLLIDER_ARGS[1] * 2 + 0.2
+    )
+  })
 }
 
 function AnimatedSurfaceMaterial({
@@ -454,14 +486,98 @@ function TreeCluster() {
   return (
     <group>
       {TREE_LAYOUTS.map(({ treePosition }, index) => (
-        <group
+        <RigidBody
+          colliders={false}
           key={`tree-${index}`}
           position={treePosition}
           rotation={[0, (index % 2 === 0 ? 1 : -1) * 0.18 * (index + 1), 0]}
+          type="fixed"
         >
+          <CuboidCollider args={TREE_TRUNK_COLLIDER_ARGS} position={[0, 1.95, 0]} />
           <EvergreenTree variant={(index % 3) as 0 | 1 | 2} />
-        </group>
+        </RigidBody>
       ))}
+    </group>
+  )
+}
+
+function CrateField() {
+  return (
+    <group>
+      {BOX_LAYOUTS.map((crateLayout, index) => (
+        <CrateObstacle crateLayout={crateLayout} index={index} key={`crate-${index}`} />
+      ))}
+    </group>
+  )
+}
+
+function CrateObstacle({
+  crateLayout,
+  index
+}: {
+  crateLayout: (typeof BOX_LAYOUTS)[number]
+  index: number
+}) {
+  const [width, height, depth] = crateLayout.size
+
+  return (
+    <RigidBody
+      colliders={false}
+      position={crateLayout.position}
+      rotation={[0, crateLayout.rotationY, 0]}
+      type="fixed"
+    >
+      <CuboidCollider args={[width / 2, height / 2, depth / 2]} />
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={crateLayout.size} />
+        <meshStandardMaterial
+          color={index % 2 === 0 ? '#8f6845' : '#7b583a'}
+          roughness={0.9}
+        />
+      </mesh>
+      <mesh castShadow position={[0, height * 0.1, depth * 0.38]} receiveShadow>
+        <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
+        <meshStandardMaterial color="#c59b63" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[0, height * 0.1, -depth * 0.38]} receiveShadow>
+        <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
+        <meshStandardMaterial color="#c59b63" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[width * 0.38, height * 0.08, 0]} receiveShadow>
+        <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
+        <meshStandardMaterial color="#c59b63" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[-width * 0.38, height * 0.08, 0]} receiveShadow>
+        <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
+        <meshStandardMaterial color="#c59b63" roughness={0.84} />
+      </mesh>
+    </RigidBody>
+  )
+}
+
+function ArenaBounds() {
+  const halfThickness = ARENA_BOUNDARY_COLLIDER_THICKNESS / 2
+  const sideLength = arenaHalfSize + ARENA_BOUNDARY_COLLIDER_THICKNESS
+  const halfHeight = ARENA_BOUNDARY_COLLIDER_HEIGHT / 2
+
+  return (
+    <group>
+      <CuboidCollider
+        args={[halfThickness, halfHeight, sideLength]}
+        position={[arenaHalfSize + halfThickness, halfHeight, 0]}
+      />
+      <CuboidCollider
+        args={[halfThickness, halfHeight, sideLength]}
+        position={[-arenaHalfSize - halfThickness, halfHeight, 0]}
+      />
+      <CuboidCollider
+        args={[sideLength, halfHeight, halfThickness]}
+        position={[0, halfHeight, arenaHalfSize + halfThickness]}
+      />
+      <CuboidCollider
+        args={[sideLength, halfHeight, halfThickness]}
+        position={[0, halfHeight, -arenaHalfSize - halfThickness]}
+      />
     </group>
   )
 }
@@ -738,6 +854,7 @@ function RoundStage({
   const { camera, clock, gl } = useThree()
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
   const playerRef = useRef<Group | null>(null)
+  const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const controlsRef = useRef<IControlsState>({
     backward: false,
     forward: false,
@@ -952,6 +1069,16 @@ function RoundStage({
     monkeyStateRef.current = createMonkeyState()
     heartStateRef.current = createHeartState()
 
+    playerBodyRef.current?.setTranslation(
+      {
+        x: PLAYER_START_POSITION[0],
+        y: PLAYER_START_POSITION[1],
+        z: PLAYER_START_POSITION[2]
+      },
+      true
+    )
+    playerBodyRef.current?.setLinvel({ x: 0, y: 0, z: 0 }, true)
+
     cameraPosition
       .set(...PLAYER_START_POSITION)
       .add(new Vector3(0, playerCameraHeight, playerCameraDistance))
@@ -974,6 +1101,16 @@ function RoundStage({
   }, [camera, cameraPosition, difficulty, gl, roundKey])
 
   useFrame((_, delta) => {
+    const playerBodyTranslation = playerBodyRef.current?.translation()
+
+    if (playerBodyTranslation) {
+      playerPositionRef.current.set(
+        playerBodyTranslation.x,
+        PLAYER_START_POSITION[1],
+        playerBodyTranslation.z
+      )
+    }
+
     if (playerRef.current) {
       playerRef.current.position.copy(playerPositionRef.current)
     }
@@ -1040,9 +1177,20 @@ function RoundStage({
       1 - Math.exp(-delta * playerFacingTurnSpeed)
     )
 
-    playerPositionRef.current.addScaledVector(playerVelocityRef.current, delta)
-    playerPositionRef.current.x = clampToArena(playerPositionRef.current.x)
-    playerPositionRef.current.z = clampToArena(playerPositionRef.current.z)
+    if (playerBodyRef.current) {
+      playerBodyRef.current.setLinvel(
+        {
+          x: isActive ? playerVelocityRef.current.x : 0,
+          y: 0,
+          z: isActive ? playerVelocityRef.current.z : 0
+        },
+        true
+      )
+    } else {
+      playerPositionRef.current.addScaledVector(playerVelocityRef.current, delta)
+      playerPositionRef.current.x = clampToArena(playerPositionRef.current.x)
+      playerPositionRef.current.z = clampToArena(playerPositionRef.current.z)
+    }
 
     playerRef.current.rotation.y = Math.atan2(
       playerDirectionRef.current.x,
@@ -1137,6 +1285,17 @@ function RoundStage({
         continue
       }
 
+      if (
+        isPointInsideAnyCrate(
+          [projectile.position.x, projectile.position.y, projectile.position.z],
+          BOX_LAYOUTS
+        ) ||
+        isPointInsideTreeTrunk(projectile.position)
+      ) {
+        projectile.active = false
+        continue
+      }
+
       if (projectile.owner === 'player') {
         const hitMonkey = monkeyStateRef.current.find((monkeyState) => {
           if (!monkeyState.active) {
@@ -1199,7 +1358,26 @@ function RoundStage({
   return (
     <>
       <color args={['#d8efe8']} attach="background" />
-      <fog args={['#d8efe8', 14, 42]} attach="fog" />
+      <fog args={['#d8efe8', GAME_FOG_NEAR, GAME_FOG_FAR]} attach="fog" />
+
+      <RigidBody
+        canSleep={false}
+        ccd
+        colliders={false}
+        enabledRotations={[false, false, false]}
+        enabledTranslations={[true, false, true]}
+        gravityScale={0}
+        linearDamping={10}
+        position={PLAYER_START_POSITION}
+        ref={playerBodyRef}
+      >
+        <CapsuleCollider
+          args={[playerColliderHalfHeight, playerColliderRadius]}
+          position={[0, 1.25, 0]}
+        />
+      </RigidBody>
+
+      <ArenaBounds />
 
       <AtmosphereDome />
       <AtmosphereParticles />
@@ -1223,7 +1401,7 @@ function RoundStage({
       />
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[60, 60]} />
+        <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
         <meshStandardMaterial color="#c6e2cf" roughness={0.94} />
       </mesh>
 
@@ -1232,11 +1410,12 @@ function RoundStage({
         receiveShadow
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <ringGeometry args={[5.5, 6.7, 48]} />
+        <ringGeometry args={[8.5, 10.5, 64]} />
         <meshStandardMaterial color="#dff4d6" roughness={1} />
       </mesh>
 
       <TreeCluster />
+      <CrateField />
       <HeartPickups heartStateRef={heartStateRef} />
       <VikingTroop monkeyStateRef={monkeyStateRef} />
       <AxeProjectiles projectilesRef={projectilesRef} />
@@ -1285,18 +1464,22 @@ function GameScene({
 }: IGameSceneProps) {
   return (
     <Canvas
-      camera={{ far: 80, fov: 42, near: 0.1, position: [0, 5, 14] }}
+      camera={{ far: 140, fov: 42, near: 0.1, position: [0, 5, 14] }}
       dpr={[1, 1.8]}
       fallback={<div>WebGL is unavailable.</div>}
       shadows
     >
-      <RoundStage
-        difficulty={difficulty}
-        isActive={isActive}
-        onHealthChange={onHealthChange}
-        onMonkeyHit={onMonkeyHit}
-        roundKey={roundKey}
-      />
+      <Suspense fallback={null}>
+        <Physics colliders={false} gravity={[0, 0, 0]}>
+          <RoundStage
+            difficulty={difficulty}
+            isActive={isActive}
+            onHealthChange={onHealthChange}
+            onMonkeyHit={onMonkeyHit}
+            roundKey={roundKey}
+          />
+        </Physics>
+      </Suspense>
     </Canvas>
   )
 }
