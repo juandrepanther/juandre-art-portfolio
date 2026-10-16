@@ -35,19 +35,28 @@ function HomePageHeader({ isDarkMode, onToggleDarkMode }: IHomePageHeader) {
       <Toolbar
         disableGutters
         sx={{
-          width: 'min(1200px, calc(100% - 32px))',
+          width: {
+            xs: 'calc(100% - 24px)',
+            sm: 'min(1200px, calc(100% - 40px))'
+          },
           mx: 'auto',
-          py: 2,
+          py: { xs: 1.25, sm: 1.5, md: 2 },
           minHeight: 'unset',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}
       >
         <Box>
-          <Typography variant="body2" sx={{ color: 'secondary.main' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'secondary.main', letterSpacing: '0.08em' }}
+          >
             JANIS DREGERIS
           </Typography>
-          <Typography variant="h1" sx={{ fontSize: '1rem' }}>
+          <Typography
+            variant="h1"
+            sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, lineHeight: 1.1 }}
+          >
             FULL STACK ENGINEER
           </Typography>
         </Box>
@@ -67,7 +76,8 @@ function HomePageHeader({ isDarkMode, onToggleDarkMode }: IHomePageHeader) {
               gap: 1,
               '.MuiFormControlLabel-label': {
                 color: 'text.secondary',
-                fontSize: '0.875rem'
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                whiteSpace: 'nowrap'
               }
             }}
           />

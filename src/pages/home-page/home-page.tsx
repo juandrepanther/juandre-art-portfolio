@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Link, Stack } from '@mui/material'
+import { Box, Container, Link, Stack } from '@mui/material'
 import { Suspense, lazy, useState } from 'react'
 import type { MouseEvent } from 'react'
 import useReducedMotion from 'hooks/use-reduced-motion'
@@ -42,6 +42,8 @@ function HomePage() {
   const handlePointerLeave = () => {
     setPointerRatio({ x: 0, y: 0 })
   }
+
+  const pageGutter = { xs: 2, sm: 3, lg: 4 }
 
   return (
     <Box sx={{ backgroundColor: 'background.default', color: 'text.primary' }}>
@@ -96,44 +98,55 @@ function HomePage() {
         <Container
           disableGutters
           maxWidth="lg"
-          sx={{ position: 'relative', zIndex: 1, px: { xs: 2, md: 3 } }}
+          sx={{ position: 'relative', zIndex: 1 }}
         >
-          <Stack spacing={sectionGap} sx={{ pb: { xs: 4, md: 6 } }}>
-            <HeroSection
-              isDarkMode={isDarkMode}
-              isReducedMotion={isReducedMotion}
-              pointerRatio={pointerRatio}
-            />
+          <Box sx={{ px: pageGutter }}>
+            <Stack spacing={sectionGap} sx={{ pb: { xs: 5, md: 7 } }}>
+              <HeroSection
+                isDarkMode={isDarkMode}
+                isReducedMotion={isReducedMotion}
+                pointerRatio={pointerRatio}
+              />
 
-            <Grid container rowSpacing={sectionGap}>
-              <Grid size={{ xs: 12, md: 7 }}>
-                <ExperienceSection isDarkMode={isDarkMode} />
-              </Grid>
-              <Grid size={{ xs: 12, md: 5 }}>
-                <SkillsSection isDarkMode={isDarkMode} />
-              </Grid>
-            </Grid>
-
-            <Box
-              sx={{
-                display: 'grid',
-                gap: sectionGap,
-                gridTemplateColumns: {
-                  xs: 'minmax(0, 12fr)',
-                  md: 'minmax(0, 6fr) minmax(0, 6fr)'
-                }
-              }}
-            >
-              <Box>
-                <EducationSection />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: sectionGap,
+                  gridTemplateColumns: {
+                    xs: 'minmax(0, 1fr)',
+                    md: 'minmax(0, 1.2fr) minmax(0, 0.8fr)'
+                  }
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <ExperienceSection isDarkMode={isDarkMode} />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <SkillsSection isDarkMode={isDarkMode} />
+                </Box>
               </Box>
-              <Box>
-                <ContactSection isDarkMode={isDarkMode} />
-              </Box>
-            </Box>
 
-            <CertificatesSection isDarkMode={isDarkMode} />
-          </Stack>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: sectionGap,
+                  gridTemplateColumns: {
+                    xs: 'minmax(0, 1fr)',
+                    md: 'repeat(2, minmax(0, 1fr))'
+                  }
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <EducationSection />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <ContactSection isDarkMode={isDarkMode} />
+                </Box>
+              </Box>
+
+              <CertificatesSection isDarkMode={isDarkMode} />
+            </Stack>
+          </Box>
         </Container>
       </Box>
     </Box>

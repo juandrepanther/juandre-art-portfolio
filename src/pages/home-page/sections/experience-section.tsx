@@ -20,7 +20,7 @@ function ExperienceSection({ isDarkMode }: IExperienceSection) {
               spacing={1.5}
               sx={{ justifyContent: 'space-between' }}
             >
-              <Box>
+              <Box sx={{ minWidth: 0 }}>
                 <Typography sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
                   {experienceStep.title}
                 </Typography>
@@ -28,11 +28,15 @@ function ExperienceSection({ isDarkMode }: IExperienceSection) {
                   {experienceStep.place}
                 </Typography>
               </Box>
-              <Typography sx={{ color: 'secondary.main' }}>
+              <Typography sx={{ color: 'secondary.main', flexShrink: 0 }}>
                 {experienceStep.year}
               </Typography>
             </Stack>
-            <Stack component="ul" spacing={1} sx={{ color: 'text.secondary' }}>
+            <Stack
+              component="ul"
+              spacing={1}
+              sx={{ color: 'text.secondary', pl: 2.25 }}
+            >
               {experienceStep.responsibilities.map((responsibility) => (
                 <Box component="li" key={responsibility}>
                   {responsibility.replace(/\s+/g, ' ').trim()}

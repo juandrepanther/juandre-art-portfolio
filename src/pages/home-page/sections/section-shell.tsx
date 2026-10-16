@@ -19,19 +19,24 @@ function SectionShell({ title, eyebrow, children }: ISectionShell) {
       component="section"
       sx={{
         height: '100%',
+        minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         border: (theme) =>
           theme.palette.mode === 'dark'
             ? '1px solid rgba(220, 229, 236, 0.14)'
             : '1px solid rgba(20, 32, 44, 0.12)',
-        borderRadius: '32px',
+        borderRadius: { xs: '28px', md: '32px' },
         backgroundColor: (theme) =>
           theme.palette.mode === 'dark'
             ? 'rgba(12, 17, 23, 0.74)'
             : 'rgba(255, 255, 255, 0.78)',
         backdropFilter: 'blur(22px)',
-        p: { xs: 3, md: 4 }
+        boxShadow: (theme) =>
+          theme.palette.mode === 'dark'
+            ? '0 24px 60px rgba(9, 18, 26, 0.18)'
+            : '0 24px 60px rgba(20, 32, 44, 0.08)',
+        p: { xs: 2.5, sm: 3, md: 4 }
       }}
     >
       <Box sx={{ display: 'grid', gap: 1 }}>
@@ -40,7 +45,8 @@ function SectionShell({ title, eyebrow, children }: ISectionShell) {
             sx={{
               color: 'secondary.main',
               fontSize: '0.8rem',
-              letterSpacing: '0.16em'
+              fontWeight: 700,
+              letterSpacing: '0.12em'
             }}
           >
             {eyebrow}
@@ -49,7 +55,10 @@ function SectionShell({ title, eyebrow, children }: ISectionShell) {
         <Typography
           id={sectionId}
           variant="h2"
-          sx={{ fontSize: { xs: '1.65rem', md: '2.3rem' } }}
+          sx={{
+            fontSize: { xs: '1.55rem', sm: '1.75rem', md: '2.3rem' },
+            lineHeight: 1.05
+          }}
         >
           {title}
         </Typography>

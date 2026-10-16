@@ -16,18 +16,19 @@ export const sectionTitles = [
 ]
 
 export const aboutParagraphs = [
-  `Full Stack Engineer with wealth of
-  experience in building scalable and
-  user-friendly web applications.
-  Proficient in front-end and back-end
-  development, utilizing various
-  technologies. Proven track record of
-  delivering high-quality code and
-  meeting project deadlines. `,
+  `Full Stack Engineer with experience delivering
+  scalable, user-focused web applications through
+  a balanced combination of front-end expertise and
+  back-end reliability. Comfortable working across
+  a broad technology stack, with a consistent track
+  record of producing high-quality solutions within
+  project timelines.`,
   `
-  Whatever time it will take - I will find the
-  solution! Addicted from the deep
-  learning and passion for the details.`
+  I approach complex challenges with persistence,
+  analytical thinking, and a strong sense of
+  ownership. Continuous learning and attention to
+  detail are central to the way I design, build,
+  and refine software.`
 ]
 
 interface IExperienceStep {

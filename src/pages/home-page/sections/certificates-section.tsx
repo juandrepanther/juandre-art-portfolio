@@ -12,9 +12,13 @@ function CertificatesSection({ isDarkMode }: ICertificatesSection) {
     <SectionShell eyebrow="Proof" title={sectionTitles[4]}>
       <Box
         sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 3
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: {
+            xs: 'minmax(0, 1fr)',
+            sm: 'repeat(2, minmax(0, 1fr))',
+            lg: 'repeat(4, minmax(0, 1fr))'
+          }
         }}
       >
         {certificatesData.map((certificate) => (
@@ -22,11 +26,7 @@ function CertificatesSection({ isDarkMode }: ICertificatesSection) {
             key={certificate.title}
             sx={{
               display: 'flex',
-              width: {
-                xs: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(25% - 18px)'
-              }
+              minWidth: 0
             }}
           >
             <Link
@@ -47,7 +47,7 @@ function CertificatesSection({ isDarkMode }: ICertificatesSection) {
                   display: 'flex',
                   width: '100%',
                   height: '100%',
-                  minHeight: 240,
+                  minHeight: { xs: 220, md: 240 },
                   border: '1px solid transparent',
                   borderRadius: '28px',
                   p: 2.5

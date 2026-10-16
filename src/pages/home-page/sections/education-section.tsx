@@ -16,7 +16,7 @@ function EducationSection() {
               alignItems: 'flex-start'
             }}
           >
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={{ fontWeight: 700 }}>
                 {educationItem.title}
               </Typography>
@@ -24,7 +24,13 @@ function EducationSection() {
                 {educationItem.place}
               </Typography>
             </Box>
-            <Typography sx={{ color: 'secondary.main', whiteSpace: 'nowrap' }}>
+            <Typography
+              sx={{
+                color: 'secondary.main',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}
+            >
               {educationItem.year}
             </Typography>
           </Stack>

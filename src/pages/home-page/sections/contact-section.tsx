@@ -21,7 +21,9 @@ function ContactSection({ isDarkMode }: IContactSection) {
             <Typography sx={{ color: 'text.secondary' }}>
               {detail.title}
             </Typography>
-            <Typography>{detail.data}</Typography>
+            <Typography sx={{ overflowWrap: 'anywhere' }}>
+              {detail.data}
+            </Typography>
           </Stack>
         ))}
         <Divider
@@ -64,10 +66,11 @@ function ContactSection({ isDarkMode }: IContactSection) {
                     }),
                     {
                       display: 'flex',
-                      p: 2,
+                      p: 1,
                       gap: 1.5,
                       border: '1px solid transparent',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      minHeight: 77
                     }
                   ]}
                   target={contact.email ? undefined : '_blank'}
@@ -95,7 +98,14 @@ function ContactSection({ isDarkMode }: IContactSection) {
                       }}
                     />
                   </Box>
-                  <Typography>{contact.title}</Typography>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '0.9rem', sm: '.9rem' },
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {contact.title}
+                  </Typography>
                 </Link>
               </Box>
             )
