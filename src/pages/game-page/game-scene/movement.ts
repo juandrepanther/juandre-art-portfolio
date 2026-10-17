@@ -1,9 +1,9 @@
 import { Vector3 } from 'three'
 import { PLAYER_MOVE_SPEED, type TDifficultyLevel } from '../helpers'
 import {
-  hardcoreMonkeyFlightProximity,
-  hardcoreMonkeyFlightSpeed,
-  playerFacingTurnSpeed
+  HARDCORE_MONKEY_FLIGHT_PROXIMITY,
+  HARDCORE_MONKEY_FLIGHT_SPEED,
+  PLAYER_FACING_TURN_SPEED
 } from '../settings'
 import { createRandomMonkeyFlightPosition } from './helpers'
 import type { IControlsState, IMonkeyState } from './types'
@@ -48,7 +48,7 @@ export function updatePlayerFacing(
   desiredFacing.copy(cameraForward)
   playerDirection.lerp(
     desiredFacing,
-    1 - Math.exp(-delta * playerFacingTurnSpeed)
+    1 - Math.exp(-delta * PLAYER_FACING_TURN_SPEED)
   )
 }
 
@@ -65,7 +65,7 @@ export function applyMonkeyTravelByDifficulty(
 
       if (
         travelToTarget.lengthSq() <=
-        hardcoreMonkeyFlightProximity * hardcoreMonkeyFlightProximity
+        HARDCORE_MONKEY_FLIGHT_PROXIMITY * HARDCORE_MONKEY_FLIGHT_PROXIMITY
       ) {
         monkeyState.targetPosition.copy(createRandomMonkeyFlightPosition())
         return
@@ -73,7 +73,7 @@ export function applyMonkeyTravelByDifficulty(
 
       monkeyState.position.addScaledVector(
         travelToTarget.normalize(),
-        delta * hardcoreMonkeyFlightSpeed
+        delta * HARDCORE_MONKEY_FLIGHT_SPEED
       )
       return
     }

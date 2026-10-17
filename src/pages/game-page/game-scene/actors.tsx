@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { TREE_LAYOUTS } from '../helpers'
-import { projectilePoolSize } from '../settings'
+import { PROJECTILE_POOL_SIZE } from '../settings'
 import { Group, MeshStandardMaterial as ThreeMeshStandardMaterial } from 'three'
 import { AnimatedSurfaceMaterial } from './lighting'
 import type {
@@ -190,7 +190,7 @@ function VikingEnemy({ index, monkeyStateRef }: IVikingEnemy) {
 export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
   return (
     <group>
-      {Array.from({ length: projectilePoolSize }, (_, index) => (
+      {Array.from({ length: PROJECTILE_POOL_SIZE }, (_, index) => (
         <AxeProjectile
           index={index}
           key={`axe-${index}`}

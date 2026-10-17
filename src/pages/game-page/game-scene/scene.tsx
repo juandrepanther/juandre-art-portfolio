@@ -4,8 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
-import { scenePlayerJumpGravity } from './helpers'
-import { gameControlMap } from '../settings'
+import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
 
 function GameScene({
   difficulty,
@@ -15,7 +14,7 @@ function GameScene({
   roundKey
 }: IGameSceneProps) {
   return (
-    <KeyboardControls map={gameControlMap}>
+    <KeyboardControls map={GAME_CONTROL_MAP}>
       <Canvas
         camera={{ far: 140, fov: 42, near: 0.1, position: [0, 5, 14] }}
         dpr={[1, 1.8]}
@@ -27,7 +26,7 @@ function GameScene({
           <Physics
             colliders={false}
             debug={import.meta.env.DEV}
-            gravity={[0, -scenePlayerJumpGravity, 0]}
+            gravity={[0, -PLAYER_JUMP_GRAVITY, 0]}
           >
             <RoundStage
               difficulty={difficulty}

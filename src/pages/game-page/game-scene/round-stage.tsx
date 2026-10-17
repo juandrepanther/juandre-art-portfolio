@@ -18,7 +18,6 @@ import {
   createRandomHeartPosition,
   resetControlsState,
   resetProjectileState,
-  scenePlayerJumpVelocity,
   spawnProjectileIntoPool,
   syncControlsState,
   isPointInsideTreeTrunk
@@ -59,21 +58,22 @@ import {
   updatePlayerMovement
 } from './movement'
 import {
-  heartPickupRadius,
-  monkeyAimPrecision,
-  monkeyHitRadius,
-  monkeyHitboxOffset,
-  playerBodyGroundOffset,
-  playerColliderHalfHeight,
-  playerCollisionRadius,
-  playerHitFlashDurationMs,
-  playerHitRadius,
-  playerHitboxOffset,
-  pointerLockMaxPolarAngle,
-  pointerLockMinPolarAngle,
-  pointerLockSelector,
-  pointerLockSpeed,
-  projectilePoolSize,
+  HEART_PICKUP_RADIUS,
+  MONKEY_AIM_PRECISION,
+  MONKEY_HIT_RADIUS,
+  MONKEY_HITBOX_OFFSET,
+  PLAYER_BODY_GROUND_OFFSET,
+  PLAYER_COLLIDER_HALF_HEIGHT,
+  PLAYER_COLLISION_RADIUS,
+  PLAYER_HIT_FLASH_DURATION_MS,
+  PLAYER_HIT_RADIUS,
+  PLAYER_HITBOX_OFFSET,
+  PLAYER_JUMP_VELOCITY,
+  POINTER_LOCK_MAX_POLAR_ANGLE,
+  POINTER_LOCK_MIN_POLAR_ANGLE,
+  POINTER_LOCK_SELECTOR,
+  POINTER_LOCK_SPEED,
+  PROJECTILE_POOL_SIZE,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -104,7 +104,7 @@ export default function RoundStage({
   const playerDirectionRef = useRef(new Vector3(0, 0, -1))
   const desiredFacingRef = useRef(new Vector3(0, 0, -1))
   const projectilesRef = useRef(
-    Array.from({ length: projectilePoolSize }, createProjectileState)
+    Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
   const monkeyStateRef = useRef(createMonkeyState())
   const heartStateRef = useRef(createHeartState(crateLayouts))
@@ -135,7 +135,7 @@ export default function RoundStage({
     hitFlashTimeoutRef.current = window.setTimeout(() => {
       setIsPlayerHitFlashing(false)
       hitFlashTimeoutRef.current = null
-    }, playerHitFlashDurationMs)
+    }, PLAYER_HIT_FLASH_DURATION_MS)
   }
 
   const triggerPlayerJump = useEffectEvent(() => {
@@ -154,7 +154,7 @@ export default function RoundStage({
     playerBody.setLinvel(
       {
         x: currentVelocity.x,
-        y: scenePlayerJumpVelocity,
+        y: PLAYER_JUMP_VELOCITY,
         z: currentVelocity.z
       },
       true
@@ -288,7 +288,7 @@ export default function RoundStage({
     playerBodyRef.current?.setTranslation(
       {
         x: PLAYER_START_POSITION[0],
-        y: playerBodyGroundOffset,
+        y: PLAYER_BODY_GROUND_OFFSET,
         z: PLAYER_START_POSITION[2]
       },
       true
@@ -381,7 +381,7 @@ export default function RoundStage({
     const now = clock.elapsedTime
     const playerHitboxCenter = playerPositionRef.current
       .clone()
-      .add(playerHitboxOffset)
+      .add(PLAYER_HITBOX_OFFSET)
 
     for (const monkeyState of monkeyStateRef.current) {
       applyMonkeyTravelByDifficulty(monkeyState, difficulty, delta)
@@ -403,7 +403,7 @@ export default function RoundStage({
         const target = playerHitboxCenter.clone()
         const distanceToPlayer =
           monkeyState.position.distanceTo(playerHitboxCenter)
-        const precisionOffset = distanceToPlayer * monkeyAimPrecision
+        const precisionOffset = distanceToPlayer * MONKEY_AIM_PRECISION
 
         target.x += (Math.random() - 0.5) * precisionOffset * 2
         target.z += (Math.random() - 0.5) * precisionOffset * 2
@@ -456,11 +456,11 @@ export default function RoundStage({
 
             const monkeyHitboxCenter = monkeyState.position
               .clone()
-              .add(monkeyHitboxOffset)
+              .add(MONKEY_HITBOX_OFFSET)
 
             return (
               monkeyHitboxCenter.distanceTo(projectile.position) <=
-              monkeyHitRadius
+              MONKEY_HIT_RADIUS
             )
           })
 
@@ -476,7 +476,7 @@ export default function RoundStage({
         default:
           if (
             playerHitboxCenter.distanceTo(projectile.position) <=
-              playerHitRadius &&
+              PLAYER_HIT_RADIUS &&
             now - lastDamageAtRef.current > 0.3
           ) {
             lastDamageAtRef.current = now
@@ -500,7 +500,7 @@ export default function RoundStage({
 
       if (
         playerPositionRef.current.distanceTo(heartState.position) <=
-        heartPickupRadius
+        HEART_PICKUP_RADIUS
       ) {
         heartState.active = false
         heartState.respawnAt = now + HEART_RESPAWN_SECONDS
@@ -565,19 +565,19 @@ export default function RoundStage({
         lockRotations
         position={[
           PLAYER_START_POSITION[0],
-          playerBodyGroundOffset,
+          PLAYER_BODY_GROUND_OFFSET,
           PLAYER_START_POSITION[2]
         ]}
         ref={playerBodyRef}
         type="dynamic"
       >
         <CapsuleCollider
-          args={[playerColliderHalfHeight, playerCollisionRadius]}
+          args={[PLAYER_COLLIDER_HALF_HEIGHT, PLAYER_COLLISION_RADIUS]}
           friction={0.8}
         />
         <Suspense fallback={null}>
           <VikingAvatar
-            groundOffset={playerBodyGroundOffset}
+            groundOffset={PLAYER_BODY_GROUND_OFFSET}
             isHitFlashing={isPlayerHitFlashing}
             playerRef={playerRef}
           />
@@ -588,12 +588,12 @@ export default function RoundStage({
 
       <PointerLockControls
         makeDefault
-        maxPolarAngle={pointerLockMaxPolarAngle}
-        minPolarAngle={pointerLockMinPolarAngle}
+        maxPolarAngle={POINTER_LOCK_MAX_POLAR_ANGLE}
+        minPolarAngle={POINTER_LOCK_MIN_POLAR_ANGLE}
         onLock={handlePointerLock}
         onUnlock={handlePointerUnlock}
-        pointerSpeed={pointerLockSpeed}
-        selector={pointerLockSelector}
+        pointerSpeed={POINTER_LOCK_SPEED}
+        selector={POINTER_LOCK_SELECTOR}
       />
     </>
   )

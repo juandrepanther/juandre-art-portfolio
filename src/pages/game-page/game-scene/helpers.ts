@@ -6,15 +6,13 @@ import {
   type ICrateLayout
 } from '../helpers'
 import {
-  arenaHalfSize,
-  atmosphereParticleCount,
-  hardcoreMonkeyFlightHeightMax,
-  hardcoreMonkeyFlightHeightMin,
-  heartPickupRadius,
-  heartSpawnHeight,
-  heartSpawnPlacementAttempts,
-  playerJumpGravity,
-  playerJumpVelocity,
+  ARENA_HALF_SIZE,
+  ATMOSPHERE_PARTICLE_COUNT,
+  HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX,
+  HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN,
+  HEART_PICKUP_RADIUS,
+  HEART_SPAWN_HEIGHT,
+  HEART_SPAWN_PLACEMENT_ATTEMPTS,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -58,15 +56,16 @@ export function resetProjectileState(projectile: IProjectileState) {
 }
 
 export function createAtmosphereParticleData(): IAtmosphereParticleData {
-  const positions = new Float32Array(atmosphereParticleCount * 3)
-  const scales = new Float32Array(atmosphereParticleCount)
+  const positions = new Float32Array(ATMOSPHERE_PARTICLE_COUNT * 3)
+  const scales = new Float32Array(ATMOSPHERE_PARTICLE_COUNT)
 
-  for (let index = 0; index < atmosphereParticleCount; index += 1) {
+  for (let index = 0; index < ATMOSPHERE_PARTICLE_COUNT; index += 1) {
     const positionOffset = index * 3
 
-    positions[positionOffset] = (Math.random() - 0.5) * arenaHalfSize * 3.4
+    positions[positionOffset] = (Math.random() - 0.5) * ARENA_HALF_SIZE * 3.4
     positions[positionOffset + 1] = 1.4 + Math.random() * 11.5
-    positions[positionOffset + 2] = (Math.random() - 0.5) * arenaHalfSize * 3.4
+    positions[positionOffset + 2] =
+      (Math.random() - 0.5) * ARENA_HALF_SIZE * 3.4
     scales[index] = 8 + Math.random() * 16
   }
 
@@ -74,7 +73,7 @@ export function createAtmosphereParticleData(): IAtmosphereParticleData {
 }
 
 export function clampToArena(value: number) {
-  return Math.max(-arenaHalfSize, Math.min(arenaHalfSize, value))
+  return Math.max(-ARENA_HALF_SIZE, Math.min(ARENA_HALF_SIZE, value))
 }
 
 export function isPointInsideTreeTrunk(point: Vector3) {
@@ -93,11 +92,11 @@ export function isPointInsideTreeTrunk(point: Vector3) {
 
 export function createRandomMonkeyFlightPosition() {
   return new Vector3(
-    clampToArena((Math.random() - 0.5) * arenaHalfSize * 2),
-    hardcoreMonkeyFlightHeightMin +
+    clampToArena((Math.random() - 0.5) * ARENA_HALF_SIZE * 2),
+    HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN +
       Math.random() *
-        (hardcoreMonkeyFlightHeightMax - hardcoreMonkeyFlightHeightMin),
-    clampToArena((Math.random() - 0.5) * arenaHalfSize * 2)
+        (HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX - HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN),
+    clampToArena((Math.random() - 0.5) * ARENA_HALF_SIZE * 2)
   )
 }
 
@@ -115,16 +114,16 @@ export function createMonkeyState() {
 }
 
 export function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
-  const spawnRange = arenaHalfSize - heartPickupRadius
+  const spawnRange = ARENA_HALF_SIZE - HEART_PICKUP_RADIUS
 
   for (
     let attemptIndex = 0;
-    attemptIndex < heartSpawnPlacementAttempts;
+    attemptIndex < HEART_SPAWN_PLACEMENT_ATTEMPTS;
     attemptIndex += 1
   ) {
     const position = new Vector3(
       (Math.random() - 0.5) * spawnRange * 2,
-      heartSpawnHeight,
+      HEART_SPAWN_HEIGHT,
       (Math.random() - 0.5) * spawnRange * 2
     )
 
@@ -139,7 +138,7 @@ export function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
     }
   }
 
-  return new Vector3(0, heartSpawnHeight, 0)
+  return new Vector3(0, HEART_SPAWN_HEIGHT, 0)
 }
 
 export function createHeartState(crateLayouts: ICrateLayout[]) {
@@ -204,6 +203,3 @@ export function spawnProjectileIntoPool(
   projectile.velocity.copy(velocity)
   projectile.ttl = ttl
 }
-
-export const scenePlayerJumpGravity = playerJumpGravity
-export const scenePlayerJumpVelocity = playerJumpVelocity

@@ -1,11 +1,11 @@
 import { Euler, Vector3 } from 'three'
 import { PLAYER_START_POSITION } from '../helpers'
 import {
-  playerBodyGroundOffset,
-  playerCameraAimPitch,
-  playerCameraDistance,
-  playerCameraHeight,
-  worldUp
+  PLAYER_BODY_GROUND_OFFSET,
+  PLAYER_CAMERA_AIM_PITCH,
+  PLAYER_CAMERA_DISTANCE,
+  PLAYER_CAMERA_HEIGHT,
+  WORLD_UP
 } from '../settings'
 import { createLookDirection } from './helpers'
 
@@ -36,7 +36,7 @@ interface ISyncCameraState {
 export function createInitialPlayerPosition() {
   return new Vector3(
     PLAYER_START_POSITION[0],
-    playerBodyGroundOffset,
+    PLAYER_BODY_GROUND_OFFSET,
     PLAYER_START_POSITION[2]
   )
 }
@@ -48,13 +48,15 @@ export function resetCameraState({
   cameraRight,
   playerPosition
 }: IResetCameraState) {
-  camera.quaternion.setFromEuler(new Euler(playerCameraAimPitch, 0, 0, 'YXZ'))
-  cameraLookDirection.copy(createLookDirection(0, playerCameraAimPitch))
+  camera.quaternion.setFromEuler(
+    new Euler(PLAYER_CAMERA_AIM_PITCH, 0, 0, 'YXZ')
+  )
+  cameraLookDirection.copy(createLookDirection(0, PLAYER_CAMERA_AIM_PITCH))
   cameraForward.set(0, 0, -1)
   cameraRight.set(1, 0, 0)
   camera.position
     .set(...PLAYER_START_POSITION)
-    .add(new Vector3(0, playerCameraHeight, playerCameraDistance))
+    .add(new Vector3(0, PLAYER_CAMERA_HEIGHT, PLAYER_CAMERA_DISTANCE))
   camera.lookAt(
     playerPosition.clone().add(cameraLookDirection.clone().multiplyScalar(18))
   )
@@ -76,7 +78,7 @@ export function syncCameraState({
     cameraForward.normalize()
   }
 
-  cameraRight.crossVectors(cameraForward, worldUp).normalize()
+  cameraRight.crossVectors(cameraForward, WORLD_UP).normalize()
 }
 
 export function updateCameraFollowPosition(
@@ -87,8 +89,8 @@ export function updateCameraFollowPosition(
 ) {
   const desiredCameraPosition = playerPosition
     .clone()
-    .add(new Vector3(0, playerCameraHeight, 0))
-    .add(cameraForward.clone().multiplyScalar(-playerCameraDistance))
+    .add(new Vector3(0, PLAYER_CAMERA_HEIGHT, 0))
+    .add(cameraForward.clone().multiplyScalar(-PLAYER_CAMERA_DISTANCE))
 
   cameraPosition.lerp(desiredCameraPosition, 1 - Math.exp(-delta * 10))
 }

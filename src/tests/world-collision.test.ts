@@ -7,7 +7,7 @@ import {
   isPointInsideAnyCrate,
   isPointInsideCrate
 } from 'pages/game-page/world-collision'
-import { BOX_LAYOUTS } from 'pages/game-page/world-layout'
+import { BOX_LAYOUTS } from 'pages/game-page/settings'
 
 describe('world collision helpers', () => {
   it('detects points inside an axis-aligned crate volume', () => {

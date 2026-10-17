@@ -6,7 +6,7 @@ import {
   TREE_TRUNK_COLLIDER_ARGS,
   type ICrateLayout
 } from '../helpers'
-import { arenaHalfSize } from '../settings'
+import { ARENA_HALF_SIZE } from '../settings'
 import { AnimatedSurfaceMaterial } from './lighting'
 import { getTreeVariant } from './helpers'
 import type { TTreeVariant } from './types'
@@ -223,26 +223,26 @@ function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
 
 export function ArenaBounds() {
   const halfThickness = ARENA_BOUNDARY_COLLIDER_THICKNESS / 2
-  const sideLength = arenaHalfSize + ARENA_BOUNDARY_COLLIDER_THICKNESS
+  const sideLength = ARENA_HALF_SIZE + ARENA_BOUNDARY_COLLIDER_THICKNESS
   const halfHeight = ARENA_BOUNDARY_COLLIDER_HEIGHT / 2
 
   return (
     <group>
       <CuboidCollider
         args={[halfThickness, halfHeight, sideLength]}
-        position={[arenaHalfSize + halfThickness, halfHeight, 0]}
+        position={[ARENA_HALF_SIZE + halfThickness, halfHeight, 0]}
       />
       <CuboidCollider
         args={[halfThickness, halfHeight, sideLength]}
-        position={[-arenaHalfSize - halfThickness, halfHeight, 0]}
+        position={[-ARENA_HALF_SIZE - halfThickness, halfHeight, 0]}
       />
       <CuboidCollider
         args={[sideLength, halfHeight, halfThickness]}
-        position={[0, halfHeight, arenaHalfSize + halfThickness]}
+        position={[0, halfHeight, ARENA_HALF_SIZE + halfThickness]}
       />
       <CuboidCollider
         args={[sideLength, halfHeight, halfThickness]}
-        position={[0, halfHeight, -arenaHalfSize - halfThickness]}
+        position={[0, halfHeight, -ARENA_HALF_SIZE - halfThickness]}
       />
     </group>
   )

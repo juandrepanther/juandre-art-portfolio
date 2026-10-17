@@ -24,9 +24,7 @@ export function GameSceneInstructions() {
             width: 'min(90vw, 480px)'
           }}
         >
-          Click the scene to lock the pointer. Move relative to the camera with
-          WASD or the arrow keys, jump with Space, aim with the mouse, and click
-          to hurl an axe through the center reticle.
+          Valhalla is waiting for you!
         </div>
       </Html>
     </Billboard>
