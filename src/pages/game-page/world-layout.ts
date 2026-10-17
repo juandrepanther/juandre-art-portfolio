@@ -1,5 +1,4 @@
 import {
-  BOX_LAYOUTS,
   CRATE_FOOTPRINT_PADDING,
   CRATE_LAYOUT_COUNT,
   CRATE_PLACEMENT_ATTEMPTS,
@@ -36,18 +35,6 @@ interface ICrateStackLayout {
 
 function cloneCrateSize(size: ICrateLayout['size']): ICrateLayout['size'] {
   return [size[0], size[1], size[2]]
-}
-
-function cloneCrateLayout(crateLayout: ICrateLayout): ICrateLayout {
-  return {
-    position: [
-      crateLayout.position[0],
-      crateLayout.position[1],
-      crateLayout.position[2]
-    ],
-    rotationY: crateLayout.rotationY,
-    size: cloneCrateSize(crateLayout.size)
-  }
 }
 
 function cloneTreeLayout(treeLayout: ITreeLayout): ITreeLayout {
@@ -273,27 +260,7 @@ function createRandomCrateStack(
   return null
 }
 
-export function createRandomBoxLayouts(
-  treeLayouts: ITreeLayout[]
-): ICrateLayout[] {
-  const stackLayouts: ICrateStackLayout[] = []
-  let remainingCrates = CRATE_LAYOUT_COUNT
-
-  while (remainingCrates > 0) {
-    const stackLayout = createRandomCrateStack(
-      stackLayouts,
-      treeLayouts,
-      remainingCrates
-    )
-
-    if (!stackLayout) {
-      return BOX_LAYOUTS.map(cloneCrateLayout)
-    }
-
-    stackLayouts.push(stackLayout)
-    remainingCrates -= stackLayout.stackHeight
-  }
-
+function createCrateLayoutsFromStacks(stackLayouts: ICrateStackLayout[]) {
   return stackLayouts.flatMap((stackLayout) => {
     const [, crateHeight] = stackLayout.size
 
@@ -311,4 +278,44 @@ export function createRandomBoxLayouts(
       }
     })
   })
+}
+
+export function createRandomBoxLayouts(
+  treeLayouts: ITreeLayout[]
+): ICrateLayout[] {
+  let bestStackLayouts: ICrateStackLayout[] = []
+
+  for (
+    let generationAttempt = 0;
+    generationAttempt < CRATE_PLACEMENT_ATTEMPTS;
+    generationAttempt += 1
+  ) {
+    const stackLayouts: ICrateStackLayout[] = []
+    let remainingCrates = CRATE_LAYOUT_COUNT
+
+    while (remainingCrates > 0) {
+      const stackLayout = createRandomCrateStack(
+        stackLayouts,
+        treeLayouts,
+        remainingCrates
+      )
+
+      if (!stackLayout) {
+        break
+      }
+
+      stackLayouts.push(stackLayout)
+      remainingCrates -= stackLayout.stackHeight
+    }
+
+    if (remainingCrates === 0) {
+      return createCrateLayoutsFromStacks(stackLayouts)
+    }
+
+    if (stackLayouts.length > bestStackLayouts.length) {
+      bestStackLayouts = stackLayouts
+    }
+  }
+
+  return createCrateLayoutsFromStacks(bestStackLayouts)
 }

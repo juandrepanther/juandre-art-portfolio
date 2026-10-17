@@ -7,11 +7,29 @@ import {
   isPointInsideAnyCrate,
   isPointInsideCrate
 } from 'pages/game-page/world-collision'
-import { BOX_LAYOUTS } from 'pages/game-page/settings'
+import type { ICrateLayout } from 'pages/game-page/world-layout'
+
+const crateLayouts: ICrateLayout[] = [
+  {
+    position: [-20, 0.9, -14],
+    rotationY: 0,
+    size: [2.4, 1.8, 2.1]
+  },
+  {
+    position: [-9, 0.85, 6],
+    rotationY: 0.52,
+    size: [2.1, 1.7, 2.1]
+  },
+  {
+    position: [22, 0.8, -10],
+    rotationY: -0.2,
+    size: [2, 1.6, 2]
+  }
+]
 
 describe('world collision helpers', () => {
   it('detects points inside an axis-aligned crate volume', () => {
-    const crate = BOX_LAYOUTS[0]
+    const crate = crateLayouts[0]
 
     expect(
       isPointInsideCrate(
@@ -22,7 +40,7 @@ describe('world collision helpers', () => {
   })
 
   it('detects points inside a rotated crate volume', () => {
-    const crate = BOX_LAYOUTS[5]
+    const crate = crateLayouts[1]
 
     expect(
       isPointInsideCrate(
@@ -34,12 +52,12 @@ describe('world collision helpers', () => {
   })
 
   it('rejects points outside all crate volumes', () => {
-    expect(isPointInsideAnyCrate([0, 4, 0], BOX_LAYOUTS)).toBe(false)
-    expect(isPointInsideAnyCrate([36, 0.7, -35], BOX_LAYOUTS)).toBe(false)
+    expect(isPointInsideAnyCrate([0, 4, 0], crateLayouts)).toBe(false)
+    expect(isPointInsideAnyCrate([36, 0.7, -35], crateLayouts)).toBe(false)
   })
 
   it('detects circle overlap with a crate face', () => {
-    const crate = BOX_LAYOUTS[0]
+    const crate = crateLayouts[0]
 
     expect(
       doesCircleIntersectCrate(
@@ -53,13 +71,13 @@ describe('world collision helpers', () => {
 
   it('rejects circles that are clear of all crates', () => {
     expect(
-      doesCircleIntersectAnyCrate({ x: 35, z: -34 }, 0.6, BOX_LAYOUTS, 0.08)
+      doesCircleIntersectAnyCrate({ x: 35, z: -34 }, 0.6, crateLayouts, 0.08)
     ).toBe(false)
   })
 
   it('returns the highest crate top under an overlapping circle', () => {
-    const firstCrate = BOX_LAYOUTS[0]
-    const secondCrate = BOX_LAYOUTS[3]
+    const firstCrate = crateLayouts[0]
+    const secondCrate = crateLayouts[2]
 
     expect(
       findHighestCrateTopUnderCircle(
@@ -73,7 +91,7 @@ describe('world collision helpers', () => {
 
   it('returns null when no crate sits under the circle', () => {
     expect(
-      findHighestCrateTopUnderCircle({ x: 35, z: -34 }, 0.6, BOX_LAYOUTS, 0.08)
+      findHighestCrateTopUnderCircle({ x: 35, z: -34 }, 0.6, crateLayouts, 0.08)
     ).toBeNull()
   })
 })
