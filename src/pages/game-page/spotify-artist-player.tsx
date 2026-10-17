@@ -16,7 +16,7 @@ function SpotifyArtistPlayer({
         width: 340,
         maxWidth: 'min(340px, calc(100vw - 48px))',
         p: 1.5,
-        borderRadius: 4,
+        borderRadius: 2,
         backdropFilter: 'blur(18px)',
         backgroundColor: isDarkMode
           ? 'rgba(12, 17, 23, 0.62)'
@@ -41,7 +41,7 @@ function SpotifyArtistPlayer({
           width: '100%',
           height: 352,
           border: 0,
-          borderRadius: 3,
+          borderRadius: 1.5,
           overflow: 'hidden',
           backgroundColor: isDarkMode
             ? 'rgba(12, 17, 23, 0.8)'

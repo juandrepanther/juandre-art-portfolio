@@ -73,3 +73,21 @@ export function formatTimeLabel(totalSeconds: number) {
 
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
+
+export function getGameStatusLabel(
+  gameStatus: TGameStatus,
+  countdownSeconds: number
+) {
+  switch (gameStatus) {
+    case 'playing':
+      return 'Survive the axe storm'
+    case 'countdown':
+      return `Run starts in ${countdownSeconds}`
+    case 'won':
+      return 'You survived the minute'
+    case 'lost':
+      return 'The raiding party got you'
+    default:
+      return 'Choose a difficulty'
+  }
+}

@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import HomePageHeader from 'pages/home-page/sections/home-page-header'
-import GameScene from './game-scene'
+import GameScene from './game-scene/scene'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   DESKTOP_BREAKPOINT,
@@ -24,6 +24,7 @@ import {
   SURVIVAL_TIME_SECONDS,
   clampHealth,
   formatTimeLabel,
+  getGameStatusLabel,
   type TGameStatus,
   type TDifficultyLevel
 } from './helpers'
@@ -140,7 +141,7 @@ function GamePage() {
               mt: 8,
               px: { xs: 4, md: 6 },
               py: { xs: 5, md: 6 },
-              borderRadius: 6,
+              borderRadius: 3,
               border: isDarkMode
                 ? '1px solid rgba(220, 229, 236, 0.12)'
                 : '1px solid rgba(20, 32, 44, 0.12)',
@@ -173,7 +174,7 @@ function GamePage() {
               height: 'calc(100vh - 112px)',
               minHeight: 'calc(100vh - 112px)',
               overflow: 'hidden',
-              borderRadius: 6,
+              borderRadius: 3,
               border: isDarkMode
                 ? '1px solid rgba(220, 229, 236, 0.12)'
                 : '1px solid rgba(20, 32, 44, 0.12)',
@@ -240,7 +241,7 @@ function GamePage() {
                 width: 360,
                 maxWidth: 'calc(100% - 48px)',
                 p: 3.25,
-                borderRadius: 4,
+                borderRadius: 2,
                 backdropFilter: 'blur(18px)',
                 backgroundColor: isDarkMode
                   ? 'rgba(12, 17, 23, 0.62)'
@@ -256,17 +257,7 @@ function GamePage() {
                   label={`Mode: ${difficultyConfig.label}`}
                 />
                 <Chip
-                  label={
-                    gameStatus === 'playing'
-                      ? 'Survive the axe storm'
-                      : gameStatus === 'countdown'
-                        ? `Run starts in ${countdownSeconds}`
-                        : gameStatus === 'won'
-                          ? 'You survived the minute'
-                          : gameStatus === 'lost'
-                            ? 'The raiding party got you'
-                            : 'Choose a difficulty'
-                  }
+                  label={getGameStatusLabel(gameStatus, countdownSeconds)}
                   variant="outlined"
                 />
               </Stack>
@@ -433,7 +424,7 @@ function GamePage() {
                   width: 420,
                   maxWidth: 'calc(100% - 48px)',
                   p: 5,
-                  borderRadius: 5,
+                  borderRadius: 3,
                   backdropFilter: 'blur(18px)',
                   backgroundColor: isDarkMode
                     ? 'rgba(12, 17, 23, 0.58)'

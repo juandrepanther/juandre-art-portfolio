@@ -13,7 +13,7 @@ vi.mock('hooks/useWindowSize', () => ({
   default: () => mockedUseWindowSize()
 }))
 
-vi.mock('pages/game-page/game-scene', () => ({
+vi.mock('pages/game-page/game-scene/scene', () => ({
   default: function MockGameScene({ onHealthChange }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
