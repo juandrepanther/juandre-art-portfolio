@@ -2,15 +2,10 @@ import { useGLTF } from '@react-three/drei'
 import { useEffect } from 'react'
 import { useEffectEvent } from 'react'
 import { useRef } from 'react'
+import { useState } from 'react'
 import type { RefObject } from 'react'
-import {
-  Box3,
-  Color,
-  Material,
-  Mesh,
-  MeshStandardMaterial,
-  Vector3
-} from 'three'
+import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
+import { Color, Material, Mesh, MeshStandardMaterial } from 'three'
 import type { Group } from 'three'
 
 interface IVikingAvatar {
@@ -19,12 +14,11 @@ interface IVikingAvatar {
   playerRef: RefObject<Group | null>
 }
 
-const lowPolyVikingModelUrl = new URL(
-  'assets/models/low_poly_viking.glb',
-  import.meta.url
-).href
-
 const vikingModelScale = 1
+const vikingModelCenterX = 0.25
+const vikingModelGroundOffset = 0.08
+const vikingModelCenterZ = -0.1065
+const vikingModelRotation: [number, number, number] = [-Math.PI / 2, 0, 0]
 const playerHitFlashColor = new Color('#ff3b30')
 
 useGLTF.preload(lowPolyVikingModelUrl)
@@ -35,11 +29,12 @@ function VikingAvatar({
   playerRef
 }: IVikingAvatar) {
   const { scene } = useGLTF(lowPolyVikingModelUrl)
+  const [modelScene] = useState(() => scene.clone(true))
   const modelRef = useRef<Group | null>(null)
   const baseMaterialColorsRef = useRef(new WeakMap<Material, Color>())
 
   const syncMaterialColors = useEffectEvent((isFlashing: boolean) => {
-    scene.traverse((object) => {
+    modelScene.traverse((object) => {
       if (!(object instanceof Mesh)) {
         return
       }
@@ -65,10 +60,11 @@ function VikingAvatar({
   })
 
   useEffect(() => {
-    scene.traverse((object) => {
+    modelScene.traverse((object) => {
       if (object instanceof Mesh) {
         object.castShadow = false
         object.receiveShadow = false
+        object.frustumCulled = false
 
         const materials = Array.isArray(object.material)
           ? object.material
@@ -84,24 +80,7 @@ function VikingAvatar({
         }
       }
     })
-  }, [scene])
-
-  useEffect(() => {
-    if (!modelRef.current) {
-      return
-    }
-
-    const bounds = new Box3().setFromObject(modelRef.current)
-    const center = new Vector3()
-
-    bounds.getCenter(center)
-
-    modelRef.current.position.set(
-      -center.x,
-      -bounds.min.y - groundOffset,
-      -center.z
-    )
-  }, [groundOffset, scene])
+  }, [modelScene])
 
   useEffect(() => {
     syncMaterialColors(isHitFlashing)
@@ -109,12 +88,20 @@ function VikingAvatar({
     return () => {
       syncMaterialColors(false)
     }
-  }, [isHitFlashing, scene])
+  }, [isHitFlashing, modelScene])
 
   return (
-    <group ref={playerRef} position={[0, -2, 0]} scale={vikingModelScale}>
-      <group ref={modelRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <primitive object={scene} />
+    <group ref={playerRef} scale={vikingModelScale}>
+      <group
+        ref={modelRef}
+        position={[
+          vikingModelCenterX,
+          -groundOffset - vikingModelGroundOffset,
+          vikingModelCenterZ
+        ]}
+        rotation={vikingModelRotation}
+      >
+        <primitive object={modelScene} />
       </group>
     </group>
   )
