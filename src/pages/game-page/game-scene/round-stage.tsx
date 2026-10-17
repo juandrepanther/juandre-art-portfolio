@@ -7,7 +7,7 @@ import {
 } from '@react-three/rapier'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
-import type { Group } from 'three'
+import type { DirectionalLight, Group, SpotLight } from 'three'
 import { Vector3 } from 'three'
 import VikingAvatar from '../viking-avatar'
 import { AxeProjectiles } from './actors/axe-projectiles'
@@ -33,13 +33,15 @@ import {
 import {
   AtmosphereDome,
   AtmosphereParticles,
-  CinematicLights
+  CinematicLights,
+  GroundFog,
+  StormLightning
 } from './lighting'
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds, CrateField, TreeCluster } from './world'
 import {
-  GAME_FOG_FAR,
-  GAME_FOG_NEAR,
+  GAME_BACKGROUND_COLOR,
+  GAME_FOG_COLOR,
   GAME_GROUND_SIZE,
   MAX_HEALTH,
   PAINKILLER_HEAL,
@@ -75,6 +77,27 @@ import {
   POINTER_LOCK_SELECTOR,
   POINTER_LOCK_SPEED,
   PROJECTILE_POOL_SIZE,
+  DIRECTIONAL_LIGHT_BASE_COLOR,
+  DIRECTIONAL_LIGHT_BASE_INTENSITY,
+  DIRECTIONAL_LIGHT_POSITION,
+  DIRECTIONAL_LIGHT_SHADOW_BIAS,
+  DIRECTIONAL_LIGHT_SHADOW_CAMERA_BOUNDS,
+  DIRECTIONAL_LIGHT_SHADOW_CAMERA_FAR,
+  DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE,
+  DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS,
+  GAME_FOG_DENSITY,
+  GAME_GROUND_COLOR,
+  GAME_RING_COLOR,
+  SPOTLIGHT_ANGLE,
+  SPOTLIGHT_BASE_COLOR,
+  SPOTLIGHT_BASE_INTENSITY,
+  SPOTLIGHT_DECAY,
+  SPOTLIGHT_DISTANCE,
+  SPOTLIGHT_PENUMBRA,
+  SPOTLIGHT_POSITION,
+  SPOTLIGHT_SHADOW_BIAS,
+  SPOTLIGHT_SHADOW_MAP_SIZE,
+  SPOTLIGHT_SHADOW_NORMAL_BIAS,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -125,6 +148,8 @@ export default function RoundStage({
   const cameraForwardRef = useRef(new Vector3(0, 0, -1))
   const cameraRightRef = useRef(new Vector3(1, 0, 0))
   const hitFlashTimeoutRef = useRef<number | null>(null)
+  const directionalLightRef = useRef<DirectionalLight | null>(null)
+  const spotlightRef = useRef<SpotLight | null>(null)
 
   const setHealth = (health: number) => {
     healthRef.current = health
@@ -544,34 +569,56 @@ export default function RoundStage({
 
   return (
     <>
-      <color args={['#d8efe8']} attach="background" />
-      <fog args={['#d8efe8', GAME_FOG_NEAR, GAME_FOG_FAR]} attach="fog" />
+      <color args={[GAME_BACKGROUND_COLOR]} attach="background" />
+      <fogExp2 args={[GAME_FOG_COLOR, GAME_FOG_DENSITY]} attach="fog" />
 
       <ArenaBounds />
       <AtmosphereDome />
       <AtmosphereParticles />
+      <GroundFog />
 
-      <ambientLight intensity={0.45} />
-      <hemisphereLight color="#fff8ea" groundColor="#9eb9af" intensity={1.1} />
+      <ambientLight intensity={0.22} />
+      <hemisphereLight color="#cfd6db" groundColor="#4b5358" intensity={0.58} />
       <CinematicLights />
+      <StormLightning
+        directionalLightRef={directionalLightRef}
+        spotlightRef={spotlightRef}
+      />
       <directionalLight
         castShadow
-        intensity={1.45}
-        position={[7, 14, 5]}
-        shadow-mapSize-height={2048}
-        shadow-mapSize-width={2048}
+        color={DIRECTIONAL_LIGHT_BASE_COLOR}
+        intensity={DIRECTIONAL_LIGHT_BASE_INTENSITY}
+        position={DIRECTIONAL_LIGHT_POSITION}
+        ref={directionalLightRef}
+        shadow-bias={DIRECTIONAL_LIGHT_SHADOW_BIAS}
+        shadow-camera-bottom={-DIRECTIONAL_LIGHT_SHADOW_CAMERA_BOUNDS}
+        shadow-camera-far={DIRECTIONAL_LIGHT_SHADOW_CAMERA_FAR}
+        shadow-camera-left={-DIRECTIONAL_LIGHT_SHADOW_CAMERA_BOUNDS}
+        shadow-camera-right={DIRECTIONAL_LIGHT_SHADOW_CAMERA_BOUNDS}
+        shadow-camera-top={DIRECTIONAL_LIGHT_SHADOW_CAMERA_BOUNDS}
+        shadow-mapSize-height={DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE}
+        shadow-mapSize-width={DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE}
+        shadow-normalBias={DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS}
       />
       <spotLight
-        angle={0.42}
+        angle={SPOTLIGHT_ANGLE}
         castShadow
-        intensity={42}
-        penumbra={0.8}
-        position={[-9, 16, 12]}
+        color={SPOTLIGHT_BASE_COLOR}
+        decay={SPOTLIGHT_DECAY}
+        distance={SPOTLIGHT_DISTANCE}
+        intensity={SPOTLIGHT_BASE_INTENSITY}
+        penumbra={SPOTLIGHT_PENUMBRA}
+        position={SPOTLIGHT_POSITION}
+        ref={spotlightRef}
+        shadow-bias={SPOTLIGHT_SHADOW_BIAS}
+        shadow-mapSize-height={SPOTLIGHT_SHADOW_MAP_SIZE}
+        shadow-mapSize-width={SPOTLIGHT_SHADOW_MAP_SIZE}
+        shadow-normalBias={SPOTLIGHT_SHADOW_NORMAL_BIAS}
       />
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
-        <meshStandardMaterial color="#c6e2cf" roughness={0.94} />
+        <meshStandardMaterial color={GAME_GROUND_COLOR} roughness={0.96} />
       </mesh>
       <CuboidCollider
         args={[GAME_GROUND_SIZE / 2, 0.1, GAME_GROUND_SIZE / 2]}
@@ -584,7 +631,7 @@ export default function RoundStage({
         rotation={[-Math.PI / 2, 0, 0]}
       >
         <ringGeometry args={[8.5, 10.5, 64]} />
-        <meshStandardMaterial color="#dff4d6" roughness={1} />
+        <meshStandardMaterial color={GAME_RING_COLOR} roughness={1} />
       </mesh>
 
       <TreeCluster treeLayouts={treeLayouts} />

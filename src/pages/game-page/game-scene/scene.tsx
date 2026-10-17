@@ -1,6 +1,7 @@
 import { KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
+import { Perf } from 'r3f-perf'
 import { Suspense } from 'react'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
@@ -24,6 +25,7 @@ function GameScene({
         shadows
       >
         <Suspense fallback={null}>
+          {import.meta.env.DEV ? <Perf position="top-right" /> : null}
           <Physics
             colliders={false}
             debug={import.meta.env.DEV}
