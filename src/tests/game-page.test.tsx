@@ -51,9 +51,7 @@ describe('GamePage', () => {
     expect(
       screen.getByText(/hold the grove for 15 seconds/i)
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /start run/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /fight/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /noob/i })).toBeInTheDocument()
     expect(screen.getByText('00:15')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
@@ -92,7 +90,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
-    fireEvent.click(screen.getByRole('button', { name: /start run/i }))
+    fireEvent.click(screen.getByRole('button', { name: /fight/i }))
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()

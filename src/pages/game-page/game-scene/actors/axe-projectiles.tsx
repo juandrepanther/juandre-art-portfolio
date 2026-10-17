@@ -1,10 +1,11 @@
+import { useGLTF } from '@react-three/drei'
+import { useEffect } from 'react'
 import { useRef } from 'react'
+import { useState } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
-import {
-  MeshStandardMaterial as ThreeMeshStandardMaterial,
-  type Group
-} from 'three'
+import axeModelUrl from 'assets/models/axe.glb?url'
+import { Mesh, MeshStandardMaterial, type Group } from 'three'
 import { PROJECTILE_POOL_SIZE } from '../../settings'
 import type { IProjectileState, TProjectileOwner } from '../types'
 
@@ -18,10 +19,14 @@ interface IAxeProjectile {
 }
 
 interface IProjectilePalette {
-  blade: string
-  bladeEdge: string
-  handle: string
+  tint: string
 }
+
+const axeModelScale = 0.62
+const axeModelPosition: [number, number, number] = [0.2725, 0.06, 0]
+const axeModelRotation: [number, number, number] = [Math.PI / 2, Math.PI / 2, 0]
+
+useGLTF.preload(axeModelUrl)
 
 export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
   return (
@@ -38,73 +43,73 @@ export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
 }
 
 function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
+  const { scene } = useGLTF(axeModelUrl)
+  const [modelScene] = useState(() => scene.clone(true))
   const axeRef = useRef<Group | null>(null)
-  const handleMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
-  const bladeMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
-  const bladeEdgeMaterialRef = useRef<ThreeMeshStandardMaterial | null>(null)
+  const tintMaterialsRef = useRef<MeshStandardMaterial[]>([])
+  const tintedOwnerRef = useRef<TProjectileOwner | null>(null)
+
+  useEffect(() => {
+    const tintMaterials = new Set<MeshStandardMaterial>()
+
+    modelScene.traverse((object) => {
+      if (!(object instanceof Mesh)) {
+        return
+      }
+
+      object.castShadow = true
+      object.receiveShadow = false
+      object.frustumCulled = false
+
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material]
+
+      for (const material of materials) {
+        if (material instanceof MeshStandardMaterial) {
+          material.vertexColors = true
+          tintMaterials.add(material)
+        }
+      }
+    })
+
+    tintMaterialsRef.current = [...tintMaterials]
+  }, [modelScene])
 
   useFrame(() => {
     const projectileState = projectilesRef.current[index]
 
-    if (
-      !axeRef.current ||
-      !handleMaterialRef.current ||
-      !bladeMaterialRef.current ||
-      !bladeEdgeMaterialRef.current ||
-      !projectileState
-    ) {
+    if (!axeRef.current || !projectileState) {
       return
     }
 
-    const palette = getProjectilePalette(projectileState.owner)
-
     axeRef.current.visible = projectileState.active
     axeRef.current.position.copy(projectileState.position)
-    handleMaterialRef.current.color.set(palette.handle)
-    bladeMaterialRef.current.color.set(palette.blade)
-    bladeEdgeMaterialRef.current.color.set(palette.bladeEdge)
+
+    if (tintedOwnerRef.current !== projectileState.owner) {
+      const palette = getProjectilePalette(projectileState.owner)
+
+      for (const material of tintMaterialsRef.current) {
+        material.color.set(palette.tint)
+      }
+
+      tintedOwnerRef.current = projectileState.owner
+    }
 
     if (projectileState.velocity.lengthSq() > 0) {
-      axeRef.current.rotation.z += 0.18
+      axeRef.current.rotation.z -= 0.18
     }
   })
 
   return (
     <group ref={axeRef}>
-      <mesh castShadow position={[0, 0, 0]} rotation={[0, 0, 0.12]}>
-        <cylinderGeometry args={[0.045, 0.055, 0.92, 8]} />
-        <meshStandardMaterial
-          ref={handleMaterialRef}
-          color="#7b5534"
-          roughness={0.86}
-        />
-      </mesh>
-      <mesh castShadow position={[0.2, 0.18, 0]} rotation={[0, 0, 0.22]}>
-        <boxGeometry args={[0.34, 0.14, 0.08]} />
-        <meshStandardMaterial
-          ref={bladeMaterialRef}
-          color="#d9e4ea"
-          metalness={0.72}
-          roughness={0.22}
-        />
-      </mesh>
-      <mesh castShadow position={[0.34, 0.28, 0]} rotation={[0, 0, 0.72]}>
-        <coneGeometry args={[0.1, 0.34, 8]} />
-        <meshStandardMaterial
-          ref={bladeEdgeMaterialRef}
-          color="#d9e4ea"
-          metalness={0.72}
-          roughness={0.22}
-        />
-      </mesh>
-      <mesh castShadow position={[-0.12, -0.18, 0]} rotation={[0, 0, -0.7]}>
-        <coneGeometry args={[0.06, 0.22, 8]} />
-        <meshStandardMaterial
-          color="#b7c0c8"
-          metalness={0.66}
-          roughness={0.26}
-        />
-      </mesh>
+      <group
+        position={axeModelPosition}
+        rotation={axeModelRotation}
+        scale={axeModelScale}
+      >
+        <primitive object={modelScene} />
+      </group>
     </group>
   )
 }
@@ -113,15 +118,11 @@ function getProjectilePalette(owner: TProjectileOwner): IProjectilePalette {
   switch (owner) {
     case 'enemy':
       return {
-        blade: '#b2bcc3',
-        bladeEdge: '#c1c9d0',
-        handle: '#543625'
+        tint: '#b7b0a2'
       }
     default:
       return {
-        blade: '#d9e4ea',
-        bladeEdge: '#eaf0f4',
-        handle: '#7b5534'
+        tint: '#d32f30'
       }
   }
 }

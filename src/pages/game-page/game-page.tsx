@@ -295,14 +295,6 @@ function GamePage() {
                     {formatTimeLabel(remainingTime)}
                   </Typography>
                 </Box>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                    Enemy movement
-                  </Typography>
-                  <Typography variant="h5">
-                    {difficultyConfig.enemyMovementSpeed.toFixed(1)}
-                  </Typography>
-                </Box>
               </Stack>
 
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
@@ -339,11 +331,11 @@ function GamePage() {
 
               <Stack direction="row" spacing={1.5}>
                 <Button
-                  color="secondary"
+                  color="error"
                   onClick={handleStartGame}
                   variant="contained"
                 >
-                  {isPlaying || isCountingDown ? 'Restart Run' : 'Start Run'}
+                  {isPlaying || isCountingDown ? 'Restart' : 'Fight'}
                 </Button>
                 <Button
                   color="primary"
@@ -360,7 +352,7 @@ function GamePage() {
                   }}
                   variant="outlined"
                 >
-                  Reset
+                  STOP
                 </Button>
               </Stack>
             </Stack>
@@ -444,7 +436,7 @@ function GamePage() {
                 <Typography
                   sx={{ color: 'secondary.main', letterSpacing: '0.14em' }}
                 >
-                  THIRD PERSON SURVIVAL
+                  VALHALLA AWAITS
                 </Typography>
                 <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
                   {gameStatus === 'won'
