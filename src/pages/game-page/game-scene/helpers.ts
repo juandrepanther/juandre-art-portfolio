@@ -1,9 +1,9 @@
 import { Vector3 } from 'three'
 import {
   HEART_RESPAWN_SECONDS,
-  TREE_LAYOUTS,
   TREE_TRUNK_COLLIDER_ARGS,
-  type ICrateLayout
+  type ICrateLayout,
+  type ITreeLayout
 } from '../helpers'
 import {
   ARENA_HALF_SIZE,
@@ -76,8 +76,11 @@ export function clampToArena(value: number) {
   return Math.max(-ARENA_HALF_SIZE, Math.min(ARENA_HALF_SIZE, value))
 }
 
-export function isPointInsideTreeTrunk(point: Vector3) {
-  return TREE_LAYOUTS.some(({ treePosition }) => {
+export function isPointInsideTreeTrunk(
+  point: Vector3,
+  treeLayouts: ITreeLayout[]
+) {
+  return treeLayouts.some(({ treePosition }) => {
     const deltaX = Math.abs(point.x - treePosition[0])
     const deltaZ = Math.abs(point.z - treePosition[2])
 
@@ -100,8 +103,8 @@ export function createRandomMonkeyFlightPosition() {
   )
 }
 
-export function createMonkeyState() {
-  return TREE_LAYOUTS.map((layout, index) => ({
+export function createMonkeyState(treeLayouts: ITreeLayout[]) {
+  return treeLayouts.map((layout, index) => ({
     active: true,
     animationOffset: index * 0.7,
     homePosition: new Vector3(...layout.monkeyPosition),
@@ -113,7 +116,10 @@ export function createMonkeyState() {
   }))
 }
 
-export function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
+export function createRandomHeartPosition(
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[] = []
+) {
   const spawnRange = ARENA_HALF_SIZE - HEART_PICKUP_RADIUS
 
   for (
@@ -132,7 +138,7 @@ export function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
         [position.x, position.y, position.z],
         crateLayouts
       ) &&
-      !isPointInsideTreeTrunk(position)
+      !isPointInsideTreeTrunk(position, treeLayouts)
     ) {
       return position
     }
@@ -141,16 +147,19 @@ export function createRandomHeartPosition(crateLayouts: ICrateLayout[]) {
   return new Vector3(0, HEART_SPAWN_HEIGHT, 0)
 }
 
-export function createHeartState(crateLayouts: ICrateLayout[]) {
-  const initialHeartIndex = Math.floor(Math.random() * TREE_LAYOUTS.length)
+export function createHeartState(
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[]
+) {
+  const initialHeartIndex = Math.floor(Math.random() * treeLayouts.length)
 
-  return TREE_LAYOUTS.map((_, index) => {
+  return treeLayouts.map((_, index) => {
     const isActive = index === initialHeartIndex
 
     return {
       active: isActive,
       animationOffset: index * 0.45,
-      position: createRandomHeartPosition(crateLayouts),
+      position: createRandomHeartPosition(crateLayouts, treeLayouts),
       respawnAt: isActive ? 0 : Math.random() * HEART_RESPAWN_SECONDS
     }
   })

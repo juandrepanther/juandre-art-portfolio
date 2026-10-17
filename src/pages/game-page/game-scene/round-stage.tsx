@@ -49,6 +49,7 @@ import {
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
   createRandomBoxLayouts,
+  createRandomTreeLayouts,
   type IGameSceneProps
 } from '../helpers'
 import {
@@ -89,7 +90,8 @@ export default function RoundStage({
   const [subscribeToKeyboard, getKeyboardState] =
     useKeyboardControls<TGameControl>()
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
-  const [crateLayouts] = useState(() => createRandomBoxLayouts())
+  const [treeLayouts] = useState(() => createRandomTreeLayouts())
+  const [crateLayouts] = useState(() => createRandomBoxLayouts(treeLayouts))
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
   const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
@@ -106,8 +108,8 @@ export default function RoundStage({
   const projectilesRef = useRef(
     Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
-  const monkeyStateRef = useRef(createMonkeyState())
-  const heartStateRef = useRef(createHeartState(crateLayouts))
+  const monkeyStateRef = useRef(createMonkeyState(treeLayouts))
+  const heartStateRef = useRef(createHeartState(crateLayouts, treeLayouts))
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
@@ -282,8 +284,8 @@ export default function RoundStage({
       playerPosition: playerPositionRef.current
     })
     resetControlsState(controlsRef.current)
-    monkeyStateRef.current = createMonkeyState()
-    heartStateRef.current = createHeartState(crateLayouts)
+    monkeyStateRef.current = createMonkeyState(treeLayouts)
+    heartStateRef.current = createHeartState(crateLayouts, treeLayouts)
 
     playerBodyRef.current?.setTranslation(
       {
@@ -302,7 +304,7 @@ export default function RoundStage({
     lastDamageAtRef.current = -10
     healthRef.current = MAX_HEALTH
     onHealthChangeRef.current(MAX_HEALTH)
-  }, [camera, crateLayouts, difficulty, gl, roundKey])
+  }, [camera, crateLayouts, difficulty, gl, roundKey, treeLayouts])
 
   useFrame((_, delta) => {
     const playerBody = playerBodyRef.current
@@ -441,7 +443,7 @@ export default function RoundStage({
           [projectile.position.x, projectile.position.y, projectile.position.z],
           crateLayouts
         ) ||
-        isPointInsideTreeTrunk(projectile.position)
+        isPointInsideTreeTrunk(projectile.position, treeLayouts)
       ) {
         projectile.active = false
         continue
@@ -492,7 +494,9 @@ export default function RoundStage({
       if (!heartState.active) {
         if (now >= heartState.respawnAt) {
           heartState.active = true
-          heartState.position.copy(createRandomHeartPosition(crateLayouts))
+          heartState.position.copy(
+            createRandomHeartPosition(crateLayouts, treeLayouts)
+          )
         }
 
         continue
@@ -554,10 +558,10 @@ export default function RoundStage({
         <meshStandardMaterial color="#dff4d6" roughness={1} />
       </mesh>
 
-      <TreeCluster />
+      <TreeCluster treeLayouts={treeLayouts} />
       <CrateField crateLayouts={crateLayouts} />
-      <HeartPickups heartStateRef={heartStateRef} />
-      <VikingTroop monkeyStateRef={monkeyStateRef} />
+      <HeartPickups heartStateRef={heartStateRef} treeLayouts={treeLayouts} />
+      <VikingTroop monkeyStateRef={monkeyStateRef} treeLayouts={treeLayouts} />
       <AxeProjectiles projectilesRef={projectilesRef} />
       <RigidBody
         canSleep={false}

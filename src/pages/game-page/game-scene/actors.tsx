@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { TREE_LAYOUTS } from '../helpers'
+import type { ITreeLayout } from '../helpers'
 import { PROJECTILE_POOL_SIZE } from '../settings'
 import { Group, MeshStandardMaterial as ThreeMeshStandardMaterial } from 'three'
 import { AnimatedSurfaceMaterial } from './lighting'
@@ -14,6 +14,7 @@ import type {
 
 interface IHeartPickups {
   heartStateRef: RefObject<IHeartState[]>
+  treeLayouts: ITreeLayout[]
 }
 
 interface IHeartPickup {
@@ -23,6 +24,7 @@ interface IHeartPickup {
 
 interface IVikingTroop {
   monkeyStateRef: RefObject<IMonkeyState[]>
+  treeLayouts: ITreeLayout[]
 }
 
 interface IVikingEnemy {
@@ -45,10 +47,10 @@ interface IProjectilePalette {
   handle: string
 }
 
-export function HeartPickups({ heartStateRef }: IHeartPickups) {
+export function HeartPickups({ heartStateRef, treeLayouts }: IHeartPickups) {
   return (
     <group>
-      {TREE_LAYOUTS.map((_, index) => (
+      {treeLayouts.map((_, index) => (
         <HeartPickup
           heartStateRef={heartStateRef}
           index={index}
@@ -98,10 +100,10 @@ function HeartPickup({ heartStateRef, index }: IHeartPickup) {
   )
 }
 
-export function VikingTroop({ monkeyStateRef }: IVikingTroop) {
+export function VikingTroop({ monkeyStateRef, treeLayouts }: IVikingTroop) {
   return (
     <group>
-      {TREE_LAYOUTS.map((_, index) => (
+      {treeLayouts.map((_, index) => (
         <VikingEnemy
           index={index}
           key={`monkey-${index}`}

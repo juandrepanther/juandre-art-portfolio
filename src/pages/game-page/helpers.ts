@@ -20,11 +20,11 @@ export {
   GAME_GROUND_SIZE,
   PLAYER_START_POSITION,
   PLAYER_START_CRATE_EXCLUSION_RADIUS,
-  TREE_LAYOUTS,
+  TREE_LAYOUT_COUNT,
   TREE_TRUNK_COLLIDER_ARGS
 } from './settings'
 
-export { createRandomBoxLayouts } from './world-layout'
+export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
 
 export interface IDifficultyConfig {
   axeSpeed: number

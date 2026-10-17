@@ -1,6 +1,6 @@
 import type { KeyboardControlsEntry } from '@react-three/drei'
 import { Vector3 } from 'three'
-import type { ICrateLayout, ITreeLayout, TWorldPosition } from './world-layout'
+import type { ICrateLayout, TWorldPosition } from './world-layout'
 
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 
@@ -14,56 +14,7 @@ export const TREE_TRUNK_COLLIDER_ARGS: [number, number, number] = [
   0.85, 1.95, 0.85
 ]
 export const PLAYER_START_POSITION: TWorldPosition = [0, 1.1, 23]
-export const TREE_LAYOUTS: ITreeLayout[] = [
-  {
-    treePosition: [-28, 0, -24],
-    monkeyPosition: [-28.9, 2.5, -25.1]
-  },
-  {
-    treePosition: [-12, 0, -28],
-    monkeyPosition: [-12.8, 2.4, -29]
-  },
-  {
-    treePosition: [10, 0, -30],
-    monkeyPosition: [9.3, 2.45, -31.1]
-  },
-  {
-    treePosition: [28, 0, -22],
-    monkeyPosition: [27.2, 2.35, -23.1]
-  },
-  {
-    treePosition: [-31, 0, -4],
-    monkeyPosition: [-31.8, 2.5, -5]
-  },
-  {
-    treePosition: [30, 0, -2],
-    monkeyPosition: [29.3, 2.45, -3]
-  },
-  {
-    treePosition: [-24, 0, 16],
-    monkeyPosition: [-24.9, 2.55, 15.2]
-  },
-  {
-    treePosition: [-5, 0, 24],
-    monkeyPosition: [-5.8, 2.4, 23.1]
-  },
-  {
-    treePosition: [14, 0, 18],
-    monkeyPosition: [13.3, 2.5, 17.2]
-  },
-  {
-    treePosition: [31, 0, 12],
-    monkeyPosition: [30.2, 2.45, 11]
-  },
-  {
-    treePosition: [-18, 0, 32],
-    monkeyPosition: [-18.9, 2.45, 31.2]
-  },
-  {
-    treePosition: [20, 0, 31],
-    monkeyPosition: [19.2, 2.45, 30.2]
-  }
-]
+export const TREE_LAYOUT_COUNT = 12
 export const BOX_LAYOUTS: ICrateLayout[] = [
   {
     position: [-20, 0.9, -14],

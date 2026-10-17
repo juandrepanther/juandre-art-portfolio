@@ -2,9 +2,9 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
   ARENA_BOUNDARY_COLLIDER_THICKNESS,
-  TREE_LAYOUTS,
   TREE_TRUNK_COLLIDER_ARGS,
-  type ICrateLayout
+  type ICrateLayout,
+  type ITreeLayout
 } from '../helpers'
 import { ARENA_HALF_SIZE } from '../settings'
 import { AnimatedSurfaceMaterial } from './lighting'
@@ -13,6 +13,10 @@ import type { TTreeVariant } from './types'
 
 interface ICrateField {
   crateLayouts: ICrateLayout[]
+}
+
+interface ITreeCluster {
+  treeLayouts: ITreeLayout[]
 }
 
 interface ICrateObstacle {
@@ -135,10 +139,10 @@ function EvergreenTree({ variant }: IEvergreenTree) {
   }
 }
 
-export function TreeCluster() {
+export function TreeCluster({ treeLayouts }: ITreeCluster) {
   return (
     <group>
-      {TREE_LAYOUTS.map(({ treePosition }, index) => (
+      {treeLayouts.map(({ treePosition }, index) => (
         <RigidBody
           colliders={false}
           key={`tree-${index}`}
