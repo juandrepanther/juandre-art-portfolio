@@ -10,7 +10,7 @@ function GameScene({
   difficulty,
   isActive,
   onHealthChange,
-  onMonkeyHit,
+  onEnemyHit,
   roundKey
 }: IGameSceneProps) {
   return (
@@ -32,7 +32,7 @@ function GameScene({
               difficulty={difficulty}
               isActive={isActive}
               onHealthChange={onHealthChange}
-              onMonkeyHit={onMonkeyHit}
+              onEnemyHit={onEnemyHit}
               key={`${difficulty}-${roundKey}`}
               roundKey={roundKey}
             />

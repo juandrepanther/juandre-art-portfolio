@@ -1,13 +1,13 @@
 import { Vector3 } from 'three'
 import type { TDifficultyLevel } from '../helpers'
 import {
-  HARDCORE_MONKEY_FLIGHT_PROXIMITY,
-  HARDCORE_MONKEY_FLIGHT_SPEED,
+  HARDCORE_ENEMY_FLIGHT_PROXIMITY,
+  HARDCORE_ENEMY_FLIGHT_SPEED,
   PLAYER_MOVE_SPEED,
   PLAYER_FACING_TURN_SPEED
 } from '../settings'
-import { createRandomMonkeyFlightPosition } from './helpers'
-import type { IControlsState, IMonkeyState } from './types'
+import { createRandomEnemyFlightPosition } from './helpers'
+import type { IControlsState, IEnemyState } from './types'
 
 interface IUpdatePlayerMovement {
   cameraForward: Vector3
@@ -53,55 +53,55 @@ export function updatePlayerFacing(
   )
 }
 
-export function applyMonkeyTravelByDifficulty(
-  monkeyState: IMonkeyState,
+export function applyEnemyTravelByDifficulty(
+  enemyState: IEnemyState,
   difficulty: TDifficultyLevel,
   delta: number
 ) {
   switch (difficulty) {
     case 'Hardcore': {
-      const travelToTarget = monkeyState.targetPosition
+      const travelToTarget = enemyState.targetPosition
         .clone()
-        .sub(monkeyState.position)
+        .sub(enemyState.position)
 
       if (
         travelToTarget.lengthSq() <=
-        HARDCORE_MONKEY_FLIGHT_PROXIMITY * HARDCORE_MONKEY_FLIGHT_PROXIMITY
+        HARDCORE_ENEMY_FLIGHT_PROXIMITY * HARDCORE_ENEMY_FLIGHT_PROXIMITY
       ) {
-        monkeyState.targetPosition.copy(createRandomMonkeyFlightPosition())
+        enemyState.targetPosition.copy(createRandomEnemyFlightPosition())
         return
       }
 
-      monkeyState.position.addScaledVector(
+      enemyState.position.addScaledVector(
         travelToTarget.normalize(),
-        delta * HARDCORE_MONKEY_FLIGHT_SPEED
+        delta * HARDCORE_ENEMY_FLIGHT_SPEED
       )
       return
     }
     default:
-      monkeyState.position.lerp(
-        monkeyState.homePosition,
+      enemyState.position.lerp(
+        enemyState.homePosition,
         1 - Math.exp(-delta * 6)
       )
   }
 }
 
-export function resetMonkeyForDifficulty(
-  monkeyState: IMonkeyState,
+export function resetEnemyForDifficulty(
+  enemyState: IEnemyState,
   difficulty: TDifficultyLevel,
   nextThrowAt: number
 ) {
-  monkeyState.active = true
+  enemyState.active = true
 
   switch (difficulty) {
     case 'Hardcore':
-      monkeyState.position.copy(createRandomMonkeyFlightPosition())
-      monkeyState.targetPosition.copy(createRandomMonkeyFlightPosition())
+      enemyState.position.copy(createRandomEnemyFlightPosition())
+      enemyState.targetPosition.copy(createRandomEnemyFlightPosition())
       break
     default:
-      monkeyState.position.copy(monkeyState.homePosition)
+      enemyState.position.copy(enemyState.homePosition)
       break
   }
 
-  monkeyState.nextThrowAt = nextThrowAt
+  enemyState.nextThrowAt = nextThrowAt
 }

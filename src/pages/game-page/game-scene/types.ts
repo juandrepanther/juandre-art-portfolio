@@ -1,6 +1,6 @@
 import { Vector3 } from 'three'
 
-export type TProjectileOwner = 'monkey' | 'player'
+export type TProjectileOwner = 'enemy' | 'player'
 
 export type TTreeVariant = 0 | 1 | 2
 
@@ -12,7 +12,7 @@ export interface IProjectileState {
   velocity: Vector3
 }
 
-export interface IMonkeyState {
+export interface IEnemyState {
   active: boolean
   animationOffset: number
   homePosition: Vector3

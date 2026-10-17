@@ -8,7 +8,7 @@ export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 export interface IDifficultyConfig {
   axeSpeed: number
   label: TDifficultyLevel
-  monkeyThrowInterval: number
+  enemyThrowInterval: number
 }
 
 export const GAME_ARENA_HALF_SIZE = 38
@@ -17,28 +17,28 @@ export const GAME_FOG_NEAR = 22
 export const GAME_FOG_FAR = 88
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_HEALTH = 100
-export const MONKEY_DAMAGE = 25
+export const ENEMY_DAMAGE = 25
 export const PAINKILLER_HEAL = 20
 export const START_RUN_COUNTDOWN_SECONDS = 2
 export const SURVIVAL_TIME_SECONDS = 60
 export const PROJECTILE_LIFETIME_SECONDS = 3.2
 export const PAINKILLER_RESPAWN_SECONDS = 10
-export const MONKEY_RESPAWN_SECONDS = 5
+export const ENEMY_RESPAWN_SECONDS = 5
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
   Easy: {
     label: 'Easy',
     axeSpeed: 8,
-    monkeyThrowInterval: 2.6
+    enemyThrowInterval: 2.6
   },
   Pro: {
     label: 'Pro',
     axeSpeed: 13,
-    monkeyThrowInterval: 1.95
+    enemyThrowInterval: 1.95
   },
   Hardcore: {
     label: 'Hardcore',
     axeSpeed: 18,
-    monkeyThrowInterval: 1.3
+    enemyThrowInterval: 1.3
   }
 }
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8
@@ -70,15 +70,15 @@ export const CRATE_STACK_HEIGHT_MAX = 3
 export const PLAYER_START_CRATE_EXCLUSION_RADIUS = 6.5
 
 export const ARENA_HALF_SIZE = GAME_ARENA_HALF_SIZE
-export const MONKEY_AIM_PRECISION = 0.1
+export const ENEMY_AIM_PRECISION = 0.1
 export const ATMOSPHERE_PARTICLE_COUNT = 180
 export const PROJECTILE_POOL_SIZE = 40
-export const MONKEY_HIT_RADIUS = 1.45
-export const MONKEY_HITBOX_OFFSET = new Vector3(0, 0.95, 0)
-export const HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX = 6.1
-export const HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN = 2.2
-export const HARDCORE_MONKEY_FLIGHT_PROXIMITY = 0.7
-export const HARDCORE_MONKEY_FLIGHT_SPEED = 4.2
+export const ENEMY_HIT_RADIUS = 1.45
+export const ENEMY_HITBOX_OFFSET = new Vector3(0, 0.95, 0)
+export const HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX = 6.1
+export const HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN = 2.2
+export const HARDCORE_ENEMY_FLIGHT_PROXIMITY = 0.7
+export const HARDCORE_ENEMY_FLIGHT_SPEED = 4.2
 export const PAINKILLER_PICKUP_RADIUS = 1.55
 export const PAINKILLER_SPAWN_HEIGHT = 0.9
 export const PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS = 40

@@ -1,12 +1,12 @@
 import { useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { MeshStandardMaterial as ThreeMeshStandardMaterial, type Group } from 'three'
+import {
+  MeshStandardMaterial as ThreeMeshStandardMaterial,
+  type Group
+} from 'three'
 import { PROJECTILE_POOL_SIZE } from '../../settings'
-import type {
-  IProjectileState,
-  TProjectileOwner
-} from '../types'
+import type { IProjectileState, TProjectileOwner } from '../types'
 
 interface IAxeProjectiles {
   projectilesRef: RefObject<IProjectileState[]>
@@ -111,7 +111,7 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
 
 function getProjectilePalette(owner: TProjectileOwner): IProjectilePalette {
   switch (owner) {
-    case 'monkey':
+    case 'enemy':
       return {
         blade: '#b2bcc3',
         bladeEdge: '#c1c9d0',

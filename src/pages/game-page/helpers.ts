@@ -17,13 +17,13 @@ export {
   CRATE_STACK_HEIGHT_MAX,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
+  ENEMY_DAMAGE,
+  ENEMY_RESPAWN_SECONDS,
   GAME_ARENA_HALF_SIZE,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
   MAX_HEALTH,
-  MONKEY_DAMAGE,
-  MONKEY_RESPAWN_SECONDS,
   PAINKILLER_HEAL,
   PAINKILLER_RESPAWN_SECONDS,
   PLAYER_START_CRATE_EXCLUSION_RADIUS,
@@ -41,7 +41,7 @@ export interface IGameSceneProps {
   difficulty: TDifficultyLevel
   isActive: boolean
   onHealthChange: (health: number) => void
-  onMonkeyHit: () => void
+  onEnemyHit: () => void
   roundKey: number
 }
 

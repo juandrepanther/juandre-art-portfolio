@@ -5,7 +5,7 @@ import {
   createRandomTreeLayouts
 } from 'pages/game-page/helpers'
 import {
-  createMonkeyState,
+  createEnemyState,
   isPointInsideTreeTrunk
 } from 'pages/game-page/game-scene/helpers'
 import { Vector3 } from 'three'
@@ -27,7 +27,7 @@ afterEach(() => {
 })
 
 describe('game layout helpers', () => {
-  it('generates a full tree layout and keeps monkeys attached to the tree positions', () => {
+  it('generates a full tree layout and keeps enemies attached to the tree positions', () => {
     const randomValues = [
       0.1, 0.1, 0.5, 0.5, 0.5, 0.35, 0.1, 0.5, 0.5, 0.5, 0.6, 0.1, 0.5, 0.5,
       0.5, 0.85, 0.1, 0.5, 0.5, 0.5, 0.1, 0.35, 0.5, 0.5, 0.5, 0.35, 0.35, 0.5,
@@ -40,22 +40,22 @@ describe('game layout helpers', () => {
       .mockImplementation(createRandomSequence(randomValues))
 
     const treeLayouts = createRandomTreeLayouts()
-    const monkeyStates = createMonkeyState(treeLayouts)
+    const enemyStates = createEnemyState(treeLayouts)
 
     expect(randomSpy).toHaveBeenCalled()
     expect(treeLayouts).toHaveLength(TREE_LAYOUT_COUNT)
-    expect(monkeyStates).toHaveLength(TREE_LAYOUT_COUNT)
+    expect(enemyStates).toHaveLength(TREE_LAYOUT_COUNT)
     expect(
       new Set(treeLayouts.map((layout) => layout.treePosition.join(','))).size
     ).toBe(TREE_LAYOUT_COUNT)
 
     for (const [index, layout] of treeLayouts.entries()) {
-      expect(layout.monkeyPosition).not.toEqual(layout.treePosition)
-      expect(monkeyStates[index]?.homePosition.toArray()).toEqual(
-        layout.monkeyPosition
+      expect(layout.enemyPosition).not.toEqual(layout.treePosition)
+      expect(enemyStates[index]?.homePosition.toArray()).toEqual(
+        layout.enemyPosition
       )
-      expect(monkeyStates[index]?.position.toArray()).toEqual(
-        layout.monkeyPosition
+      expect(enemyStates[index]?.position.toArray()).toEqual(
+        layout.enemyPosition
       )
     }
   })
@@ -63,7 +63,7 @@ describe('game layout helpers', () => {
   it('detects tree trunk collisions against generated layouts', () => {
     const treeLayouts: ITreeLayout[] = [
       {
-        monkeyPosition: [1, 2.5, 1],
+        enemyPosition: [1, 2.5, 1],
         treePosition: [0, 0, 0]
       }
     ]

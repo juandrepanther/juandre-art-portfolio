@@ -38,7 +38,7 @@ function GamePage() {
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Easy')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [health, setHealth] = useState(MAX_HEALTH)
-  const [monkeyHits, setMonkeyHits] = useState(0)
+  const [enemyHits, setEnemyHits] = useState(0)
   const [remainingTime, setRemainingTime] = useState(SURVIVAL_TIME_SECONDS)
   const [countdownSeconds, setCountdownSeconds] = useState(
     START_RUN_COUNTDOWN_SECONDS
@@ -108,7 +108,7 @@ function GamePage() {
 
   const handleStartGame = () => {
     setHealth(MAX_HEALTH)
-    setMonkeyHits(0)
+    setEnemyHits(0)
     setRemainingTime(SURVIVAL_TIME_SECONDS)
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
@@ -189,10 +189,10 @@ function GamePage() {
             <GameScene
               difficulty={difficulty}
               isActive={isPlaying}
-              onHealthChange={handleHealthChange}
-              onMonkeyHit={() =>
-                setMonkeyHits((currentMonkeyHits) => currentMonkeyHits + 1)
+              onEnemyHit={() =>
+                setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
               }
+              onHealthChange={handleHealthChange}
               roundKey={roundKey}
             />
 
@@ -305,9 +305,9 @@ function GamePage() {
 
               <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                 <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                  Viking hits
+                  Enemies defeated
                 </Typography>
-                <Typography variant="h5">{monkeyHits}</Typography>
+                <Typography variant="h5">{enemyHits}</Typography>
               </Stack>
 
               <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
@@ -346,7 +346,7 @@ function GamePage() {
                   onClick={() => {
                     setGameStatus('menu')
                     setHealth(MAX_HEALTH)
-                    setMonkeyHits(0)
+                    setEnemyHits(0)
                     setRemainingTime(SURVIVAL_TIME_SECONDS)
                     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
                     setRoundKey((currentRoundKey) => currentRoundKey + 1)
@@ -484,7 +484,7 @@ function GamePage() {
                     The raiders drained your health to 0%.
                   </Typography>
                   <Typography variant="body2">
-                    Raider hits landed: {monkeyHits}
+                    Enemies defeated: {enemyHits}
                   </Typography>
                 </Stack>
               </DialogContent>

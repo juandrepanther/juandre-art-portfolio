@@ -15,7 +15,7 @@ import {
 export type TWorldPosition = [number, number, number]
 
 export interface ITreeLayout {
-  monkeyPosition: TWorldPosition
+  enemyPosition: TWorldPosition
   treePosition: TWorldPosition
 }
 
@@ -39,10 +39,10 @@ function cloneCrateSize(size: ICrateLayout['size']): ICrateLayout['size'] {
 
 function cloneTreeLayout(treeLayout: ITreeLayout): ITreeLayout {
   return {
-    monkeyPosition: [
-      treeLayout.monkeyPosition[0],
-      treeLayout.monkeyPosition[1],
-      treeLayout.monkeyPosition[2]
+    enemyPosition: [
+      treeLayout.enemyPosition[0],
+      treeLayout.enemyPosition[1],
+      treeLayout.enemyPosition[2]
     ],
     treePosition: [
       treeLayout.treePosition[0],
@@ -92,7 +92,7 @@ function doesTreeOverlapPlayerStart(
   return deltaX * deltaX + deltaZ * deltaZ <= collisionRadius * collisionRadius
 }
 
-function createTreeMonkeyPosition(
+function createTreeEnemyPosition(
   positionX: number,
   positionZ: number
 ): TWorldPosition {
@@ -128,7 +128,7 @@ function createRandomTreeStack(existingTrees: ITreeLayout[]) {
     }
 
     return {
-      monkeyPosition: createTreeMonkeyPosition(positionX, positionZ),
+      enemyPosition: createTreeEnemyPosition(positionX, positionZ),
       treePosition: [positionX, 0, positionZ] as TWorldPosition
     }
   }

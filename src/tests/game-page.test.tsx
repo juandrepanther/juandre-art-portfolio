@@ -56,7 +56,7 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /easy/i })).toBeInTheDocument()
     expect(screen.getByText('01:00')).toBeInTheDocument()
-    expect(screen.getByText(/viking hits/i)).toBeInTheDocument()
+    expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
     expect(screen.getByTestId('spotify-artist-player')).toBeInTheDocument()
     expect(screen.getByTitle(/spotify artist player/i)).toHaveAttribute(

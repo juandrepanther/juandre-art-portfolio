@@ -8,8 +8,8 @@ import {
 import {
   ARENA_HALF_SIZE,
   ATMOSPHERE_PARTICLE_COUNT,
-  HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX,
-  HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN,
+  HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX,
+  HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN,
   PAINKILLER_PICKUP_RADIUS,
   PAINKILLER_SPAWN_HEIGHT,
   PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
@@ -93,26 +93,26 @@ export function isPointInsideTreeTrunk(
   })
 }
 
-export function createRandomMonkeyFlightPosition() {
+export function createRandomEnemyFlightPosition() {
   return new Vector3(
     clampToArena((Math.random() - 0.5) * ARENA_HALF_SIZE * 2),
-    HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN +
+    HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN +
       Math.random() *
-        (HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX - HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN),
+        (HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX - HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN),
     clampToArena((Math.random() - 0.5) * ARENA_HALF_SIZE * 2)
   )
 }
 
-export function createMonkeyState(treeLayouts: ITreeLayout[]) {
+export function createEnemyState(treeLayouts: ITreeLayout[]) {
   return treeLayouts.map((layout, index) => ({
     active: true,
     animationOffset: index * 0.7,
-    homePosition: new Vector3(...layout.monkeyPosition),
+    homePosition: new Vector3(...layout.enemyPosition),
     nextThrowAt: 0,
-    position: new Vector3(...layout.monkeyPosition),
+    position: new Vector3(...layout.enemyPosition),
     respawnAt: 0,
     rotationY: 0,
-    targetPosition: createRandomMonkeyFlightPosition()
+    targetPosition: createRandomEnemyFlightPosition()
   }))
 }
 

@@ -11,10 +11,10 @@ import type { Group } from 'three'
 import { Vector3 } from 'three'
 import VikingAvatar from '../viking-avatar'
 import { AxeProjectiles } from './actors/axe-projectiles'
+import { Enemy } from './actors/enemy'
 import { PainkillerPickups } from './actors/painkiller-pickups'
-import { VikingTroop } from './actors/viking-troop'
 import {
-  createMonkeyState,
+  createEnemyState,
   createPainkillerState,
   createProjectileState,
   createRandomPainkillerPosition,
@@ -39,12 +39,12 @@ import { GameSceneInstructions } from './overlay'
 import { ArenaBounds, CrateField, TreeCluster } from './world'
 import {
   DIFFICULTY_CONFIGS,
+  ENEMY_DAMAGE,
+  ENEMY_RESPAWN_SECONDS,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
   MAX_HEALTH,
-  MONKEY_DAMAGE,
-  MONKEY_RESPAWN_SECONDS,
   PAINKILLER_HEAL,
   PAINKILLER_RESPAWN_SECONDS,
   PLAYER_START_POSITION,
@@ -54,15 +54,15 @@ import {
   type IGameSceneProps
 } from '../helpers'
 import {
-  applyMonkeyTravelByDifficulty,
-  resetMonkeyForDifficulty,
+  applyEnemyTravelByDifficulty,
+  resetEnemyForDifficulty,
   updatePlayerFacing,
   updatePlayerMovement
 } from './movement'
 import {
-  MONKEY_AIM_PRECISION,
-  MONKEY_HIT_RADIUS,
-  MONKEY_HITBOX_OFFSET,
+  ENEMY_AIM_PRECISION,
+  ENEMY_HIT_RADIUS,
+  ENEMY_HITBOX_OFFSET,
   PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
   PLAYER_AXE_SPEED,
@@ -85,7 +85,7 @@ export default function RoundStage({
   difficulty,
   isActive,
   onHealthChange,
-  onMonkeyHit,
+  onEnemyHit,
   roundKey
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
@@ -110,14 +110,14 @@ export default function RoundStage({
   const projectilesRef = useRef(
     Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
-  const monkeyStateRef = useRef(createMonkeyState(treeLayouts))
+  const enemyStateRef = useRef(createEnemyState(treeLayouts))
   const painkillerStateRef = useRef(
     createPainkillerState(crateLayouts, treeLayouts)
   )
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
-  const onMonkeyHitRef = useRef(onMonkeyHit)
+  const onEnemyHitRef = useRef(onEnemyHit)
   const pendingPointerShotRef = useRef(false)
   const shootPlayerProjectileRef = useRef<() => void>(() => {})
   const isPointerLockedRef = useRef(false)
@@ -172,8 +172,8 @@ export default function RoundStage({
   }, [onHealthChange])
 
   useEffect(() => {
-    onMonkeyHitRef.current = onMonkeyHit
-  }, [onMonkeyHit])
+    onEnemyHitRef.current = onEnemyHit
+  }, [onEnemyHit])
 
   useEffect(() => {
     return () => {
@@ -288,7 +288,7 @@ export default function RoundStage({
       playerPosition: playerPositionRef.current
     })
     resetControlsState(controlsRef.current)
-    monkeyStateRef.current = createMonkeyState(treeLayouts)
+    enemyStateRef.current = createEnemyState(treeLayouts)
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
       treeLayouts
@@ -392,27 +392,27 @@ export default function RoundStage({
       .clone()
       .add(PLAYER_HITBOX_OFFSET)
 
-    for (const monkeyState of monkeyStateRef.current) {
-      applyMonkeyTravelByDifficulty(monkeyState, difficulty, delta)
-      monkeyState.rotationY = Math.atan2(
-        playerPositionRef.current.x - monkeyState.position.x,
-        playerPositionRef.current.z - monkeyState.position.z
+    for (const enemyState of enemyStateRef.current) {
+      applyEnemyTravelByDifficulty(enemyState, difficulty, delta)
+      enemyState.rotationY = Math.atan2(
+        playerPositionRef.current.x - enemyState.position.x,
+        playerPositionRef.current.z - enemyState.position.z
       )
 
-      if (!monkeyState.active) {
-        if (now >= monkeyState.respawnAt) {
-          resetMonkeyForDifficulty(monkeyState, difficulty, now + 1.1)
+      if (!enemyState.active) {
+        if (now >= enemyState.respawnAt) {
+          resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
         }
 
         continue
       }
 
-      if (now >= monkeyState.nextThrowAt) {
-        const origin = monkeyState.position.clone().add(new Vector3(0, 0.15, 0))
+      if (now >= enemyState.nextThrowAt) {
+        const origin = enemyState.position.clone().add(new Vector3(0, 0.15, 0))
         const target = playerHitboxCenter.clone()
         const distanceToPlayer =
-          monkeyState.position.distanceTo(playerHitboxCenter)
-        const precisionOffset = distanceToPlayer * MONKEY_AIM_PRECISION
+          enemyState.position.distanceTo(playerHitboxCenter)
+        const precisionOffset = distanceToPlayer * ENEMY_AIM_PRECISION
 
         target.x += (Math.random() - 0.5) * precisionOffset * 2
         target.z += (Math.random() - 0.5) * precisionOffset * 2
@@ -424,11 +424,11 @@ export default function RoundStage({
             .sub(origin)
             .normalize()
             .multiplyScalar(difficultyConfig.axeSpeed),
-          'monkey',
+          'enemy',
           PROJECTILE_LIFETIME_SECONDS
         )
 
-        monkeyState.nextThrowAt = now + difficultyConfig.monkeyThrowInterval
+        enemyState.nextThrowAt = now + difficultyConfig.enemyThrowInterval
       }
     }
 
@@ -458,26 +458,26 @@ export default function RoundStage({
 
       switch (projectile.owner) {
         case 'player': {
-          const hitMonkey = monkeyStateRef.current.find((monkeyState) => {
-            if (!monkeyState.active) {
+          const hitEnemy = enemyStateRef.current.find((enemyState) => {
+            if (!enemyState.active) {
               return false
             }
 
-            const monkeyHitboxCenter = monkeyState.position
+            const enemyHitboxCenter = enemyState.position
               .clone()
-              .add(MONKEY_HITBOX_OFFSET)
+              .add(ENEMY_HITBOX_OFFSET)
 
             return (
-              monkeyHitboxCenter.distanceTo(projectile.position) <=
-              MONKEY_HIT_RADIUS
+              enemyHitboxCenter.distanceTo(projectile.position) <=
+              ENEMY_HIT_RADIUS
             )
           })
 
-          if (hitMonkey) {
-            hitMonkey.active = false
-            hitMonkey.respawnAt = now + MONKEY_RESPAWN_SECONDS
+          if (hitEnemy) {
+            hitEnemy.active = false
+            hitEnemy.respawnAt = now + ENEMY_RESPAWN_SECONDS
             projectile.active = false
-            onMonkeyHitRef.current()
+            onEnemyHitRef.current()
           }
 
           continue
@@ -491,7 +491,7 @@ export default function RoundStage({
             lastDamageAtRef.current = now
             projectile.active = false
             triggerPlayerHitFlash()
-            setHealth(Math.max(0, healthRef.current - MONKEY_DAMAGE))
+            setHealth(Math.max(0, healthRef.current - ENEMY_DAMAGE))
           }
           continue
       }
@@ -567,11 +567,11 @@ export default function RoundStage({
 
       <TreeCluster treeLayouts={treeLayouts} />
       <CrateField crateLayouts={crateLayouts} />
+      <Enemy enemyStateRef={enemyStateRef} treeLayouts={treeLayouts} />
       <PainkillerPickups
         painkillerStateRef={painkillerStateRef}
         treeLayouts={treeLayouts}
       />
-      <VikingTroop monkeyStateRef={monkeyStateRef} treeLayouts={treeLayouts} />
       <AxeProjectiles projectilesRef={projectilesRef} />
       <RigidBody
         canSleep={false}
