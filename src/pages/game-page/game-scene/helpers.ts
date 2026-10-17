@@ -1,6 +1,6 @@
 import { Vector3 } from 'three'
 import {
-  HEART_RESPAWN_SECONDS,
+  PAINKILLER_RESPAWN_SECONDS,
   TREE_TRUNK_COLLIDER_ARGS,
   type ICrateLayout,
   type ITreeLayout
@@ -10,9 +10,9 @@ import {
   ATMOSPHERE_PARTICLE_COUNT,
   HARDCORE_MONKEY_FLIGHT_HEIGHT_MAX,
   HARDCORE_MONKEY_FLIGHT_HEIGHT_MIN,
-  HEART_PICKUP_RADIUS,
-  HEART_SPAWN_HEIGHT,
-  HEART_SPAWN_PLACEMENT_ATTEMPTS,
+  PAINKILLER_PICKUP_RADIUS,
+  PAINKILLER_SPAWN_HEIGHT,
+  PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -116,20 +116,20 @@ export function createMonkeyState(treeLayouts: ITreeLayout[]) {
   }))
 }
 
-export function createRandomHeartPosition(
+export function createRandomPainkillerPosition(
   crateLayouts: ICrateLayout[],
   treeLayouts: ITreeLayout[] = []
 ) {
-  const spawnRange = ARENA_HALF_SIZE - HEART_PICKUP_RADIUS
+  const spawnRange = ARENA_HALF_SIZE - PAINKILLER_PICKUP_RADIUS
 
   for (
     let attemptIndex = 0;
-    attemptIndex < HEART_SPAWN_PLACEMENT_ATTEMPTS;
+    attemptIndex < PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS;
     attemptIndex += 1
   ) {
     const position = new Vector3(
       (Math.random() - 0.5) * spawnRange * 2,
-      HEART_SPAWN_HEIGHT,
+      PAINKILLER_SPAWN_HEIGHT,
       (Math.random() - 0.5) * spawnRange * 2
     )
 
@@ -144,23 +144,23 @@ export function createRandomHeartPosition(
     }
   }
 
-  return new Vector3(0, HEART_SPAWN_HEIGHT, 0)
+  return new Vector3(0, PAINKILLER_SPAWN_HEIGHT, 0)
 }
 
-export function createHeartState(
+export function createPainkillerState(
   crateLayouts: ICrateLayout[],
   treeLayouts: ITreeLayout[]
 ) {
-  const initialHeartIndex = Math.floor(Math.random() * treeLayouts.length)
+  const initialPainkillerIndex = Math.floor(Math.random() * treeLayouts.length)
 
   return treeLayouts.map((_, index) => {
-    const isActive = index === initialHeartIndex
+    const isActive = index === initialPainkillerIndex
 
     return {
       active: isActive,
       animationOffset: index * 0.45,
-      position: createRandomHeartPosition(crateLayouts, treeLayouts),
-      respawnAt: isActive ? 0 : Math.random() * HEART_RESPAWN_SECONDS
+      position: createRandomPainkillerPosition(crateLayouts, treeLayouts),
+      respawnAt: isActive ? 0 : Math.random() * PAINKILLER_RESPAWN_SECONDS
     }
   })
 }

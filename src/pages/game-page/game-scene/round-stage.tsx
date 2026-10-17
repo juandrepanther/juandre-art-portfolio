@@ -10,12 +10,14 @@ import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { Group } from 'three'
 import { Vector3 } from 'three'
 import VikingAvatar from '../viking-avatar'
-import { AxeProjectiles, HeartPickups, VikingTroop } from './actors'
+import { AxeProjectiles } from './actors/axe-projectiles'
+import { PainkillerPickups } from './actors/painkiller-pickups'
+import { VikingTroop } from './actors/viking-troop'
 import {
-  createHeartState,
   createMonkeyState,
+  createPainkillerState,
   createProjectileState,
-  createRandomHeartPosition,
+  createRandomPainkillerPosition,
   resetControlsState,
   resetProjectileState,
   spawnProjectileIntoPool,
@@ -40,11 +42,11 @@ import {
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
-  HEART_HEAL,
-  HEART_RESPAWN_SECONDS,
   MAX_HEALTH,
   MONKEY_DAMAGE,
   MONKEY_RESPAWN_SECONDS,
+  PAINKILLER_HEAL,
+  PAINKILLER_RESPAWN_SECONDS,
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
   createRandomBoxLayouts,
@@ -58,10 +60,10 @@ import {
   updatePlayerMovement
 } from './movement'
 import {
-  HEART_PICKUP_RADIUS,
   MONKEY_AIM_PRECISION,
   MONKEY_HIT_RADIUS,
   MONKEY_HITBOX_OFFSET,
+  PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
   PLAYER_AXE_SPEED,
   PLAYER_COLLIDER_HALF_HEIGHT,
@@ -109,7 +111,9 @@ export default function RoundStage({
     Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
   const monkeyStateRef = useRef(createMonkeyState(treeLayouts))
-  const heartStateRef = useRef(createHeartState(crateLayouts, treeLayouts))
+  const painkillerStateRef = useRef(
+    createPainkillerState(crateLayouts, treeLayouts)
+  )
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
@@ -285,7 +289,10 @@ export default function RoundStage({
     })
     resetControlsState(controlsRef.current)
     monkeyStateRef.current = createMonkeyState(treeLayouts)
-    heartStateRef.current = createHeartState(crateLayouts, treeLayouts)
+    painkillerStateRef.current = createPainkillerState(
+      crateLayouts,
+      treeLayouts
+    )
 
     playerBodyRef.current?.setTranslation(
       {
@@ -490,12 +497,12 @@ export default function RoundStage({
       }
     }
 
-    for (const heartState of heartStateRef.current) {
-      if (!heartState.active) {
-        if (now >= heartState.respawnAt) {
-          heartState.active = true
-          heartState.position.copy(
-            createRandomHeartPosition(crateLayouts, treeLayouts)
+    for (const painkillerState of painkillerStateRef.current) {
+      if (!painkillerState.active) {
+        if (now >= painkillerState.respawnAt) {
+          painkillerState.active = true
+          painkillerState.position.copy(
+            createRandomPainkillerPosition(crateLayouts, treeLayouts)
           )
         }
 
@@ -503,12 +510,12 @@ export default function RoundStage({
       }
 
       if (
-        playerPositionRef.current.distanceTo(heartState.position) <=
-        HEART_PICKUP_RADIUS
+        playerPositionRef.current.distanceTo(painkillerState.position) <=
+        PAINKILLER_PICKUP_RADIUS
       ) {
-        heartState.active = false
-        heartState.respawnAt = now + HEART_RESPAWN_SECONDS
-        setHealth(Math.min(MAX_HEALTH, healthRef.current + HEART_HEAL))
+        painkillerState.active = false
+        painkillerState.respawnAt = now + PAINKILLER_RESPAWN_SECONDS
+        setHealth(Math.min(MAX_HEALTH, healthRef.current + PAINKILLER_HEAL))
       }
     }
   })
@@ -560,7 +567,10 @@ export default function RoundStage({
 
       <TreeCluster treeLayouts={treeLayouts} />
       <CrateField crateLayouts={crateLayouts} />
-      <HeartPickups heartStateRef={heartStateRef} treeLayouts={treeLayouts} />
+      <PainkillerPickups
+        painkillerStateRef={painkillerStateRef}
+        treeLayouts={treeLayouts}
+      />
       <VikingTroop monkeyStateRef={monkeyStateRef} treeLayouts={treeLayouts} />
       <AxeProjectiles projectilesRef={projectilesRef} />
       <RigidBody

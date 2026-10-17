@@ -445,9 +445,10 @@ function GamePage() {
                     : 'Hold the grove for sixty seconds.'}
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                  Vikings hurl axes with a slight aiming variance, hearts appear
-                  randomly across the arena floor, heal +20%, and each hit
-                  removes 15% health. Easy starts slow, Hardcore is relentless.
+                  Vikings hurl axes with a slight aiming variance, painkillers
+                  appear randomly across the arena floor, heal +20%, and each
+                  hit removes 15% health. Easy starts slow, Hardcore is
+                  relentless.
                 </Typography>
               </Stack>
             ) : null}

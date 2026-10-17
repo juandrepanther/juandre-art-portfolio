@@ -23,7 +23,7 @@ export interface IMonkeyState {
   targetPosition: Vector3
 }
 
-export interface IHeartState {
+export interface IPainkillerState {
   active: boolean
   animationOffset: number
   position: Vector3
