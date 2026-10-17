@@ -2,12 +2,45 @@ import type { KeyboardControlsEntry } from '@react-three/drei'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
+export type TDifficultyLevel = 'Easy' | 'Pro' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
+
+export interface IDifficultyConfig {
+  axeSpeed: number
+  label: TDifficultyLevel
+  monkeyThrowInterval: number
+}
 
 export const GAME_ARENA_HALF_SIZE = 38
 export const GAME_GROUND_SIZE = 104
 export const GAME_FOG_NEAR = 22
 export const GAME_FOG_FAR = 88
+export const DESKTOP_BREAKPOINT = 1024
+export const MAX_HEALTH = 100
+export const MONKEY_DAMAGE = 25
+export const HEART_HEAL = 20
+export const START_RUN_COUNTDOWN_SECONDS = 2
+export const SURVIVAL_TIME_SECONDS = 60
+export const PROJECTILE_LIFETIME_SECONDS = 3.2
+export const HEART_RESPAWN_SECONDS = 10
+export const MONKEY_RESPAWN_SECONDS = 5
+export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
+  Easy: {
+    label: 'Easy',
+    axeSpeed: 8,
+    monkeyThrowInterval: 2.6
+  },
+  Pro: {
+    label: 'Pro',
+    axeSpeed: 13,
+    monkeyThrowInterval: 1.95
+  },
+  Hardcore: {
+    label: 'Hardcore',
+    axeSpeed: 18,
+    monkeyThrowInterval: 1.3
+  }
+}
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8
 export const ARENA_BOUNDARY_COLLIDER_THICKNESS = 2
 export const TREE_TRUNK_COLLIDER_ARGS: [number, number, number] = [

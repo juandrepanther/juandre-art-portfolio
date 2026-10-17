@@ -1,7 +1,9 @@
-export type TDifficultyLevel = 'Easy' | 'Pro' | 'Hardcore'
+import { MAX_HEALTH } from './settings'
+import type { TDifficultyLevel } from './settings'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
+export type { IDifficultyConfig, TDifficultyLevel } from './settings'
 export type { ICrateLayout, ITreeLayout, TWorldPosition } from './world-layout'
 
 export {
@@ -13,23 +15,27 @@ export {
   CRATE_PLACEMENT_MARGIN,
   CRATE_SIZE_PRESETS,
   CRATE_STACK_HEIGHT_MAX,
+  DESKTOP_BREAKPOINT,
+  DIFFICULTY_CONFIGS,
   GAME_ARENA_HALF_SIZE,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
-  PLAYER_START_POSITION,
+  HEART_HEAL,
+  HEART_RESPAWN_SECONDS,
+  MAX_HEALTH,
+  MONKEY_DAMAGE,
+  MONKEY_RESPAWN_SECONDS,
   PLAYER_START_CRATE_EXCLUSION_RADIUS,
+  PLAYER_START_POSITION,
+  PROJECTILE_LIFETIME_SECONDS,
+  START_RUN_COUNTDOWN_SECONDS,
+  SURVIVAL_TIME_SECONDS,
   TREE_LAYOUT_COUNT,
   TREE_TRUNK_COLLIDER_ARGS
 } from './settings'
 
 export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
-
-export interface IDifficultyConfig {
-  axeSpeed: number
-  label: TDifficultyLevel
-  monkeyThrowInterval: number
-}
 
 export interface IGameSceneProps {
   difficulty: TDifficultyLevel
@@ -37,34 +43,6 @@ export interface IGameSceneProps {
   onHealthChange: (health: number) => void
   onMonkeyHit: () => void
   roundKey: number
-}
-
-export const DESKTOP_BREAKPOINT = 1024
-export const MAX_HEALTH = 100
-export const MONKEY_DAMAGE = 15
-export const HEART_HEAL = 20
-export const START_RUN_COUNTDOWN_SECONDS = 2
-export const SURVIVAL_TIME_SECONDS = 60
-export const PROJECTILE_LIFETIME_SECONDS = 3.2
-export const HEART_RESPAWN_SECONDS = 10
-export const MONKEY_RESPAWN_SECONDS = 5
-
-export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
-  Easy: {
-    label: 'Easy',
-    axeSpeed: 8,
-    monkeyThrowInterval: 2.6
-  },
-  Pro: {
-    label: 'Pro',
-    axeSpeed: 13,
-    monkeyThrowInterval: 1.95
-  },
-  Hardcore: {
-    label: 'Hardcore',
-    axeSpeed: 18,
-    monkeyThrowInterval: 1.3
-  }
 }
 
 export function clampHealth(health: number) {
