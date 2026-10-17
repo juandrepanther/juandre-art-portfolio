@@ -588,7 +588,7 @@ export default function RoundStage({
         </Suspense>
       </RigidBody>
 
-      <GameSceneInstructions />
+      <GameSceneInstructions key={roundKey} />
 
       <PointerLockControls
         makeDefault

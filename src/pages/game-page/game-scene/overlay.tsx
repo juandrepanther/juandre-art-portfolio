@@ -1,6 +1,25 @@
 import { Billboard, Html } from '@react-three/drei'
+import { useState } from 'react'
+import quoteEntries from './quotes.json'
+
+interface IQuoteEntry {
+  text: string
+  source: string
+}
+
+function getRandomQuote(entries: IQuoteEntry[]): IQuoteEntry {
+  if (entries.length === 0) {
+    return { text: '', source: '' }
+  }
+
+  const randomIndex = Math.floor(Math.random() * entries.length)
+
+  return entries[randomIndex] ?? entries[0]
+}
 
 export function GameSceneInstructions() {
+  const [quote] = useState(() => getRandomQuote(quoteEntries))
+
   return (
     <Billboard
       follow
@@ -21,10 +40,16 @@ export function GameSceneInstructions() {
             padding: '14px 22px',
             backdropFilter: 'blur(12px)',
             background: 'rgba(244, 252, 248, 0.72)',
+            textAlign: 'center',
             width: 'min(90vw, 480px)'
           }}
         >
-          Valhalla is waiting for you!
+          <div style={{ fontSize: '15px', letterSpacing: '0.03em' }}>
+            {quote.text}
+          </div>
+          <div style={{ fontSize: '11px', marginTop: '8px', opacity: 0.8 }}>
+            {quote.source}
+          </div>
         </div>
       </Html>
     </Billboard>
