@@ -2,7 +2,6 @@ import { Vector3 } from 'three'
 import type { TDifficultyLevel } from '../helpers'
 import {
   HARDCORE_ENEMY_FLIGHT_PROXIMITY,
-  HARDCORE_ENEMY_FLIGHT_SPEED,
   PLAYER_MOVE_SPEED,
   PLAYER_FACING_TURN_SPEED
 } from '../settings'
@@ -56,6 +55,7 @@ export function updatePlayerFacing(
 export function applyEnemyTravelByDifficulty(
   enemyState: IEnemyState,
   difficulty: TDifficultyLevel,
+  enemyMovementSpeed: number,
   delta: number
 ) {
   switch (difficulty) {
@@ -66,7 +66,8 @@ export function applyEnemyTravelByDifficulty(
 
       if (
         travelToTarget.lengthSq() <=
-        HARDCORE_ENEMY_FLIGHT_PROXIMITY * HARDCORE_ENEMY_FLIGHT_PROXIMITY
+          HARDCORE_ENEMY_FLIGHT_PROXIMITY * HARDCORE_ENEMY_FLIGHT_PROXIMITY ||
+        Math.random() < delta * 0.8
       ) {
         enemyState.targetPosition.copy(createRandomEnemyFlightPosition())
         return
@@ -74,14 +75,14 @@ export function applyEnemyTravelByDifficulty(
 
       enemyState.position.addScaledVector(
         travelToTarget.normalize(),
-        delta * HARDCORE_ENEMY_FLIGHT_SPEED
+        delta * enemyMovementSpeed
       )
       return
     }
     default:
       enemyState.position.lerp(
         enemyState.homePosition,
-        1 - Math.exp(-delta * 6)
+        1 - Math.exp(-delta * enemyMovementSpeed)
       )
   }
 }

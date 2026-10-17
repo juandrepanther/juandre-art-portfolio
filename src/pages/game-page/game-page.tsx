@@ -21,7 +21,6 @@ import {
   DIFFICULTY_CONFIGS,
   MAX_HEALTH,
   START_RUN_COUNTDOWN_SECONDS,
-  SURVIVAL_TIME_SECONDS,
   clampHealth,
   formatTimeLabel,
   getGameStatusLabel,
@@ -35,11 +34,13 @@ const SPOTIFY_ARTIST_EMBED_URL =
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const { width } = useWindowSize()
-  const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Easy')
+  const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [health, setHealth] = useState(MAX_HEALTH)
   const [enemyHits, setEnemyHits] = useState(0)
-  const [remainingTime, setRemainingTime] = useState(SURVIVAL_TIME_SECONDS)
+  const [remainingTime, setRemainingTime] = useState(
+    DIFFICULTY_CONFIGS.Noob.roundTime
+  )
   const [countdownSeconds, setCountdownSeconds] = useState(
     START_RUN_COUNTDOWN_SECONDS
   )
@@ -109,7 +110,7 @@ function GamePage() {
   const handleStartGame = () => {
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
-    setRemainingTime(SURVIVAL_TIME_SECONDS)
+    setRemainingTime(difficultyConfig.roundTime)
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
     setGameStatus('countdown')
@@ -187,6 +188,7 @@ function GamePage() {
             }}
           >
             <GameScene
+              difficultyConfig={difficultyConfig}
               difficulty={difficulty}
               isActive={isPlaying}
               onEnemyHit={() =>
@@ -295,10 +297,10 @@ function GamePage() {
                 </Box>
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                    Axe speed
+                    Enemy movement
                   </Typography>
                   <Typography variant="h5">
-                    {difficultyConfig.axeSpeed.toFixed(0)}
+                    {difficultyConfig.enemyMovementSpeed.toFixed(1)}
                   </Typography>
                 </Box>
               </Stack>
@@ -317,7 +319,12 @@ function GamePage() {
                       key={difficultyOption}
                       color="secondary"
                       disabled={isPlaying || isCountingDown}
-                      onClick={() => setDifficulty(difficultyOption)}
+                      onClick={() => {
+                        setDifficulty(difficultyOption)
+                        setRemainingTime(
+                          DIFFICULTY_CONFIGS[difficultyOption].roundTime
+                        )
+                      }}
                       variant={
                         difficultyOption === difficulty
                           ? 'contained'
@@ -347,7 +354,7 @@ function GamePage() {
                     setGameStatus('menu')
                     setHealth(MAX_HEALTH)
                     setEnemyHits(0)
-                    setRemainingTime(SURVIVAL_TIME_SECONDS)
+                    setRemainingTime(difficultyConfig.roundTime)
                     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
                     setRoundKey((currentRoundKey) => currentRoundKey + 1)
                   }}
@@ -441,14 +448,15 @@ function GamePage() {
                 </Typography>
                 <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
                   {gameStatus === 'won'
-                    ? 'You lasted the full minute.'
-                    : 'Hold the grove for sixty seconds.'}
+                    ? 'You lasted the full round.'
+                    : `Hold the grove for ${difficultyConfig.roundTime} seconds.`}
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
                   Vikings hurl axes with a slight aiming variance, painkillers
                   appear randomly across the arena floor, heal +20%, and each
-                  hit removes 15% health. Easy starts slow, Hardcore is
-                  relentless.
+                  hit removes health based on the selected difficulty. Noob is
+                  slow and forgiving, Balls keeps the pressure up, and Hardcore
+                  stays relentless.
                 </Typography>
               </Stack>
             ) : null}

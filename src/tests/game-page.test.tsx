@@ -49,13 +49,13 @@ describe('GamePage', () => {
       screen.getByRole('link', { name: /back to portfolio/i })
     ).toHaveAttribute('href', '/')
     expect(
-      screen.getByText(/hold the grove for sixty seconds/i)
+      screen.getByText(/hold the grove for 15 seconds/i)
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /start run/i })
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /easy/i })).toBeInTheDocument()
-    expect(screen.getByText('01:00')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /noob/i })).toBeInTheDocument()
+    expect(screen.getByText('00:15')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
     expect(screen.getByTestId('spotify-artist-player')).toBeInTheDocument()

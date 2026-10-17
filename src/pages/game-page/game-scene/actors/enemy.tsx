@@ -7,12 +7,11 @@ import type { RefObject } from 'react'
 import enemyModelUrl from 'assets/models/enemy.glb?url'
 import { Mesh } from 'three'
 import type { Group } from 'three'
-import type { ITreeLayout } from '../../helpers'
 import type { IEnemyState } from '../types'
 
 interface IEnemy {
   enemyStateRef: RefObject<IEnemyState[]>
-  treeLayouts: ITreeLayout[]
+  enemyCount: number
 }
 
 interface IEnemyUnit {
@@ -26,10 +25,10 @@ const enemyModelRotation: [number, number, number] = [0, 0, 0]
 
 useGLTF.preload(enemyModelUrl)
 
-export function Enemy({ enemyStateRef, treeLayouts }: IEnemy) {
+export function Enemy({ enemyCount, enemyStateRef }: IEnemy) {
   return (
     <group>
-      {treeLayouts.map((_, index) => (
+      {Array.from({ length: enemyCount }, (_, index) => (
         <EnemyUnit
           enemyStateRef={enemyStateRef}
           index={index}

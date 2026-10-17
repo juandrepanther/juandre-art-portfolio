@@ -1,5 +1,5 @@
 import { MAX_HEALTH } from './settings'
-import type { TDifficultyLevel } from './settings'
+import type { IDifficultyConfig, TDifficultyLevel } from './settings'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
@@ -17,7 +17,6 @@ export {
   CRATE_STACK_HEIGHT_MAX,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
-  ENEMY_DAMAGE,
   ENEMY_RESPAWN_SECONDS,
   GAME_ARENA_HALF_SIZE,
   GAME_FOG_FAR,
@@ -30,7 +29,6 @@ export {
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
   START_RUN_COUNTDOWN_SECONDS,
-  SURVIVAL_TIME_SECONDS,
   TREE_LAYOUT_COUNT,
   TREE_TRUNK_COLLIDER_ARGS
 } from './settings'
@@ -38,6 +36,7 @@ export {
 export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
 
 export interface IGameSceneProps {
+  difficultyConfig: IDifficultyConfig
   difficulty: TDifficultyLevel
   isActive: boolean
   onHealthChange: (health: number) => void
@@ -67,7 +66,7 @@ export function getGameStatusLabel(
     case 'countdown':
       return `Run starts in ${countdownSeconds}`
     case 'won':
-      return 'You survived the minute'
+      return 'You survived the round'
     case 'lost':
       return 'The raiding party got you'
     default:

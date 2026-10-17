@@ -40,23 +40,20 @@ describe('game layout helpers', () => {
       .mockImplementation(createRandomSequence(randomValues))
 
     const treeLayouts = createRandomTreeLayouts()
-    const enemyStates = createEnemyState(treeLayouts)
+    const enemyStates = createEnemyState(5, [], treeLayouts)
 
     expect(randomSpy).toHaveBeenCalled()
     expect(treeLayouts).toHaveLength(TREE_LAYOUT_COUNT)
-    expect(enemyStates).toHaveLength(TREE_LAYOUT_COUNT)
+    expect(enemyStates).toHaveLength(5)
     expect(
       new Set(treeLayouts.map((layout) => layout.treePosition.join(','))).size
     ).toBe(TREE_LAYOUT_COUNT)
 
-    for (const [index, layout] of treeLayouts.entries()) {
-      expect(layout.enemyPosition).not.toEqual(layout.treePosition)
-      expect(enemyStates[index]?.homePosition.toArray()).toEqual(
-        layout.enemyPosition
+    for (const enemyState of enemyStates) {
+      expect(enemyState.homePosition.toArray()).toEqual(
+        enemyState.position.toArray()
       )
-      expect(enemyStates[index]?.position.toArray()).toEqual(
-        layout.enemyPosition
-      )
+      expect(enemyState.active).toBe(true)
     }
   })
 

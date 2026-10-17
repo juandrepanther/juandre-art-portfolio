@@ -38,14 +38,12 @@ import {
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds, CrateField, TreeCluster } from './world'
 import {
-  DIFFICULTY_CONFIGS,
-  ENEMY_DAMAGE,
-  ENEMY_RESPAWN_SECONDS,
   GAME_FOG_FAR,
   GAME_FOG_NEAR,
   GAME_GROUND_SIZE,
   MAX_HEALTH,
   PAINKILLER_HEAL,
+  ENEMY_RESPAWN_SECONDS,
   PAINKILLER_RESPAWN_SECONDS,
   PLAYER_START_POSITION,
   PROJECTILE_LIFETIME_SECONDS,
@@ -82,6 +80,7 @@ import {
 import { isPointInsideAnyCrate } from '../world-collision'
 
 export default function RoundStage({
+  difficultyConfig,
   difficulty,
   isActive,
   onHealthChange,
@@ -94,7 +93,6 @@ export default function RoundStage({
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
   const [treeLayouts] = useState(() => createRandomTreeLayouts())
   const [crateLayouts] = useState(() => createRandomBoxLayouts(treeLayouts))
-  const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
   const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
   const controlsRef = useRef({
@@ -110,7 +108,9 @@ export default function RoundStage({
   const projectilesRef = useRef(
     Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
-  const enemyStateRef = useRef(createEnemyState(treeLayouts))
+  const enemyStateRef = useRef(
+    createEnemyState(difficultyConfig.enemyCount, crateLayouts, treeLayouts)
+  )
   const painkillerStateRef = useRef(
     createPainkillerState(crateLayouts, treeLayouts)
   )
@@ -288,7 +288,11 @@ export default function RoundStage({
       playerPosition: playerPositionRef.current
     })
     resetControlsState(controlsRef.current)
-    enemyStateRef.current = createEnemyState(treeLayouts)
+    enemyStateRef.current = createEnemyState(
+      difficultyConfig.enemyCount,
+      crateLayouts,
+      treeLayouts
+    )
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
       treeLayouts
@@ -311,7 +315,15 @@ export default function RoundStage({
     lastDamageAtRef.current = -10
     healthRef.current = MAX_HEALTH
     onHealthChangeRef.current(MAX_HEALTH)
-  }, [camera, crateLayouts, difficulty, gl, roundKey, treeLayouts])
+  }, [
+    camera,
+    crateLayouts,
+    difficultyConfig.enemyCount,
+    difficulty,
+    gl,
+    roundKey,
+    treeLayouts
+  ])
 
   useFrame((_, delta) => {
     const playerBody = playerBodyRef.current
@@ -393,14 +405,19 @@ export default function RoundStage({
       .add(PLAYER_HITBOX_OFFSET)
 
     for (const enemyState of enemyStateRef.current) {
-      applyEnemyTravelByDifficulty(enemyState, difficulty, delta)
+      applyEnemyTravelByDifficulty(
+        enemyState,
+        difficulty,
+        difficultyConfig.enemyMovementSpeed,
+        delta
+      )
       enemyState.rotationY = Math.atan2(
         playerPositionRef.current.x - enemyState.position.x,
         playerPositionRef.current.z - enemyState.position.z
       )
 
       if (!enemyState.active) {
-        if (now >= enemyState.respawnAt) {
+        if (difficulty !== 'Noob' && now >= enemyState.respawnAt) {
           resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
         }
 
@@ -423,7 +440,7 @@ export default function RoundStage({
           target
             .sub(origin)
             .normalize()
-            .multiplyScalar(difficultyConfig.axeSpeed),
+            .multiplyScalar(difficultyConfig.enemyProjectileSpeed),
           'enemy',
           PROJECTILE_LIFETIME_SECONDS
         )
@@ -475,7 +492,10 @@ export default function RoundStage({
 
           if (hitEnemy) {
             hitEnemy.active = false
-            hitEnemy.respawnAt = now + ENEMY_RESPAWN_SECONDS
+            hitEnemy.respawnAt =
+              difficulty === 'Noob'
+                ? Number.POSITIVE_INFINITY
+                : now + ENEMY_RESPAWN_SECONDS
             projectile.active = false
             onEnemyHitRef.current()
           }
@@ -491,7 +511,9 @@ export default function RoundStage({
             lastDamageAtRef.current = now
             projectile.active = false
             triggerPlayerHitFlash()
-            setHealth(Math.max(0, healthRef.current - ENEMY_DAMAGE))
+            setHealth(
+              Math.max(0, healthRef.current - difficultyConfig.enemyDamage)
+            )
           }
           continue
       }
@@ -567,7 +589,10 @@ export default function RoundStage({
 
       <TreeCluster treeLayouts={treeLayouts} />
       <CrateField crateLayouts={crateLayouts} />
-      <Enemy enemyStateRef={enemyStateRef} treeLayouts={treeLayouts} />
+      <Enemy
+        enemyCount={difficultyConfig.enemyCount}
+        enemyStateRef={enemyStateRef}
+      />
       <PainkillerPickups
         painkillerStateRef={painkillerStateRef}
         treeLayouts={treeLayouts}

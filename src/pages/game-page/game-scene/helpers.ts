@@ -8,11 +8,14 @@ import {
 import {
   ARENA_HALF_SIZE,
   ATMOSPHERE_PARTICLE_COUNT,
+  CRATE_PLACEMENT_ATTEMPTS,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN,
   PAINKILLER_PICKUP_RADIUS,
   PAINKILLER_SPAWN_HEIGHT,
   PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
+  PLAYER_START_CRATE_EXCLUSION_RADIUS,
+  PLAYER_START_POSITION,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -103,17 +106,66 @@ export function createRandomEnemyFlightPosition() {
   )
 }
 
-export function createEnemyState(treeLayouts: ITreeLayout[]) {
-  return treeLayouts.map((layout, index) => ({
-    active: true,
-    animationOffset: index * 0.7,
-    homePosition: new Vector3(...layout.enemyPosition),
-    nextThrowAt: 0,
-    position: new Vector3(...layout.enemyPosition),
-    respawnAt: 0,
-    rotationY: 0,
-    targetPosition: createRandomEnemyFlightPosition()
-  }))
+function isEnemySpawnBlocked(
+  position: Vector3,
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[]
+) {
+  const deltaX = position.x - PLAYER_START_POSITION[0]
+  const deltaZ = position.z - PLAYER_START_POSITION[2]
+  const exclusionRadius = PLAYER_START_CRATE_EXCLUSION_RADIUS + 1.1
+
+  if (deltaX * deltaX + deltaZ * deltaZ <= exclusionRadius * exclusionRadius) {
+    return true
+  }
+
+  return (
+    isPointInsideAnyCrate([position.x, position.y, position.z], crateLayouts) ||
+    isPointInsideTreeTrunk(position, treeLayouts)
+  )
+}
+
+function createRandomEnemySpawnPosition(
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[]
+) {
+  for (
+    let attemptIndex = 0;
+    attemptIndex < CRATE_PLACEMENT_ATTEMPTS;
+    attemptIndex += 1
+  ) {
+    const position = createRandomEnemyFlightPosition()
+
+    if (!isEnemySpawnBlocked(position, crateLayouts, treeLayouts)) {
+      return position
+    }
+  }
+
+  return createRandomEnemyFlightPosition()
+}
+
+export function createEnemyState(
+  enemyCount: number,
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[]
+) {
+  return Array.from({ length: enemyCount }, (_, index) => {
+    const spawnPosition = createRandomEnemySpawnPosition(
+      crateLayouts,
+      treeLayouts
+    )
+
+    return {
+      active: true,
+      animationOffset: index * 0.7,
+      homePosition: spawnPosition.clone(),
+      nextThrowAt: 0,
+      position: spawnPosition,
+      respawnAt: 0,
+      rotationY: 0,
+      targetPosition: createRandomEnemyFlightPosition()
+    }
+  })
 }
 
 export function createRandomPainkillerPosition(

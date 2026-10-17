@@ -7,6 +7,7 @@ import RoundStage from './round-stage'
 import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
 
 function GameScene({
+  difficultyConfig,
   difficulty,
   isActive,
   onHealthChange,
@@ -29,6 +30,7 @@ function GameScene({
             gravity={[0, -PLAYER_JUMP_GRAVITY, 0]}
           >
             <RoundStage
+              difficultyConfig={difficultyConfig}
               difficulty={difficulty}
               isActive={isActive}
               onHealthChange={onHealthChange}
