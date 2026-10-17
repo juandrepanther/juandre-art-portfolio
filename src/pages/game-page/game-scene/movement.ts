@@ -1,8 +1,9 @@
 import { Vector3 } from 'three'
-import { PLAYER_MOVE_SPEED, type TDifficultyLevel } from '../helpers'
+import type { TDifficultyLevel } from '../helpers'
 import {
   HARDCORE_MONKEY_FLIGHT_PROXIMITY,
   HARDCORE_MONKEY_FLIGHT_SPEED,
+  PLAYER_MOVE_SPEED,
   PLAYER_FACING_TURN_SPEED
 } from '../settings'
 import { createRandomMonkeyFlightPosition } from './helpers'
