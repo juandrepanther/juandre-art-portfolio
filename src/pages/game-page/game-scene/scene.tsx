@@ -1,4 +1,4 @@
-import { KeyboardControls } from '@react-three/drei'
+import { Environment, KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
@@ -27,6 +27,7 @@ function GameScene({
       >
         <Suspense fallback={null}>
           {import.meta.env.DEV ? <Perf position="top-right" /> : null}
+          <Environment preset="forest" background backgroundBlurriness={0.4} />
           <Physics
             colliders={false}
             debug={import.meta.env.DEV}

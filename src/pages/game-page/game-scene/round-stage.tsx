@@ -30,7 +30,7 @@ import {
   syncCameraState,
   updateCameraFollowPosition
 } from './camera'
-import { AtmosphereDome, AtmosphereParticles, StormLightning } from './lighting'
+import { AtmosphereParticles, StormLightning } from './lighting'
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds } from './world-objects/arena-bounds'
 import { CrateField } from './world-objects/crate-field'
@@ -551,7 +551,6 @@ export default function RoundStage({
   return (
     <>
       <ArenaBounds />
-      <AtmosphereDome />
       <AtmosphereParticles />
 
       <hemisphereLight color="#cfd6db" groundColor="#4b5358" intensity={0.58} />

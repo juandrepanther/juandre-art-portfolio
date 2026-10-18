@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import {
   AdditiveBlending,
-  BackSide,
   BufferGeometry,
   Color,
   DirectionalLight,
@@ -20,10 +19,6 @@ import {
 import {
   animatedFragmentShader,
   animatedVertexShader,
-  atmosphereFragmentShader,
-  groundFogFragmentShader,
-  groundFogVertexShader,
-  atmosphereVertexShader,
   particleFragmentShader,
   particleVertexShader
 } from '../shaders'
@@ -96,34 +91,6 @@ export function AnimatedSurfaceMaterial({
   )
 }
 
-export function AtmosphereDome() {
-  const materialRef = useRef<ShaderMaterial | null>(null)
-
-  useFrame(({ clock }) => {
-    if (!materialRef.current) {
-      return
-    }
-
-    materialRef.current.uniforms.uTime.value = clock.elapsedTime
-  })
-
-  return (
-    <mesh position={[0, 10, 0]}>
-      <sphereGeometry args={[52, 48, 48]} />
-      <shaderMaterial
-        ref={materialRef}
-        fragmentShader={atmosphereFragmentShader}
-        side={BackSide}
-        uniforms={{
-          ...sharedLightningUniforms,
-          uTime: { value: 0 }
-        }}
-        vertexShader={atmosphereVertexShader}
-      />
-    </mesh>
-  )
-}
-
 export function AtmosphereParticles() {
   const geometryRef = useRef<BufferGeometry | null>(null)
   const materialRef = useRef<ShaderMaterial | null>(null)
@@ -170,106 +137,6 @@ export function AtmosphereParticles() {
         vertexShader={particleVertexShader}
       />
     </points>
-  )
-}
-
-export function GroundFog() {
-  const nearFogMaterialRef = useRef<ShaderMaterial | null>(null)
-  const wideFogMaterialRef = useRef<ShaderMaterial | null>(null)
-
-  useFrame(({ clock }) => {
-    const elapsedTime = clock.elapsedTime
-
-    if (nearFogMaterialRef.current) {
-      nearFogMaterialRef.current.uniforms.uTime.value = elapsedTime
-    }
-
-    if (wideFogMaterialRef.current) {
-      wideFogMaterialRef.current.uniforms.uTime.value = elapsedTime + 4.2
-    }
-  })
-
-  return (
-    <group>
-      <mesh position={[0, 0.85, 0]} rotation={[-Math.PI / 2, 0.2, 0]}>
-        <circleGeometry args={[21, 48]} />
-        <shaderMaterial
-          ref={nearFogMaterialRef}
-          depthWrite={false}
-          fragmentShader={groundFogFragmentShader}
-          side={DoubleSide}
-          transparent
-          uniforms={{
-            ...sharedLightningUniforms,
-            uTime: { value: 0 }
-          }}
-          vertexShader={groundFogVertexShader}
-        />
-      </mesh>
-      <mesh position={[0, 1.5, 0]} rotation={[-Math.PI / 2, -0.35, 0]}>
-        <circleGeometry args={[30, 48]} />
-        <shaderMaterial
-          ref={wideFogMaterialRef}
-          depthWrite={false}
-          fragmentShader={groundFogFragmentShader}
-          side={DoubleSide}
-          transparent
-          uniforms={{
-            ...sharedLightningUniforms,
-            uTime: { value: 0 }
-          }}
-          vertexShader={groundFogVertexShader}
-        />
-      </mesh>
-    </group>
-  )
-}
-
-export function CinematicLights() {
-  const fillLightRef = useRef<PointLight | null>(null)
-  const rimLightRef = useRef<PointLight | null>(null)
-
-  useFrame(({ clock }) => {
-    const elapsedTime = clock.elapsedTime
-
-    if (fillLightRef.current) {
-      fillLightRef.current.position.set(
-        Math.sin(elapsedTime * 0.35) * 11,
-        5.5 + Math.sin(elapsedTime * 0.6) * 0.7,
-        Math.cos(elapsedTime * 0.32) * 9
-      )
-      fillLightRef.current.intensity = 1.35 + Math.sin(elapsedTime * 1.1) * 0.18
-    }
-
-    if (rimLightRef.current) {
-      rimLightRef.current.position.set(
-        Math.cos(elapsedTime * 0.27) * -12,
-        4.3 + Math.cos(elapsedTime * 0.5) * 0.8,
-        Math.sin(elapsedTime * 0.3) * 10
-      )
-      rimLightRef.current.intensity = 1.1 + Math.cos(elapsedTime * 0.95) * 0.16
-    }
-  })
-
-  return (
-    <>
-      <pointLight
-        ref={fillLightRef}
-        color="#7f9099"
-        decay={2}
-        distance={32}
-        intensity={0.8}
-        position={[8, 6, 4]}
-      />
-      <pointLight
-        ref={rimLightRef}
-        color="#a9b7c4"
-        decay={2}
-        distance={28}
-        intensity={0.72}
-        position={[-10, 4.5, -6]}
-      />
-    </>
   )
 }
 
