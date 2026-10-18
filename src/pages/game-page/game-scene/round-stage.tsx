@@ -38,7 +38,9 @@ import {
   StormLightning
 } from './lighting'
 import { GameSceneInstructions } from './overlay'
-import { ArenaBounds, CrateField, TreeCluster } from './world'
+import { ArenaBounds } from './world-objects/arena-bounds'
+import { CrateField } from './world-objects/crate-field'
+import { TreeCluster } from './world-objects/tree-cluster'
 import {
   GAME_BACKGROUND_COLOR,
   GAME_FOG_COLOR,
