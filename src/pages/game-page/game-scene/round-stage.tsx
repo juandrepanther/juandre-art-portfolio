@@ -14,7 +14,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { DirectionalLight, Group, SpotLight } from 'three'
 import { MeshBasicMaterial, Vector3 } from 'three'
-import VikingAvatar from '../viking-avatar'
+import CharacterModel from '../character-chooser/character-model'
 import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
 import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
@@ -144,6 +144,7 @@ const createRandomCloudConfigs = (): ICloudConfig[] => {
 }
 
 export default function RoundStage({
+  characterConfig,
   difficultyConfig,
   difficulty,
   isActive,
@@ -764,10 +765,11 @@ export default function RoundStage({
           friction={0.8}
         />
         <Suspense fallback={null}>
-          <VikingAvatar
+          <CharacterModel
+            characterConfig={characterConfig}
             groundOffset={PLAYER_BODY_GROUND_OFFSET}
+            groupRef={playerRef}
             isHitFlashing={isPlayerHitFlashing}
-            playerRef={playerRef}
           />
         </Suspense>
       </RigidBody>

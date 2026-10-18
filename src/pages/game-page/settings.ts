@@ -1,9 +1,21 @@
 import type { KeyboardControlsEntry } from '@react-three/drei'
+import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
+export type TCharacterId = 'viking-raider'
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
+
+export interface ICharacterConfig {
+  description: string
+  id: TCharacterId
+  label: string
+  modelOffset: [number, number, number]
+  modelRotation: [number, number, number]
+  modelScale: number
+  modelUrl: string
+}
 
 export interface IDifficultyConfig {
   enemyCount: number
@@ -43,6 +55,18 @@ export const TNT_EXPLOSION_PARTICLES_PER_BURST = 88
 export const TNT_EXPLOSION_PARTICLE_POOL_SIZE = 72
 export const TNT_EXPLOSION_PARTICLE_COLOR = '#ff5a4a'
 export const TNT_EXPLOSION_PARTICLE_EMISSIVE = '#ff2c1c'
+export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
+  'viking-raider': {
+    id: 'viking-raider',
+    label: 'Max',
+    description:
+      'A brutal axe-runner built for the grove. Heavy stance, clean silhouette, and the current default combat rig.',
+    modelUrl: lowPolyVikingModelUrl,
+    modelScale: 1,
+    modelOffset: [0.25, -0.08, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0]
+  }
+}
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
   Noob: {
     label: 'Noob',

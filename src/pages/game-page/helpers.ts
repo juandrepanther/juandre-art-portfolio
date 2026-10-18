@@ -1,14 +1,24 @@
 import { MAX_HEALTH } from './settings'
-import type { IDifficultyConfig, TDifficultyLevel } from './settings'
+import type {
+  ICharacterConfig,
+  IDifficultyConfig,
+  TDifficultyLevel
+} from './settings'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 
-export type { IDifficultyConfig, TDifficultyLevel } from './settings'
+export type {
+  ICharacterConfig,
+  IDifficultyConfig,
+  TCharacterId,
+  TDifficultyLevel
+} from './settings'
 export type { ICrateLayout, ITreeLayout, TWorldPosition } from './world-layout'
 
 export {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
   ARENA_BOUNDARY_COLLIDER_THICKNESS,
+  CHARACTER_CONFIGS,
   CRATE_FOOTPRINT_PADDING,
   CRATE_LAYOUT_COUNT,
   CRATE_PLACEMENT_ATTEMPTS,
@@ -36,6 +46,7 @@ export {
 export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
 
 export interface IGameSceneProps {
+  characterConfig: ICharacterConfig
   difficultyConfig: IDifficultyConfig
   difficulty: TDifficultyLevel
   isActive: boolean

@@ -9,6 +9,7 @@ import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 
 function GameScene({
+  characterConfig,
   difficultyConfig,
   difficulty,
   isActive,
@@ -34,12 +35,13 @@ function GameScene({
             gravity={[0, -PLAYER_JUMP_GRAVITY, 0]}
           >
             <RoundStage
+              characterConfig={characterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}
               isActive={isActive}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
-              key={`${difficulty}-${roundKey}`}
+              key={`${difficulty}-${characterConfig.id}-${roundKey}`}
               roundKey={roundKey}
             />
           </Physics>

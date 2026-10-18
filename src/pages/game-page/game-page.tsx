@@ -14,10 +14,12 @@ import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import HomePageHeader from 'pages/home-page/sections/home-page-header'
+import CharacterChooser from './character-chooser/character-chooser'
 import GameScene from './game-scene/scene'
 import GameSceneLoaderOverlay from './game-scene/game-scene-loader'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
+  CHARACTER_CONFIGS,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
   MAX_HEALTH,
@@ -25,16 +27,22 @@ import {
   clampHealth,
   formatTimeLabel,
   getGameStatusLabel,
+  type TCharacterId,
   type TGameStatus,
   type TDifficultyLevel
 } from './helpers'
 
 const SPOTIFY_ARTIST_EMBED_URL =
   'https://open.spotify.com/embed/artist/3ygNOpBpgEmQsKBdcO68li?utm_source=generator&si=38260154709a4925'
+const characterOptions = Object.keys(CHARACTER_CONFIGS) as TCharacterId[]
 
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const { width } = useWindowSize()
+  const [selectedCharacter, setSelectedCharacter] = useState<TCharacterId>(
+    characterOptions[0]
+  )
+  const [hasChosenCharacter, setHasChosenCharacter] = useState(false)
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [health, setHealth] = useState(MAX_HEALTH)
@@ -50,6 +58,7 @@ function GamePage() {
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
+  const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
 
   useEffect(() => {
@@ -115,6 +124,25 @@ function GamePage() {
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
     setGameStatus('countdown')
+  }
+
+  const handleReturnToMenu = () => {
+    setGameStatus('menu')
+    setHealth(MAX_HEALTH)
+    setEnemyHits(0)
+    setRemainingTime(difficultyConfig.roundTime)
+    setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
+    setRoundKey((currentRoundKey) => currentRoundKey + 1)
+  }
+
+  const handleChooseCharacter = () => {
+    setHasChosenCharacter(true)
+    setRemainingTime(difficultyConfig.roundTime)
+  }
+
+  const handleChooseDifferentCharacter = () => {
+    handleReturnToMenu()
+    setHasChosenCharacter(false)
   }
 
   return (
@@ -189,6 +217,7 @@ function GamePage() {
             }}
           >
             <GameScene
+              characterConfig={selectedCharacterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}
               isActive={isPlaying}
@@ -201,179 +230,208 @@ function GamePage() {
 
             <GameSceneLoaderOverlay />
 
-            <Box
-              aria-hidden="true"
-              sx={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                width: 28,
-                height: 28,
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none',
-                zIndex: 2,
-                '&::before, &::after': {
-                  content: '""',
-                  position: 'absolute',
-                  left: '50%',
-                  top: '50%',
-                  backgroundColor: isDarkMode
-                    ? 'rgba(244, 252, 248, 0.9)'
-                    : 'rgba(20, 32, 44, 0.82)',
-                  boxShadow: isDarkMode
-                    ? '0 0 16px rgba(84, 199, 184, 0.4)'
-                    : '0 0 16px rgba(31, 138, 122, 0.25)'
-                },
-                '&::before': {
-                  width: 2,
-                  height: '100%',
-                  transform: 'translate(-50%, -50%)'
-                },
-                '&::after': {
-                  width: '100%',
-                  height: 2,
-                  transform: 'translate(-50%, -50%)'
-                }
-              }}
-            />
-
-            <Stack
-              spacing={2}
-              sx={{
-                position: 'absolute',
-                left: 24,
-                top: 24,
-                width: 360,
-                maxWidth: 'calc(100% - 48px)',
-                p: 3.25,
-                borderRadius: 2,
-                backdropFilter: 'blur(18px)',
-                backgroundColor: isDarkMode
-                  ? 'rgba(12, 17, 23, 0.62)'
-                  : 'rgba(243, 245, 248, 0.72)',
-                border: isDarkMode
-                  ? '1px solid rgba(220, 229, 236, 0.12)'
-                  : '1px solid rgba(20, 32, 44, 0.12)'
-              }}
-            >
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                <Chip
-                  color="secondary"
-                  label={`Mode: ${difficultyConfig.label}`}
-                />
-                <Chip
-                  label={getGameStatusLabel(gameStatus, countdownSeconds)}
-                  variant="outlined"
-                />
-              </Stack>
-
-              <Box>
-                <Stack
-                  direction="row"
-                  sx={{ justifyContent: 'space-between', mb: 1 }}
-                >
-                  <Typography variant="body2">Health</Typography>
-                  <Typography variant="body2">{health}%</Typography>
-                </Stack>
-                <LinearProgress
-                  color={health > 40 ? 'secondary' : 'primary'}
-                  value={health}
-                  variant="determinate"
-                  sx={{
-                    height: 12,
-                    borderRadius: '999px',
-                    backgroundColor: isDarkMode
-                      ? 'rgba(220, 229, 236, 0.14)'
-                      : 'rgba(20, 32, 44, 0.12)'
-                  }}
-                />
-              </Box>
-
-              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                    Time left
-                  </Typography>
-                  <Typography variant="h3">
-                    {formatTimeLabel(remainingTime)}
-                  </Typography>
-                </Box>
-              </Stack>
-
-              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                <Typography sx={{ color: 'text.secondary' }} variant="body2">
-                  Enemies defeated
-                </Typography>
-                <Typography variant="h5">{enemyHits}</Typography>
-              </Stack>
-
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                {(Object.keys(DIFFICULTY_CONFIGS) as TDifficultyLevel[]).map(
-                  (difficultyOption) => (
-                    <Button
-                      key={difficultyOption}
-                      color="secondary"
-                      disabled={isPlaying || isCountingDown}
-                      onClick={() => {
-                        setDifficulty(difficultyOption)
-                        setRemainingTime(
-                          DIFFICULTY_CONFIGS[difficultyOption].roundTime
-                        )
-                      }}
-                      variant={
-                        difficultyOption === difficulty
-                          ? 'contained'
-                          : 'outlined'
-                      }
-                    >
-                      {difficultyOption}
-                    </Button>
-                  )
-                )}
-              </Stack>
-
-              <Stack direction="row" spacing={1.5}>
-                <Button
-                  color="error"
-                  onClick={handleStartGame}
-                  variant="contained"
-                >
-                  {isPlaying || isCountingDown ? 'Restart' : 'Fight'}
-                </Button>
-                <Button
-                  color="primary"
-                  disabled={
-                    !isPlaying && !isCountingDown && gameStatus === 'menu'
-                  }
-                  onClick={() => {
-                    setGameStatus('menu')
-                    setHealth(MAX_HEALTH)
-                    setEnemyHits(0)
-                    setRemainingTime(difficultyConfig.roundTime)
-                    setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
-                    setRoundKey((currentRoundKey) => currentRoundKey + 1)
-                  }}
-                  variant="outlined"
-                >
-                  STOP
-                </Button>
-              </Stack>
-            </Stack>
-
-            <Box
-              sx={{
-                position: 'absolute',
-                left: 24,
-                bottom: 24,
-                zIndex: 2,
-                pointerEvents: 'auto'
-              }}
-            >
-              <SpotifyArtistPlayer
-                artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
-                isDarkMode={isDarkMode}
+            {!hasChosenCharacter ? (
+              <CharacterChooser
+                availableCharacterIds={characterOptions}
+                onCharacterChange={setSelectedCharacter}
+                onChoose={handleChooseCharacter}
+                selectedCharacterConfig={selectedCharacterConfig}
               />
-            </Box>
+            ) : null}
+
+            {hasChosenCharacter ? (
+              <>
+                <Box
+                  aria-hidden="true"
+                  sx={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    width: 28,
+                    height: 28,
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
+                    zIndex: 2,
+                    '&::before, &::after': {
+                      content: '""',
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      backgroundColor: isDarkMode
+                        ? 'rgba(244, 252, 248, 0.9)'
+                        : 'rgba(20, 32, 44, 0.82)',
+                      boxShadow: isDarkMode
+                        ? '0 0 16px rgba(84, 199, 184, 0.4)'
+                        : '0 0 16px rgba(31, 138, 122, 0.25)'
+                    },
+                    '&::before': {
+                      width: 2,
+                      height: '100%',
+                      transform: 'translate(-50%, -50%)'
+                    },
+                    '&::after': {
+                      width: '100%',
+                      height: 2,
+                      transform: 'translate(-50%, -50%)'
+                    }
+                  }}
+                />
+
+                <Stack
+                  spacing={2}
+                  sx={{
+                    position: 'absolute',
+                    left: 24,
+                    top: 24,
+                    width: 360,
+                    maxWidth: 'calc(100% - 48px)',
+                    p: 3.25,
+                    borderRadius: 2,
+                    backdropFilter: 'blur(18px)',
+                    backgroundColor: isDarkMode
+                      ? 'rgba(12, 17, 23, 0.62)'
+                      : 'rgba(243, 245, 248, 0.72)',
+                    border: isDarkMode
+                      ? '1px solid rgba(220, 229, 236, 0.12)'
+                      : '1px solid rgba(20, 32, 44, 0.12)'
+                  }}
+                >
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                    <Chip
+                      color="secondary"
+                      label={`Mode: ${difficultyConfig.label}`}
+                    />
+                    <Chip
+                      color="primary"
+                      label={selectedCharacterConfig.label}
+                    />
+                    <Chip
+                      label={getGameStatusLabel(gameStatus, countdownSeconds)}
+                      variant="outlined"
+                    />
+                  </Stack>
+
+                  <Box>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: 'space-between', mb: 1 }}
+                    >
+                      <Typography variant="body2">Health</Typography>
+                      <Typography variant="body2">{health}%</Typography>
+                    </Stack>
+                    <LinearProgress
+                      color={health > 40 ? 'secondary' : 'primary'}
+                      value={health}
+                      variant="determinate"
+                      sx={{
+                        height: 12,
+                        borderRadius: '999px',
+                        backgroundColor: isDarkMode
+                          ? 'rgba(220, 229, 236, 0.14)'
+                          : 'rgba(20, 32, 44, 0.12)'
+                      }}
+                    />
+                  </Box>
+
+                  <Stack
+                    direction="row"
+                    sx={{ justifyContent: 'space-between' }}
+                  >
+                    <Box>
+                      <Typography
+                        sx={{ color: 'text.secondary' }}
+                        variant="body2"
+                      >
+                        Time left
+                      </Typography>
+                      <Typography variant="h3">
+                        {formatTimeLabel(remainingTime)}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Stack
+                    direction="row"
+                    sx={{ justifyContent: 'space-between' }}
+                  >
+                    <Typography
+                      sx={{ color: 'text.secondary' }}
+                      variant="body2"
+                    >
+                      Enemies defeated
+                    </Typography>
+                    <Typography variant="h5">{enemyHits}</Typography>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                    {(
+                      Object.keys(DIFFICULTY_CONFIGS) as TDifficultyLevel[]
+                    ).map((difficultyOption) => (
+                      <Button
+                        key={difficultyOption}
+                        color="secondary"
+                        disabled={isPlaying || isCountingDown}
+                        onClick={() => {
+                          setDifficulty(difficultyOption)
+                          setRemainingTime(
+                            DIFFICULTY_CONFIGS[difficultyOption].roundTime
+                          )
+                        }}
+                        variant={
+                          difficultyOption === difficulty
+                            ? 'contained'
+                            : 'outlined'
+                        }
+                      >
+                        {difficultyOption}
+                      </Button>
+                    ))}
+                  </Stack>
+
+                  <Stack direction="row" spacing={1.5}>
+                    <Button
+                      color="error"
+                      onClick={handleStartGame}
+                      variant="contained"
+                    >
+                      {isPlaying || isCountingDown ? 'Restart' : 'Fight'}
+                    </Button>
+                    <Button
+                      color="success"
+                      onClick={handleChooseDifferentCharacter}
+                      variant="contained"
+                    >
+                      Choose Fighter
+                    </Button>
+                    <Button
+                      color="primary"
+                      disabled={
+                        !isPlaying && !isCountingDown && gameStatus === 'menu'
+                      }
+                      onClick={handleReturnToMenu}
+                      variant="outlined"
+                    >
+                      STOP
+                    </Button>
+                  </Stack>
+                </Stack>
+
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: 24,
+                    bottom: 24,
+                    zIndex: 2,
+                    pointerEvents: 'auto'
+                  }}
+                >
+                  <SpotifyArtistPlayer
+                    artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
+                    isDarkMode={isDarkMode}
+                  />
+                </Box>
+              </>
+            ) : null}
 
             {isCountingDown ? (
               <Stack
@@ -414,7 +472,8 @@ function GamePage() {
               </Stack>
             ) : null}
 
-            {gameStatus !== 'playing' &&
+            {hasChosenCharacter &&
+            gameStatus !== 'playing' &&
             gameStatus !== 'lost' &&
             !isCountingDown ? (
               <Stack
@@ -459,7 +518,7 @@ function GamePage() {
             <Dialog
               fullWidth
               maxWidth="xs"
-              open={gameStatus === 'lost'}
+              open={hasChosenCharacter && gameStatus === 'lost'}
               slotProps={{
                 paper: {
                   sx: {

@@ -31,6 +31,12 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
   }
 }))
 
+vi.mock('pages/game-page/character-chooser/character-preview', () => ({
+  default: function MockCharacterPreview({ characterConfig }) {
+    return <div data-testid="character-preview">{characterConfig.label}</div>
+  }
+}))
+
 describe('GamePage', () => {
   beforeEach(() => {
     vi.useRealTimers()
@@ -58,13 +64,23 @@ describe('GamePage', () => {
     )
 
     expect(screen.getByTestId('game-scene')).toBeInTheDocument()
+    expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
+    expect(screen.getByTestId('character-preview')).toHaveTextContent(/max/i)
     expect(
       screen.getByRole('link', { name: /back to portfolio/i })
     ).toHaveAttribute('href', '/')
+    expect(screen.getByText(/choose who enters the grove/i)).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     expect(
       screen.getByText(/hold the grove for 15 seconds/i)
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /fight/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /choose fighter/i })
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /noob/i })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
     expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
@@ -77,6 +93,27 @@ describe('GamePage', () => {
       'src',
       expect.stringContaining('/embed/artist/3ygNOpBpgEmQsKBdcO68li')
     )
+  })
+
+  it('reopens the chooser when the player wants a different character', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+
+    expect(
+      screen.getByRole('button', { name: /choose fighter/i })
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /choose fighter/i }))
+
+    expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
   })
 
   it('shows the desktop-only fallback on small viewports', () => {
@@ -107,7 +144,8 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
-    fireEvent.click(screen.getByRole('button', { name: /fight/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
@@ -135,6 +173,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
     expect(screen.getByText('GAME OVER')).toBeInTheDocument()
