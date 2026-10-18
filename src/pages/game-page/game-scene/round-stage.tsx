@@ -1,4 +1,9 @@
-import { PointerLockControls, useKeyboardControls } from '@react-three/drei'
+import {
+  Cloud,
+  Clouds,
+  PointerLockControls,
+  useKeyboardControls
+} from '@react-three/drei'
 import {
   CapsuleCollider,
   CuboidCollider,
@@ -8,7 +13,7 @@ import {
 import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { DirectionalLight, Group, SpotLight } from 'three'
-import { Vector3 } from 'three'
+import { MeshBasicMaterial, Vector3 } from 'three'
 import VikingAvatar from '../viking-avatar'
 import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
@@ -102,6 +107,41 @@ import {
 import { isPointInsideAnyCrate } from '../world-collision'
 
 const playerRigidBodyName = 'player-body'
+const cloudColors = ['orange', 'hotpink', 'skyblue', 'white', 'gold']
+
+interface ICloudConfig {
+  bounds: [number, number, number]
+  color: string
+  fade: number
+  position: [number, number, number]
+  scale: number
+  seed: number
+  segments: number
+  volume: number
+}
+
+const createRandomCloudConfigs = (): ICloudConfig[] => {
+  const cloudCount = Math.floor(Math.random() * 2) + 1
+
+  return Array.from({ length: cloudCount }, () => ({
+    bounds: [
+      6 + Math.random() * 6,
+      1.2 + Math.random() * 1.6,
+      1.2 + Math.random() * 1.8
+    ],
+    color: cloudColors[Math.floor(Math.random() * cloudColors.length)],
+    fade: 80 + Math.random() * 60,
+    position: [
+      -18 + Math.random() * 36,
+      7 + Math.random() * 7,
+      -18 + Math.random() * 36
+    ],
+    scale: 1.2 + Math.random() * 1.6,
+    seed: Math.random() * 10_000,
+    segments: Math.floor(20 + Math.random() * 21),
+    volume: 4 + Math.random() * 6
+  }))
+}
 
 export default function RoundStage({
   difficultyConfig,
@@ -117,6 +157,7 @@ export default function RoundStage({
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
   const [treeLayouts] = useState(() => createRandomTreeLayouts())
   const [crateLayouts] = useState(() => createRandomBoxLayouts(treeLayouts))
+  const [cloudConfigs] = useState(() => createRandomCloudConfigs())
   const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
   const controlsRef = useRef({
@@ -690,6 +731,21 @@ export default function RoundStage({
         tntBoxStateRef={tntBoxStateRef}
       />
       <AxeProjectiles projectilesRef={projectilesRef} />
+      <Clouds material={MeshBasicMaterial}>
+        {cloudConfigs.map((cloudConfig) => (
+          <Cloud
+            bounds={cloudConfig.bounds}
+            color={cloudConfig.color}
+            fade={cloudConfig.fade}
+            key={cloudConfig.seed}
+            position={cloudConfig.position}
+            scale={cloudConfig.scale}
+            seed={cloudConfig.seed}
+            segments={cloudConfig.segments}
+            volume={cloudConfig.volume}
+          />
+        ))}
+      </Clouds>
       <RigidBody
         canSleep={false}
         colliders={false}
