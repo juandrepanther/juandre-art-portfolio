@@ -571,6 +571,14 @@ export default function RoundStage({
       <AtmosphereParticles />
 
       <hemisphereLight color="#cfd6db" groundColor="#4b5358" intensity={0.58} />
+      <mesh
+        position={[0, -0.02, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
+        <meshStandardMaterial color="#4f8f3a" />
+      </mesh>
       <StormLightning
         directionalLightRef={directionalLightRef}
         spotlightRef={spotlightRef}
