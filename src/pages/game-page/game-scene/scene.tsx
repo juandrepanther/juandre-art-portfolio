@@ -2,11 +2,13 @@ import { Environment, KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
-import { Suspense } from 'react'
+import { Suspense, useRef } from 'react'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
 import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
-import { Bloom, EffectComposer } from '@react-three/postprocessing'
+import { EffectComposer, GodRays } from '@react-three/postprocessing'
+import type { Mesh } from 'three'
+import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
 
 function GameScene({
   characterConfig,
@@ -17,6 +19,8 @@ function GameScene({
   onEnemyHit,
   roundKey
 }: IGameSceneProps) {
+  const sunRef = useRef<Mesh | null>(null)
+
   return (
     <KeyboardControls map={GAME_CONTROL_MAP}>
       <Canvas
@@ -34,6 +38,15 @@ function GameScene({
             debug={import.meta.env.DEV}
             gravity={[0, -PLAYER_JUMP_GRAVITY, 0]}
           >
+            <mesh position={[0, 22, -48]} ref={sunRef}>
+              <sphereGeometry args={[3.5, 32, 32]} />
+              <meshBasicMaterial
+                color="#fff4c2"
+                depthWrite={false}
+                toneMapped={false}
+                transparent
+              />
+            </mesh>
             <RoundStage
               characterConfig={characterConfig}
               difficultyConfig={difficultyConfig}
@@ -45,12 +58,20 @@ function GameScene({
               roundKey={roundKey}
             />
           </Physics>
-          <EffectComposer enabled={true}>
-            <Bloom
-              intensity={1}
-              luminanceSmoothing={0.1}
-              luminanceThreshold={0.2}
-              mipmapBlur
+          <EffectComposer enabled={true} autoClear={false}>
+            <GodRays
+              blur={true}
+              blendFunction={BlendFunction.SCREEN}
+              clampMax={11}
+              decay={0.9}
+              density={0.96}
+              exposure={0.6}
+              kernelSize={KernelSize.SMALL}
+              resolutionX={Resolution.AUTO_SIZE}
+              resolutionY={Resolution.AUTO_SIZE}
+              samples={60}
+              sun={sunRef}
+              weight={2.4}
             />
           </EffectComposer>
         </Suspense>

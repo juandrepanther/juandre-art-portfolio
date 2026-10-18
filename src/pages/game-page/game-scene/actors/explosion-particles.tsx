@@ -78,8 +78,9 @@ export function ExplosionParticles({
             color={color}
             emissive={emissive}
             emissiveIntensity={emissiveIntensity}
-            roughness={0.25}
             metalness={0}
+            roughness={0.25}
+            toneMapped={false}
           />
         </mesh>
       ))}

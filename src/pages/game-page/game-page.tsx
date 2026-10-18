@@ -10,6 +10,7 @@ import {
   Stack,
   Typography
 } from '@mui/material'
+import { MusicNote } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
@@ -47,6 +48,7 @@ function GamePage() {
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [health, setHealth] = useState(MAX_HEALTH)
   const [enemyHits, setEnemyHits] = useState(0)
+  const [isSpotifyPlayerOpen, setIsSpotifyPlayerOpen] = useState(false)
   const [remainingTime, setRemainingTime] = useState(
     DIFFICULTY_CONFIGS.Noob.roundTime
   )
@@ -143,6 +145,14 @@ function GamePage() {
   const handleChooseDifferentCharacter = () => {
     handleReturnToMenu()
     setHasChosenCharacter(false)
+  }
+
+  const handleOpenSpotifyPlayer = () => {
+    setIsSpotifyPlayerOpen(true)
+  }
+
+  const handleCloseSpotifyPlayer = () => {
+    setIsSpotifyPlayerOpen(false)
   }
 
   return (
@@ -425,10 +435,22 @@ function GamePage() {
                     pointerEvents: 'auto'
                   }}
                 >
-                  <SpotifyArtistPlayer
-                    artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
-                    isDarkMode={isDarkMode}
-                  />
+                  {isSpotifyPlayerOpen ? (
+                    <SpotifyArtistPlayer
+                      artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
+                      isDarkMode={isDarkMode}
+                      onClose={handleCloseSpotifyPlayer}
+                    />
+                  ) : (
+                    <Button
+                      color="secondary"
+                      onClick={handleOpenSpotifyPlayer}
+                      startIcon={<MusicNote />}
+                      variant="contained"
+                    >
+                      Spotify
+                    </Button>
+                  )}
                 </Box>
               </>
             ) : null}

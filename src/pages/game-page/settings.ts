@@ -1,9 +1,10 @@
 import type { KeyboardControlsEntry } from '@react-three/drei'
+import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
-export type TCharacterId = 'viking-raider'
+export type TCharacterId = 'viking-raider' | 'lena'
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 
@@ -62,6 +63,16 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     description:
       'A brutal axe-runner built for the grove. Heavy stance, clean silhouette, and the current default combat rig.',
     modelUrl: lowPolyVikingModelUrl,
+    modelScale: 1,
+    modelOffset: [0.25, -0.08, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0]
+  },
+  lena: {
+    id: 'lena',
+    label: 'Lena',
+    description:
+      'A nimble grove fighter with a lighter stance and a fresh look for the arena. More characters can follow the same shared config pattern.',
+    modelUrl: lenaModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0]

@@ -1,21 +1,26 @@
-import { Box } from '@mui/material'
+import { Close } from '@mui/icons-material'
+import { Box, IconButton } from '@mui/material'
 
 interface ISpotifyArtistPlayer {
   artistEmbedUrl: string
+  onClose: () => void
   isDarkMode: boolean
 }
 
 function SpotifyArtistPlayer({
   artistEmbedUrl,
+  onClose,
   isDarkMode
 }: ISpotifyArtistPlayer) {
   return (
     <Box
       data-testid="spotify-artist-player"
       sx={{
+        position: 'relative',
         width: 340,
         maxWidth: 'min(340px, calc(100vw - 48px))',
         p: 1.5,
+        pt: 4.5,
         borderRadius: 2,
         backdropFilter: 'blur(18px)',
         backgroundColor: isDarkMode
@@ -29,6 +34,22 @@ function SpotifyArtistPlayer({
           : '0 22px 60px rgba(20, 32, 44, 0.14)'
       }}
     >
+      <IconButton
+        aria-label="Close Spotify player"
+        color="inherit"
+        onClick={onClose}
+        size="small"
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          zIndex: 1,
+          color: 'text.secondary'
+        }}
+      >
+        <Close fontSize="small" />
+      </IconButton>
+
       <Box
         component="iframe"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

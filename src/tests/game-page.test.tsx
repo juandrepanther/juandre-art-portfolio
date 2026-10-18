@@ -88,11 +88,31 @@ describe('GamePage', () => {
     expect(screen.getByText('00:15')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^spotify$/i })
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /^spotify$/i }))
+
     expect(screen.getByTestId('spotify-artist-player')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /close spotify player/i })
+    ).toBeInTheDocument()
     expect(screen.getByTitle(/spotify artist player/i)).toHaveAttribute(
       'src',
       expect.stringContaining('/embed/artist/3ygNOpBpgEmQsKBdcO68li')
     )
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /close spotify player/i })
+    )
+
+    expect(
+      screen.queryByTestId('spotify-artist-player')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^spotify$/i })
+    ).toBeInTheDocument()
   })
 
   it('reopens the chooser when the player wants a different character', () => {
