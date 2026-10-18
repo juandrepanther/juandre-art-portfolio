@@ -522,17 +522,14 @@ function GamePage() {
                 >
                   VALHALLA AWAITS
                 </Typography>
-                <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
+                <Typography variant="h4" sx={{ maxWidth: '12ch' }}>
                   {gameStatus === 'won'
                     ? 'You lasted the full round.'
                     : `Hold the grove for ${difficultyConfig.roundTime} seconds.`}
                 </Typography>
                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                  Vikings hurl axes with a slight aiming variance, painkillers
-                  appear randomly across the arena floor, heal +20%, and each
-                  hit removes health based on the selected difficulty. Noob is
-                  slow and forgiving, Balls keeps the pressure up, and Hardcore
-                  stays relentless.
+                  Beer and mead await the victorious. Survive the onslaught of
+                  raiders and prove your mettle in the arena.
                 </Typography>
               </Stack>
             ) : null}

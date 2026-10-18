@@ -1,12 +1,12 @@
 import { useGLTF } from '@react-three/drei'
-import { useEffect } from 'react'
-import { useRef } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
+import accordionModelUrl from 'assets/models/accordion.glb?url'
 import axeModelUrl from 'assets/models/axe.glb?url'
+import swordModelUrl from 'assets/models/sword.glb?url'
 import { Mesh, MeshStandardMaterial, type Group } from 'three'
-import { PROJECTILE_POOL_SIZE } from '../../settings'
+import { PROJECTILE_POOL_SIZE, type TWeapon } from '../../settings'
 import type { IProjectileState, TProjectileOwner } from '../types'
 
 interface IAxeProjectiles {
@@ -22,11 +22,44 @@ interface IProjectilePalette {
   tint: string
 }
 
-const axeModelScale = 0.62
-const axeModelPosition: [number, number, number] = [0.2725, 0.06, 0]
-const axeModelRotation: [number, number, number] = [Math.PI / 2, Math.PI / 2, 0]
+interface IProjectileTransform {
+  position: [number, number, number]
+  rotation: [number, number, number]
+  scale: number
+}
 
-useGLTF.preload(axeModelUrl)
+interface IProjectileModel {
+  weapon: TWeapon
+  onTintMaterialsReady: (materials: MeshStandardMaterial[]) => void
+}
+
+const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
+  axe: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    scale: 0.62
+  },
+  sword: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    scale: 0.62
+  },
+  accordion: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    scale: 0.62
+  }
+}
+
+const projectileModelUrls: Record<TWeapon, string> = {
+  axe: axeModelUrl,
+  accordion: accordionModelUrl,
+  sword: swordModelUrl
+}
+
+for (const modelUrl of Object.values(projectileModelUrls)) {
+  useGLTF.preload(modelUrl)
+}
 
 export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
   return (
@@ -43,11 +76,61 @@ export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
 }
 
 function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
-  const { scene } = useGLTF(axeModelUrl)
-  const [modelScene] = useState(() => scene.clone(true))
-  const axeRef = useRef<Group | null>(null)
+  const projectileRef = useRef<Group | null>(null)
   const tintMaterialsRef = useRef<MeshStandardMaterial[]>([])
   const tintedOwnerRef = useRef<TProjectileOwner | null>(null)
+  const [currentWeapon, setCurrentWeapon] = useState<TWeapon>('axe')
+
+  useEffect(() => {
+    tintedOwnerRef.current = null
+    tintMaterialsRef.current = []
+  }, [currentWeapon])
+
+  useFrame(() => {
+    const projectileState = projectilesRef.current[index]
+
+    if (!projectileRef.current || !projectileState) {
+      return
+    }
+
+    projectileRef.current.visible = projectileState.active
+    projectileRef.current.position.copy(projectileState.position)
+
+    if (currentWeapon !== projectileState.weapon) {
+      setCurrentWeapon(projectileState.weapon)
+    }
+
+    if (tintedOwnerRef.current !== projectileState.owner) {
+      const palette = getProjectilePalette(projectileState.owner)
+
+      for (const material of tintMaterialsRef.current) {
+        material.color.set(palette.tint)
+      }
+
+      tintedOwnerRef.current = projectileState.owner
+    }
+
+    if (projectileState.velocity.lengthSq() > 0) {
+      projectileRef.current.rotation.z -= 0.18
+    }
+  })
+
+  return (
+    <group ref={projectileRef}>
+      <ProjectileModel
+        key={currentWeapon}
+        onTintMaterialsReady={(materials) => {
+          tintMaterialsRef.current = materials
+        }}
+        weapon={currentWeapon}
+      />
+    </group>
+  )
+}
+
+function ProjectileModel({ weapon, onTintMaterialsReady }: IProjectileModel) {
+  const { scene } = useGLTF(projectileModelUrls[weapon])
+  const [modelScene] = useState(() => scene.clone(true))
 
   useEffect(() => {
     const tintMaterials = new Set<MeshStandardMaterial>()
@@ -73,43 +156,18 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
       }
     })
 
-    tintMaterialsRef.current = [...tintMaterials]
-  }, [modelScene])
+    onTintMaterialsReady([...tintMaterials])
+  }, [modelScene, onTintMaterialsReady])
 
-  useFrame(() => {
-    const projectileState = projectilesRef.current[index]
-
-    if (!axeRef.current || !projectileState) {
-      return
-    }
-
-    axeRef.current.visible = projectileState.active
-    axeRef.current.position.copy(projectileState.position)
-
-    if (tintedOwnerRef.current !== projectileState.owner) {
-      const palette = getProjectilePalette(projectileState.owner)
-
-      for (const material of tintMaterialsRef.current) {
-        material.color.set(palette.tint)
-      }
-
-      tintedOwnerRef.current = projectileState.owner
-    }
-
-    if (projectileState.velocity.lengthSq() > 0) {
-      axeRef.current.rotation.z -= 0.18
-    }
-  })
+  const projectileTransform = projectileTransforms[weapon]
 
   return (
-    <group ref={axeRef}>
-      <group
-        position={axeModelPosition}
-        rotation={axeModelRotation}
-        scale={axeModelScale}
-      >
-        <primitive object={modelScene} />
-      </group>
+    <group
+      position={projectileTransform.position}
+      rotation={projectileTransform.rotation}
+      scale={projectileTransform.scale}
+    >
+      <primitive object={modelScene} />
     </group>
   )
 }

@@ -38,6 +38,7 @@ import type {
   ITntBoxState,
   IProjectileState,
   TProjectileOwner,
+  TWeapon,
   TTreeVariant
 } from './types'
 
@@ -61,6 +62,7 @@ export function createProjectileState(): IProjectileState {
     active: false,
     owner: 'player',
     position: new Vector3(),
+    weapon: 'axe',
     ttl: 0,
     velocity: new Vector3()
   }
@@ -68,6 +70,7 @@ export function createProjectileState(): IProjectileState {
 
 export function resetProjectileState(projectile: IProjectileState) {
   projectile.active = false
+  projectile.weapon = 'axe'
   projectile.ttl = 0
   projectile.position.set(0, 0, 0)
   projectile.velocity.set(0, 0, 0)
@@ -499,7 +502,8 @@ export function spawnProjectileIntoPool(
   origin: Vector3,
   velocity: Vector3,
   owner: TProjectileOwner,
-  ttl: number
+  ttl: number,
+  weapon: TWeapon = 'axe'
 ) {
   const projectile = projectiles.find((candidate) => !candidate.active)
 
@@ -509,6 +513,7 @@ export function spawnProjectileIntoPool(
 
   projectile.active = true
   projectile.owner = owner
+  projectile.weapon = weapon
   projectile.position.copy(origin)
   projectile.velocity.copy(velocity)
   projectile.ttl = ttl

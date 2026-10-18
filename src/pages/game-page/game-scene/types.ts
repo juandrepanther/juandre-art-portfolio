@@ -1,6 +1,8 @@
 import { Vector3 } from 'three'
+import type { TWeapon } from '../settings'
 
 export type TProjectileOwner = 'enemy' | 'player'
+export type { TWeapon }
 
 export type TTreeVariant = 0 | 1 | 2
 
@@ -8,6 +10,7 @@ export interface IProjectileState {
   active: boolean
   owner: TProjectileOwner
   position: Vector3
+  weapon: TWeapon
   ttl: number
   velocity: Vector3
 }

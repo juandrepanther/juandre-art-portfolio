@@ -5,6 +5,8 @@ import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
 export type TCharacterId = 'viking-raider' | 'lena'
+export type TWeapon = 'axe' | 'sword' | 'accordion'
+export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 
@@ -16,6 +18,7 @@ export interface ICharacterConfig {
   modelRotation: [number, number, number]
   modelScale: number
   modelUrl: string
+  weapon: TCharacterWeapon
 }
 
 export interface IDifficultyConfig {
@@ -65,7 +68,8 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     modelUrl: lowPolyVikingModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],
-    modelRotation: [-Math.PI / 2, 0, 0]
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'sword'
   },
   lena: {
     id: 'lena',
@@ -75,7 +79,8 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     modelUrl: lenaModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],
-    modelRotation: [-Math.PI / 2, 0, 0]
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'accordion'
   }
 }
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
@@ -129,7 +134,7 @@ export const CRATE_SIZE_PRESETS: ICrateLayout['size'][] = [
   [2.5, 1.9, 2.4]
 ]
 export const TNT_BOX_SIZE: ICrateLayout['size'] = [1.1, 0.86, 1.04]
-export const CRATE_LAYOUT_COUNT = 32
+export const CRATE_LAYOUT_COUNT = 60
 export const CRATE_PLACEMENT_ATTEMPTS = 240
 export const CRATE_FOOTPRINT_PADDING = 0.45
 export const CRATE_PLACEMENT_MARGIN = 1.25

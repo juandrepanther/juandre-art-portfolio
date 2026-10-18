@@ -316,10 +316,11 @@ export default function RoundStage({
         origin,
         velocity,
         'player',
-        PROJECTILE_LIFETIME_SECONDS
+        PROJECTILE_LIFETIME_SECONDS,
+        characterConfig.weapon
       )
     }
-  }, [isActive])
+  }, [characterConfig.weapon, isActive])
 
   const handlePointerLock = () => {
     isPointerLockedRef.current = true
@@ -564,7 +565,8 @@ export default function RoundStage({
             .normalize()
             .multiplyScalar(difficultyConfig.enemyProjectileSpeed),
           'enemy',
-          PROJECTILE_LIFETIME_SECONDS
+          PROJECTILE_LIFETIME_SECONDS,
+          'axe'
         )
 
         enemyState.nextThrowAt = now + difficultyConfig.enemyThrowInterval
