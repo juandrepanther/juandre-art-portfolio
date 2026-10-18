@@ -49,6 +49,7 @@ function GamePage() {
   const [health, setHealth] = useState(MAX_HEALTH)
   const [enemyHits, setEnemyHits] = useState(0)
   const [isSpotifyPlayerOpen, setIsSpotifyPlayerOpen] = useState(false)
+  const [hasSpotifyPlayerOpened, setHasSpotifyPlayerOpened] = useState(false)
   const [remainingTime, setRemainingTime] = useState(
     DIFFICULTY_CONFIGS.Noob.roundTime
   )
@@ -148,6 +149,7 @@ function GamePage() {
   }
 
   const handleOpenSpotifyPlayer = () => {
+    setHasSpotifyPlayerOpened(true)
     setIsSpotifyPlayerOpen(true)
   }
 
@@ -435,13 +437,15 @@ function GamePage() {
                     pointerEvents: 'auto'
                   }}
                 >
-                  {isSpotifyPlayerOpen ? (
+                  {hasSpotifyPlayerOpened ? (
                     <SpotifyArtistPlayer
                       artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
                       isDarkMode={isDarkMode}
+                      isVisible={isSpotifyPlayerOpen}
                       onClose={handleCloseSpotifyPlayer}
                     />
-                  ) : (
+                  ) : null}
+                  {!isSpotifyPlayerOpen ? (
                     <Button
                       color="secondary"
                       onClick={handleOpenSpotifyPlayer}
@@ -450,7 +454,7 @@ function GamePage() {
                     >
                       Spotify
                     </Button>
-                  )}
+                  ) : null}
                 </Box>
               </>
             ) : null}

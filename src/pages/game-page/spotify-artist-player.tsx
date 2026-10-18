@@ -5,22 +5,26 @@ interface ISpotifyArtistPlayer {
   artistEmbedUrl: string
   onClose: () => void
   isDarkMode: boolean
+  isVisible: boolean
 }
 
 function SpotifyArtistPlayer({
   artistEmbedUrl,
   onClose,
-  isDarkMode
+  isDarkMode,
+  isVisible
 }: ISpotifyArtistPlayer) {
   return (
     <Box
       data-testid="spotify-artist-player"
+      aria-hidden={!isVisible}
       sx={{
-        position: 'relative',
-        width: 340,
+        position: isVisible ? 'relative' : 'absolute',
+        width: isVisible ? 340 : 1,
         maxWidth: 'min(340px, calc(100vw - 48px))',
-        p: 1.5,
-        pt: 4.5,
+        height: isVisible ? 'auto' : 1,
+        p: isVisible ? 1.5 : 0,
+        pt: isVisible ? 4.5 : 0,
         borderRadius: 2,
         backdropFilter: 'blur(18px)',
         backgroundColor: isDarkMode
@@ -31,24 +35,34 @@ function SpotifyArtistPlayer({
           : '1px solid rgba(20, 32, 44, 0.12)',
         boxShadow: isDarkMode
           ? '0 22px 60px rgba(0, 0, 0, 0.28)'
-          : '0 22px 60px rgba(20, 32, 44, 0.14)'
+          : '0 22px 60px rgba(20, 32, 44, 0.14)',
+        ...(isVisible
+          ? {}
+          : {
+              overflow: 'hidden',
+              opacity: 0,
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap'
+            })
       }}
     >
-      <IconButton
-        aria-label="Close Spotify player"
-        color="inherit"
-        onClick={onClose}
-        size="small"
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          zIndex: 1,
-          color: 'text.secondary'
-        }}
-      >
-        <Close fontSize="small" />
-      </IconButton>
+      {isVisible ? (
+        <IconButton
+          aria-label="Close Spotify player"
+          color="inherit"
+          onClick={onClose}
+          size="small"
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            zIndex: 1,
+            color: 'text.secondary'
+          }}
+        >
+          <Close fontSize="small" />
+        </IconButton>
+      ) : null}
 
       <Box
         component="iframe"

@@ -107,8 +107,12 @@ describe('GamePage', () => {
       screen.getByRole('button', { name: /close spotify player/i })
     )
 
+    expect(screen.getByTestId('spotify-artist-player')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    )
     expect(
-      screen.queryByTestId('spotify-artist-player')
+      screen.queryByRole('button', { name: /close spotify player/i })
     ).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^spotify$/i })

@@ -7,7 +7,7 @@ import axeModelUrl from 'assets/models/axe.glb?url'
 import swordModelUrl from 'assets/models/sword.glb?url'
 import { Mesh, MeshStandardMaterial, type Group } from 'three'
 import { PROJECTILE_POOL_SIZE, type TWeapon } from '../../settings'
-import type { IProjectileState, TProjectileOwner } from '../types'
+import type { IProjectileState } from '../types'
 
 interface IAxeProjectiles {
   projectilesRef: RefObject<IProjectileState[]>
@@ -16,10 +16,6 @@ interface IAxeProjectiles {
 interface IAxeProjectile {
   index: number
   projectilesRef: RefObject<IProjectileState[]>
-}
-
-interface IProjectilePalette {
-  tint: string
 }
 
 interface IProjectileTransform {
@@ -36,17 +32,17 @@ interface IProjectileModel {
 const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
   axe: {
     position: [0.2725, 0.06, 0],
-    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 4],
     scale: 0.62
   },
   sword: {
     position: [0.2725, 0.06, 0],
-    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 4],
     scale: 0.62
   },
   accordion: {
     position: [0.2725, 0.06, 0],
-    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
     scale: 0.62
   }
 }
@@ -78,13 +74,7 @@ export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
 function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
   const projectileRef = useRef<Group | null>(null)
   const tintMaterialsRef = useRef<MeshStandardMaterial[]>([])
-  const tintedOwnerRef = useRef<TProjectileOwner | null>(null)
   const [currentWeapon, setCurrentWeapon] = useState<TWeapon>('axe')
-
-  useEffect(() => {
-    tintedOwnerRef.current = null
-    tintMaterialsRef.current = []
-  }, [currentWeapon])
 
   useFrame(() => {
     const projectileState = projectilesRef.current[index]
@@ -98,16 +88,6 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
 
     if (currentWeapon !== projectileState.weapon) {
       setCurrentWeapon(projectileState.weapon)
-    }
-
-    if (tintedOwnerRef.current !== projectileState.owner) {
-      const palette = getProjectilePalette(projectileState.owner)
-
-      for (const material of tintMaterialsRef.current) {
-        material.color.set(palette.tint)
-      }
-
-      tintedOwnerRef.current = projectileState.owner
     }
 
     if (projectileState.velocity.lengthSq() > 0) {
@@ -170,17 +150,4 @@ function ProjectileModel({ weapon, onTintMaterialsReady }: IProjectileModel) {
       <primitive object={modelScene} />
     </group>
   )
-}
-
-function getProjectilePalette(owner: TProjectileOwner): IProjectilePalette {
-  switch (owner) {
-    case 'enemy':
-      return {
-        tint: '#b7b0a2'
-      }
-    default:
-      return {
-        tint: '#d32f30'
-      }
-  }
 }
