@@ -6,7 +6,7 @@ import { Suspense, useRef } from 'react'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
 import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
-import { EffectComposer, GodRays } from '@react-three/postprocessing'
+import { Bloom, EffectComposer, GodRays } from '@react-three/postprocessing'
 import type { Mesh } from 'three'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
 
@@ -38,7 +38,7 @@ function GameScene({
             debug={import.meta.env.DEV}
             gravity={[0, -PLAYER_JUMP_GRAVITY, 0]}
           >
-            <mesh position={[0, 22, -48]} ref={sunRef}>
+            <mesh position={[60, 22, -48]} ref={sunRef}>
               <sphereGeometry args={[3.5, 32, 32]} />
               <meshBasicMaterial
                 color="#fff4c2"
@@ -58,7 +58,7 @@ function GameScene({
               roundKey={roundKey}
             />
           </Physics>
-          <EffectComposer enabled={true} autoClear={false}>
+          <EffectComposer enabled={true}>
             <GodRays
               blur={true}
               blendFunction={BlendFunction.SCREEN}
@@ -72,6 +72,16 @@ function GameScene({
               samples={60}
               sun={sunRef}
               weight={2.4}
+            />
+
+            <Bloom
+              intensity={10} // The bloom intensity.
+              kernelSize={KernelSize.LARGE} // blur kernel size
+              luminanceThreshold={0.8} // luminance threshold. Raise this value to mask out darker elements in the scene.
+              luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+              mipmapBlur={false} // Enables or disables mipmap blur.
+              resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
+              resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
             />
           </EffectComposer>
         </Suspense>
