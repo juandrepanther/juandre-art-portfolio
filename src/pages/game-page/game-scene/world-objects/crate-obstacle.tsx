@@ -29,7 +29,7 @@ export function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
           roughness={0.9}
         />
       </RoundedBox>
-      <Sparkles count={50} scale={3} size={6} speed={0.4} />
+      <Sparkles count={50} scale={5} size={12} speed={2.4} />
     </RigidBody>
   )
 }

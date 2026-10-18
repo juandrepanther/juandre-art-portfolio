@@ -129,7 +129,7 @@ export function AtmosphereParticles() {
         fragmentShader={particleFragmentShader}
         transparent
         uniforms={{
-          uColorA: { value: new Color('#a5b0b6') },
+          uColorA: { value: new Color('yellow') },
           uColorB: { value: new Color('#d4dbe0') },
           ...sharedLightningUniforms,
           uTime: { value: 0 }
