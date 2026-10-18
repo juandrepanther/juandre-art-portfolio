@@ -8,9 +8,14 @@ import type { IGameSceneProps } from 'pages/game-page/helpers'
 import { renderWithProviders } from './tests-helpers'
 
 const mockedUseWindowSize = vi.fn()
+const mockedUseProgress = vi.fn()
 
 vi.mock('hooks/useWindowSize', () => ({
   default: () => mockedUseWindowSize()
+}))
+
+vi.mock('@react-three/drei', () => ({
+  useProgress: () => mockedUseProgress()
 }))
 
 vi.mock('pages/game-page/game-scene/scene', () => ({
@@ -31,6 +36,14 @@ describe('GamePage', () => {
     vi.useRealTimers()
     useThemeStore.setState({ isDarkMode: true })
     mockedUseWindowSize.mockReturnValue({ height: 1200, width: 1440 })
+    mockedUseProgress.mockReturnValue({
+      active: true,
+      errors: [],
+      item: '/assets/models/enemy.glb',
+      loaded: 3,
+      progress: 60,
+      total: 5
+    })
   })
 
   afterEach(() => {
@@ -53,6 +66,9 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /fight/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /noob/i })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
+    expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
+    expect(screen.getByRole('status')).toHaveTextContent(/loading enemy\.glb/i)
     expect(screen.getByText('00:15')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
@@ -73,6 +89,7 @@ describe('GamePage', () => {
     )
 
     expect(screen.queryByTestId('game-scene')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(
       screen.queryByTestId('spotify-artist-player')
     ).not.toBeInTheDocument()

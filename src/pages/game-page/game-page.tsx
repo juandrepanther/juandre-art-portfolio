@@ -15,6 +15,7 @@ import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import HomePageHeader from 'pages/home-page/sections/home-page-header'
 import GameScene from './game-scene/scene'
+import GameSceneLoaderOverlay from './game-scene/game-scene-loader'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   DESKTOP_BREAKPOINT,
@@ -197,6 +198,8 @@ function GamePage() {
               onHealthChange={handleHealthChange}
               roundKey={roundKey}
             />
+
+            <GameSceneLoaderOverlay />
 
             <Box
               aria-hidden="true"
