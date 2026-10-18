@@ -30,20 +30,12 @@ import {
   syncCameraState,
   updateCameraFollowPosition
 } from './camera'
-import {
-  AtmosphereDome,
-  AtmosphereParticles,
-  CinematicLights,
-  GroundFog,
-  StormLightning
-} from './lighting'
+import { AtmosphereDome, AtmosphereParticles, StormLightning } from './lighting'
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds } from './world-objects/arena-bounds'
 import { CrateField } from './world-objects/crate-field'
 import { TreeCluster } from './world-objects/tree-cluster'
 import {
-  GAME_BACKGROUND_COLOR,
-  GAME_FOG_COLOR,
   GAME_GROUND_SIZE,
   MAX_HEALTH,
   PAINKILLER_HEAL,
@@ -87,19 +79,6 @@ import {
   DIRECTIONAL_LIGHT_SHADOW_CAMERA_FAR,
   DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE,
   DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS,
-  GAME_FOG_DENSITY,
-  GAME_GROUND_COLOR,
-  GAME_RING_COLOR,
-  SPOTLIGHT_ANGLE,
-  SPOTLIGHT_BASE_COLOR,
-  SPOTLIGHT_BASE_INTENSITY,
-  SPOTLIGHT_DECAY,
-  SPOTLIGHT_DISTANCE,
-  SPOTLIGHT_PENUMBRA,
-  SPOTLIGHT_POSITION,
-  SPOTLIGHT_SHADOW_BIAS,
-  SPOTLIGHT_SHADOW_MAP_SIZE,
-  SPOTLIGHT_SHADOW_NORMAL_BIAS,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -571,17 +550,11 @@ export default function RoundStage({
 
   return (
     <>
-      <color args={[GAME_BACKGROUND_COLOR]} attach="background" />
-      <fogExp2 args={[GAME_FOG_COLOR, GAME_FOG_DENSITY]} attach="fog" />
-
       <ArenaBounds />
       <AtmosphereDome />
       <AtmosphereParticles />
-      <GroundFog />
 
-      <ambientLight intensity={0.22} />
       <hemisphereLight color="#cfd6db" groundColor="#4b5358" intensity={0.58} />
-      <CinematicLights />
       <StormLightning
         directionalLightRef={directionalLightRef}
         spotlightRef={spotlightRef}
@@ -602,39 +575,10 @@ export default function RoundStage({
         shadow-mapSize-width={DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE}
         shadow-normalBias={DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS}
       />
-      <spotLight
-        angle={SPOTLIGHT_ANGLE}
-        castShadow
-        color={SPOTLIGHT_BASE_COLOR}
-        decay={SPOTLIGHT_DECAY}
-        distance={SPOTLIGHT_DISTANCE}
-        intensity={SPOTLIGHT_BASE_INTENSITY}
-        penumbra={SPOTLIGHT_PENUMBRA}
-        position={SPOTLIGHT_POSITION}
-        ref={spotlightRef}
-        shadow-bias={SPOTLIGHT_SHADOW_BIAS}
-        shadow-mapSize-height={SPOTLIGHT_SHADOW_MAP_SIZE}
-        shadow-mapSize-width={SPOTLIGHT_SHADOW_MAP_SIZE}
-        shadow-normalBias={SPOTLIGHT_SHADOW_NORMAL_BIAS}
-      />
-
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
-        <meshStandardMaterial color={GAME_GROUND_COLOR} roughness={0.96} />
-      </mesh>
       <CuboidCollider
         args={[GAME_GROUND_SIZE / 2, 0.1, GAME_GROUND_SIZE / 2]}
         position={[0, -0.1, 0]}
       />
-
-      <mesh
-        position={[0, 0.05, 0]}
-        receiveShadow
-        rotation={[-Math.PI / 2, 0, 0]}
-      >
-        <ringGeometry args={[8.5, 10.5, 64]} />
-        <meshStandardMaterial color={GAME_RING_COLOR} roughness={1} />
-      </mesh>
 
       <TreeCluster treeLayouts={treeLayouts} />
       <CrateField crateLayouts={crateLayouts} />

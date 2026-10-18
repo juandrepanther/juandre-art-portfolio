@@ -60,10 +60,7 @@ export const atmosphereFragmentShader = `
   varying vec3 vWorldPosition;
 
   void main() {
-    float heightBlend = smoothstep(-4.0, 20.0, vWorldPosition.y);
-    vec3 horizon = vec3(0.52, 0.57, 0.60);
-    vec3 zenith = vec3(0.17, 0.20, 0.25);
-    vec3 skyColor = mix(horizon, zenith, heightBlend);
+    vec3 skyColor = vec3(0.52, 0.57, 0.60);
 
     float cloudWaveA = sin(vWorldPosition.x * 0.08 + uTime * 0.05);
     float cloudWaveB = cos(vWorldPosition.z * 0.09 - uTime * 0.06);

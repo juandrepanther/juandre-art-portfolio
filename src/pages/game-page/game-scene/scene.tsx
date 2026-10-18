@@ -6,6 +6,7 @@ import { Suspense } from 'react'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
 import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
+import { Bloom, EffectComposer } from '@react-three/postprocessing'
 
 function GameScene({
   difficultyConfig,
@@ -41,6 +42,14 @@ function GameScene({
               roundKey={roundKey}
             />
           </Physics>
+          <EffectComposer enabled={true}>
+            <Bloom
+              intensity={1}
+              luminanceSmoothing={0.1}
+              luminanceThreshold={0.2}
+              mipmapBlur
+            />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </KeyboardControls>

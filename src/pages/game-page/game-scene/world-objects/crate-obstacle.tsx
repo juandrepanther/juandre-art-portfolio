@@ -1,5 +1,6 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type { ICrateLayout } from '../../helpers'
+import { RoundedBox, Sparkles } from '@react-three/drei'
 
 interface ICrateObstacle {
   crateLayout: ICrateLayout
@@ -17,41 +18,18 @@ export function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
       type="fixed"
     >
       <CuboidCollider args={[width / 2, height / 2, depth / 2]} />
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={crateLayout.size} />
+      <RoundedBox
+        args={crateLayout.size}
+        castShadow
+        receiveShadow
+        radius={0.48}
+      >
         <meshStandardMaterial
           color={index % 2 === 0 ? '#8f6845' : '#7b583a'}
           roughness={0.9}
         />
-      </mesh>
-      <mesh castShadow position={[0, height * 0.1, depth * 0.38]} receiveShadow>
-        <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
-        <meshStandardMaterial color="#c59b63" roughness={0.84} />
-      </mesh>
-      <mesh
-        castShadow
-        position={[0, height * 0.1, -depth * 0.38]}
-        receiveShadow
-      >
-        <boxGeometry args={[width * 0.9, height * 0.22, depth * 0.14]} />
-        <meshStandardMaterial color="#c59b63" roughness={0.84} />
-      </mesh>
-      <mesh
-        castShadow
-        position={[width * 0.38, height * 0.08, 0]}
-        receiveShadow
-      >
-        <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
-        <meshStandardMaterial color="#c59b63" roughness={0.84} />
-      </mesh>
-      <mesh
-        castShadow
-        position={[-width * 0.38, height * 0.08, 0]}
-        receiveShadow
-      >
-        <boxGeometry args={[width * 0.14, height * 0.22, depth * 0.88]} />
-        <meshStandardMaterial color="#c59b63" roughness={0.84} />
-      </mesh>
+      </RoundedBox>
+      <Sparkles count={50} scale={3} size={6} speed={0.4} />
     </RigidBody>
   )
 }
