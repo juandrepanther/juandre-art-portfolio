@@ -19,16 +19,23 @@ import {
   PAINKILLER_PICKUP_RADIUS,
   PAINKILLER_SPAWN_HEIGHT,
   PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
+  TNT_BOX_COUNT,
+  TNT_BOX_SIZE,
+  TNT_BOX_SPAWN_PLACEMENT_ATTEMPTS,
   PLAYER_START_CRATE_EXCLUSION_RADIUS,
   PLAYER_START_POSITION,
   type TDifficultyLevel,
   type TGameControl
 } from '../settings'
-import { isPointInsideAnyCrate } from '../world-collision'
+import {
+  doesCircleIntersectAnyCrate,
+  isPointInsideAnyCrate
+} from '../world-collision'
 import type {
   IControlsState,
   IEnemyState,
   IEnemyExplosionParticleState,
+  ITntBoxState,
   IProjectileState,
   TProjectileOwner,
   TTreeVariant
@@ -197,6 +204,10 @@ export function resetEnemyForDifficulty(
 }
 
 export function createEnemyExplosionParticleState(): IEnemyExplosionParticleState {
+  return createExplosionParticleState()
+}
+
+export function createExplosionParticleState(): IEnemyExplosionParticleState {
   return {
     active: false,
     maxTtl: 0,
@@ -210,6 +221,12 @@ export function createEnemyExplosionParticleState(): IEnemyExplosionParticleStat
 export function resetEnemyExplosionParticleState(
   particleState: IEnemyExplosionParticleState
 ) {
+  resetExplosionParticleState(particleState)
+}
+
+export function resetExplosionParticleState(
+  particleState: IEnemyExplosionParticleState
+) {
   particleState.active = false
   particleState.maxTtl = 0
   particleState.position.set(0, 0, 0)
@@ -219,6 +236,14 @@ export function resetEnemyExplosionParticleState(
 }
 
 export function spawnEnemyExplosionParticles(
+  particleStates: IEnemyExplosionParticleState[],
+  origin: Vector3,
+  particleCount: number = ENEMY_EXPLOSION_PARTICLES_PER_BURST
+) {
+  spawnExplosionParticles(particleStates, origin, particleCount)
+}
+
+export function spawnExplosionParticles(
   particleStates: IEnemyExplosionParticleState[],
   origin: Vector3,
   particleCount: number = ENEMY_EXPLOSION_PARTICLES_PER_BURST
@@ -257,6 +282,139 @@ export function spawnEnemyExplosionParticles(
 
     spawnedCount += 1
   }
+}
+
+function getTntFootprintRadius() {
+  return Math.hypot(TNT_BOX_SIZE[0], TNT_BOX_SIZE[2]) / 2 + 0.25
+}
+
+function doesTntPositionOverlapPlayerStart(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number
+) {
+  const deltaX = positionX - PLAYER_START_POSITION[0]
+  const deltaZ = positionZ - PLAYER_START_POSITION[2]
+  const collisionRadius = PLAYER_START_CRATE_EXCLUSION_RADIUS + footprintRadius
+
+  return deltaX * deltaX + deltaZ * deltaZ <= collisionRadius * collisionRadius
+}
+
+function doesTntPositionOverlapTree(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number,
+  treeLayouts: ITreeLayout[]
+) {
+  const treeCollisionRadius =
+    Math.max(TREE_TRUNK_COLLIDER_ARGS[0], TREE_TRUNK_COLLIDER_ARGS[2]) +
+    footprintRadius +
+    0.45
+
+  return treeLayouts.some(({ treePosition }) => {
+    const deltaX = positionX - treePosition[0]
+    const deltaZ = positionZ - treePosition[2]
+
+    return (
+      deltaX * deltaX + deltaZ * deltaZ <=
+      treeCollisionRadius * treeCollisionRadius
+    )
+  })
+}
+
+function doesTntPositionOverlapExistingTnt(
+  positionX: number,
+  positionZ: number,
+  footprintRadius: number,
+  existingPositions: Vector3[]
+) {
+  return existingPositions.some((position) => {
+    const deltaX = positionX - position.x
+    const deltaZ = positionZ - position.z
+    const collisionRadius = footprintRadius * 2 + 0.25
+
+    return (
+      deltaX * deltaX + deltaZ * deltaZ <= collisionRadius * collisionRadius
+    )
+  })
+}
+
+export function createRandomTntPosition(
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[],
+  existingPositions: Vector3[] = []
+) {
+  const footprintRadius = getTntFootprintRadius()
+  const spawnRange = ARENA_HALF_SIZE - footprintRadius - 0.8
+
+  for (
+    let attemptIndex = 0;
+    attemptIndex < TNT_BOX_SPAWN_PLACEMENT_ATTEMPTS;
+    attemptIndex += 1
+  ) {
+    const positionX = (Math.random() - 0.5) * spawnRange * 2
+    const positionZ = (Math.random() - 0.5) * spawnRange * 2
+
+    if (
+      doesCircleIntersectAnyCrate(
+        { x: positionX, z: positionZ },
+        footprintRadius,
+        crateLayouts,
+        0.1
+      ) ||
+      doesTntPositionOverlapTree(
+        positionX,
+        positionZ,
+        footprintRadius,
+        treeLayouts
+      ) ||
+      doesTntPositionOverlapPlayerStart(
+        positionX,
+        positionZ,
+        footprintRadius
+      ) ||
+      doesTntPositionOverlapExistingTnt(
+        positionX,
+        positionZ,
+        footprintRadius,
+        existingPositions
+      )
+    ) {
+      continue
+    }
+
+    return new Vector3(positionX, TNT_BOX_SIZE[1] / 2, positionZ)
+  }
+
+  return null
+}
+
+export function createTntState(
+  crateLayouts: ICrateLayout[],
+  treeLayouts: ITreeLayout[]
+): ITntBoxState[] {
+  const tntStates: ITntBoxState[] = []
+  const existingPositions: Vector3[] = []
+
+  for (let index = 0; index < TNT_BOX_COUNT; index += 1) {
+    const position = createRandomTntPosition(
+      crateLayouts,
+      treeLayouts,
+      existingPositions
+    )
+
+    if (!position) {
+      break
+    }
+
+    existingPositions.push(position.clone())
+    tntStates.push({
+      active: true,
+      position
+    })
+  }
+
+  return tntStates
 }
 
 export function createRandomPainkillerPosition(

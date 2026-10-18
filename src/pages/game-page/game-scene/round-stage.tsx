@@ -13,17 +13,23 @@ import VikingAvatar from '../viking-avatar'
 import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
 import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
+import { ExplosionParticles } from './actors/explosion-particles'
 import { PainkillerPickups } from './actors/painkiller-pickups'
+import { TntBoxes } from './actors/tnt-boxes'
 import {
+  createExplosionParticleState,
   createEnemyState,
   createEnemyExplosionParticleState,
   createPainkillerState,
   createProjectileState,
+  createTntState,
   createRandomPainkillerPosition,
   resetControlsState,
   resetEnemyExplosionParticleState,
+  resetExplosionParticleState,
   resetProjectileState,
   spawnProjectileIntoPool,
+  spawnExplosionParticles,
   spawnEnemyExplosionParticles,
   syncControlsState,
   isPointInsideTreeTrunk
@@ -84,9 +90,18 @@ import {
   DIRECTIONAL_LIGHT_SHADOW_CAMERA_FAR,
   DIRECTIONAL_LIGHT_SHADOW_MAP_SIZE,
   DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS,
+  TNT_BOX_DAMAGE,
+  TNT_BOX_KNOCKBACK_FORCE,
+  TNT_BOX_KNOCKBACK_UPWARD_FORCE,
+  TNT_EXPLOSION_PARTICLE_COLOR,
+  TNT_EXPLOSION_PARTICLE_EMISSIVE,
+  TNT_EXPLOSION_PARTICLE_POOL_SIZE,
+  TNT_EXPLOSION_PARTICLES_PER_BURST,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
+
+const playerRigidBodyName = 'player-body'
 
 export default function RoundStage({
   difficultyConfig,
@@ -125,9 +140,15 @@ export default function RoundStage({
       createEnemyExplosionParticleState()
     )
   )
+  const tntExplosionParticleStateRef = useRef(
+    Array.from({ length: TNT_EXPLOSION_PARTICLE_POOL_SIZE }, () =>
+      createExplosionParticleState()
+    )
+  )
   const painkillerStateRef = useRef(
     createPainkillerState(crateLayouts, treeLayouts)
   )
+  const tntBoxStateRef = useRef(createTntState(crateLayouts, treeLayouts))
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
@@ -182,6 +203,42 @@ export default function RoundStage({
       true
     )
   })
+
+  const detonateTntBox = (tntIndex: number) => {
+    if (!isActive) {
+      return
+    }
+
+    const tntBoxState = tntBoxStateRef.current[tntIndex]
+    const playerBody = playerBodyRef.current
+
+    if (!tntBoxState?.active) {
+      return
+    }
+
+    tntBoxState.active = false
+    triggerPlayerHitFlash()
+    spawnExplosionParticles(
+      tntExplosionParticleStateRef.current,
+      tntBoxState.position.clone(),
+      TNT_EXPLOSION_PARTICLES_PER_BURST
+    )
+    setHealth(Math.max(0, healthRef.current - TNT_BOX_DAMAGE))
+
+    if (playerBody) {
+      const currentVelocity = playerBody.linvel()
+      const angle = Math.random() * Math.PI * 2
+
+      playerBody.setLinvel(
+        {
+          x: currentVelocity.x + Math.cos(angle) * TNT_BOX_KNOCKBACK_FORCE,
+          y: Math.max(currentVelocity.y, TNT_BOX_KNOCKBACK_UPWARD_FORCE),
+          z: currentVelocity.z + Math.sin(angle) * TNT_BOX_KNOCKBACK_FORCE
+        },
+        true
+      )
+    }
+  }
 
   useEffect(() => {
     onHealthChangeRef.current = onHealthChange
@@ -312,10 +369,14 @@ export default function RoundStage({
     for (const particleState of enemyExplosionParticleStateRef.current) {
       resetEnemyExplosionParticleState(particleState)
     }
+    for (const particleState of tntExplosionParticleStateRef.current) {
+      resetExplosionParticleState(particleState)
+    }
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
       treeLayouts
     )
+    tntBoxStateRef.current = createTntState(crateLayouts, treeLayouts)
 
     playerBodyRef.current?.setTranslation(
       {
@@ -612,15 +673,28 @@ export default function RoundStage({
       <EnemyExplosionParticles
         particleStatesRef={enemyExplosionParticleStateRef}
       />
+      <ExplosionParticles
+        color={TNT_EXPLOSION_PARTICLE_COLOR}
+        emissive={TNT_EXPLOSION_PARTICLE_EMISSIVE}
+        emissiveIntensity={1.5}
+        particlePoolSize={TNT_EXPLOSION_PARTICLE_POOL_SIZE}
+        particleStatesRef={tntExplosionParticleStateRef}
+      />
       <PainkillerPickups
         painkillerStateRef={painkillerStateRef}
         treeLayouts={treeLayouts}
+      />
+      <TntBoxes
+        onPlayerTouch={detonateTntBox}
+        playerBodyName={playerRigidBodyName}
+        tntBoxStateRef={tntBoxStateRef}
       />
       <AxeProjectiles projectilesRef={projectilesRef} />
       <RigidBody
         canSleep={false}
         colliders={false}
         lockRotations
+        name={playerRigidBodyName}
         position={[
           PLAYER_START_POSITION[0],
           PLAYER_BODY_GROUND_OFFSET,

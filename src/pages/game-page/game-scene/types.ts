@@ -32,6 +32,11 @@ export interface IEnemyExplosionParticleState {
   velocity: Vector3
 }
 
+export interface ITntBoxState {
+  active: boolean
+  position: Vector3
+}
+
 export interface IPainkillerState {
   active: boolean
   animationOffset: number

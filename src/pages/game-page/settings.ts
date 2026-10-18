@@ -33,6 +33,16 @@ export const ENEMY_EXPLOSION_PARTICLE_SPEED_MIN = 3.2
 export const ENEMY_EXPLOSION_PARTICLE_SPEED_MAX = 9.1
 export const ENEMY_EXPLOSION_PARTICLE_GRAVITY = 9.5
 export const ENEMY_EXPLOSION_PARTICLE_BASE_SCALE = 0.08
+export const TNT_BOX_COUNT = 7
+export const TNT_BOX_DAMAGE = 40
+export const TNT_BOX_TRIGGER_RADIUS = 1.28
+export const TNT_BOX_SPAWN_PLACEMENT_ATTEMPTS = 48
+export const TNT_BOX_KNOCKBACK_FORCE = 10.5
+export const TNT_BOX_KNOCKBACK_UPWARD_FORCE = 8.4
+export const TNT_EXPLOSION_PARTICLES_PER_BURST = 88
+export const TNT_EXPLOSION_PARTICLE_POOL_SIZE = 72
+export const TNT_EXPLOSION_PARTICLE_COLOR = '#ff5a4a'
+export const TNT_EXPLOSION_PARTICLE_EMISSIVE = '#ff2c1c'
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
   Noob: {
     label: 'Noob',
@@ -83,6 +93,7 @@ export const CRATE_SIZE_PRESETS: ICrateLayout['size'][] = [
   [2.4, 1.9, 2.3],
   [2.5, 1.9, 2.4]
 ]
+export const TNT_BOX_SIZE: ICrateLayout['size'] = [1.1, 0.86, 1.04]
 export const CRATE_LAYOUT_COUNT = 32
 export const CRATE_PLACEMENT_ATTEMPTS = 240
 export const CRATE_FOOTPRINT_PADDING = 0.45
