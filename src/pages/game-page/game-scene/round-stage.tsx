@@ -12,15 +12,19 @@ import { Vector3 } from 'three'
 import VikingAvatar from '../viking-avatar'
 import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
+import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
 import { PainkillerPickups } from './actors/painkiller-pickups'
 import {
   createEnemyState,
+  createEnemyExplosionParticleState,
   createPainkillerState,
   createProjectileState,
   createRandomPainkillerPosition,
   resetControlsState,
+  resetEnemyExplosionParticleState,
   resetProjectileState,
   spawnProjectileIntoPool,
+  spawnEnemyExplosionParticles,
   syncControlsState,
   isPointInsideTreeTrunk
 } from './helpers'
@@ -57,6 +61,7 @@ import {
   ENEMY_AIM_PRECISION,
   ENEMY_HIT_RADIUS,
   ENEMY_HITBOX_OFFSET,
+  ENEMY_EXPLOSION_PARTICLE_POOL_SIZE,
   PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
   PLAYER_AXE_SPEED,
@@ -114,6 +119,11 @@ export default function RoundStage({
   )
   const enemyStateRef = useRef(
     createEnemyState(difficultyConfig.enemyCount, crateLayouts, treeLayouts)
+  )
+  const enemyExplosionParticleStateRef = useRef(
+    Array.from({ length: ENEMY_EXPLOSION_PARTICLE_POOL_SIZE }, () =>
+      createEnemyExplosionParticleState()
+    )
   )
   const painkillerStateRef = useRef(
     createPainkillerState(crateLayouts, treeLayouts)
@@ -299,6 +309,9 @@ export default function RoundStage({
       crateLayouts,
       treeLayouts
     )
+    for (const particleState of enemyExplosionParticleStateRef.current) {
+      resetEnemyExplosionParticleState(particleState)
+    }
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
       treeLayouts
@@ -411,6 +424,14 @@ export default function RoundStage({
       .add(PLAYER_HITBOX_OFFSET)
 
     for (const enemyState of enemyStateRef.current) {
+      if (!enemyState.active) {
+        if (difficulty !== 'Noob' && now >= enemyState.respawnAt) {
+          resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
+        }
+
+        continue
+      }
+
       applyEnemyTravelByDifficulty(
         enemyState,
         difficulty,
@@ -421,14 +442,6 @@ export default function RoundStage({
         playerPositionRef.current.x - enemyState.position.x,
         playerPositionRef.current.z - enemyState.position.z
       )
-
-      if (!enemyState.active) {
-        if (difficulty !== 'Noob' && now >= enemyState.respawnAt) {
-          resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
-        }
-
-        continue
-      }
 
       if (now >= enemyState.nextThrowAt) {
         const origin = enemyState.position.clone().add(new Vector3(0, 0.15, 0))
@@ -497,6 +510,10 @@ export default function RoundStage({
           })
 
           if (hitEnemy) {
+            spawnEnemyExplosionParticles(
+              enemyExplosionParticleStateRef.current,
+              hitEnemy.position.clone().add(ENEMY_HITBOX_OFFSET)
+            )
             hitEnemy.active = false
             hitEnemy.respawnAt =
               difficulty === 'Noob'
@@ -584,6 +601,9 @@ export default function RoundStage({
       <Enemy
         enemyCount={difficultyConfig.enemyCount}
         enemyStateRef={enemyStateRef}
+      />
+      <EnemyExplosionParticles
+        particleStatesRef={enemyExplosionParticleStateRef}
       />
       <PainkillerPickups
         painkillerStateRef={painkillerStateRef}

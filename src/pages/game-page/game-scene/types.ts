@@ -23,6 +23,15 @@ export interface IEnemyState {
   targetPosition: Vector3
 }
 
+export interface IEnemyExplosionParticleState {
+  active: boolean
+  maxTtl: number
+  position: Vector3
+  scale: number
+  ttl: number
+  velocity: Vector3
+}
+
 export interface IPainkillerState {
   active: boolean
   animationOffset: number

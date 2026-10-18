@@ -9,6 +9,11 @@ import {
   ARENA_HALF_SIZE,
   ATMOSPHERE_PARTICLE_COUNT,
   CRATE_PLACEMENT_ATTEMPTS,
+  ENEMY_EXPLOSION_PARTICLE_BASE_SCALE,
+  ENEMY_EXPLOSION_PARTICLE_LIFETIME_SECONDS,
+  ENEMY_EXPLOSION_PARTICLE_SPEED_MAX,
+  ENEMY_EXPLOSION_PARTICLE_SPEED_MIN,
+  ENEMY_EXPLOSION_PARTICLES_PER_BURST,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN,
   PAINKILLER_PICKUP_RADIUS,
@@ -16,11 +21,14 @@ import {
   PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
   PLAYER_START_CRATE_EXCLUSION_RADIUS,
   PLAYER_START_POSITION,
+  type TDifficultyLevel,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
 import type {
   IControlsState,
+  IEnemyState,
+  IEnemyExplosionParticleState,
   IProjectileState,
   TProjectileOwner,
   TTreeVariant
@@ -148,7 +156,7 @@ export function createEnemyState(
   enemyCount: number,
   crateLayouts: ICrateLayout[],
   treeLayouts: ITreeLayout[]
-) {
+): IEnemyState[] {
   return Array.from({ length: enemyCount }, (_, index) => {
     const spawnPosition = createRandomEnemySpawnPosition(
       crateLayouts,
@@ -166,6 +174,89 @@ export function createEnemyState(
       targetPosition: createRandomEnemyFlightPosition()
     }
   })
+}
+
+export function resetEnemyForDifficulty(
+  enemyState: IEnemyState,
+  difficulty: TDifficultyLevel,
+  nextThrowAt: number
+) {
+  enemyState.active = true
+
+  switch (difficulty) {
+    case 'Hardcore':
+      enemyState.position.copy(createRandomEnemyFlightPosition())
+      enemyState.targetPosition.copy(createRandomEnemyFlightPosition())
+      break
+    default:
+      enemyState.position.copy(enemyState.homePosition)
+      break
+  }
+
+  enemyState.nextThrowAt = nextThrowAt
+}
+
+export function createEnemyExplosionParticleState(): IEnemyExplosionParticleState {
+  return {
+    active: false,
+    maxTtl: 0,
+    position: new Vector3(),
+    scale: ENEMY_EXPLOSION_PARTICLE_BASE_SCALE,
+    ttl: 0,
+    velocity: new Vector3()
+  }
+}
+
+export function resetEnemyExplosionParticleState(
+  particleState: IEnemyExplosionParticleState
+) {
+  particleState.active = false
+  particleState.maxTtl = 0
+  particleState.position.set(0, 0, 0)
+  particleState.scale = ENEMY_EXPLOSION_PARTICLE_BASE_SCALE
+  particleState.ttl = 0
+  particleState.velocity.set(0, 0, 0)
+}
+
+export function spawnEnemyExplosionParticles(
+  particleStates: IEnemyExplosionParticleState[],
+  origin: Vector3,
+  particleCount: number = ENEMY_EXPLOSION_PARTICLES_PER_BURST
+) {
+  let spawnedCount = 0
+
+  for (const particleState of particleStates) {
+    if (spawnedCount >= particleCount) {
+      return
+    }
+
+    if (particleState.active) {
+      continue
+    }
+
+    const angle = Math.random() * Math.PI * 2
+    const tilt = Math.random() * Math.PI * 0.65 - Math.PI * 0.2
+    const speed =
+      ENEMY_EXPLOSION_PARTICLE_SPEED_MIN +
+      Math.random() *
+        (ENEMY_EXPLOSION_PARTICLE_SPEED_MAX -
+          ENEMY_EXPLOSION_PARTICLE_SPEED_MIN)
+    const spread = 0.8 + Math.random() * 0.9
+
+    particleState.active = true
+    particleState.maxTtl = ENEMY_EXPLOSION_PARTICLE_LIFETIME_SECONDS
+    particleState.ttl = particleState.maxTtl
+    particleState.scale =
+      ENEMY_EXPLOSION_PARTICLE_BASE_SCALE * (0.7 + Math.random() * 0.8)
+    particleState.position.copy(origin)
+    particleState.velocity.set(
+      Math.cos(angle) * Math.cos(tilt) * speed * spread,
+      Math.sin(tilt) * speed + 2.2,
+      Math.sin(angle) * Math.cos(tilt) * speed * spread
+    )
+
+    spawnedCount += 1
+  }
 }
 
 export function createRandomPainkillerPosition(

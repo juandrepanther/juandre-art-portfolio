@@ -43,6 +43,7 @@ function EnemyUnit({ enemyStateRef, index }: IEnemyUnit) {
   const { scene } = useGLTF(enemyModelUrl)
   const [modelScene] = useState(() => scene.clone(true))
   const enemyRef = useRef<Group | null>(null)
+  const enemyModelRef = useRef<Group | null>(null)
 
   useEffect(() => {
     modelScene.traverse((object) => {
@@ -64,6 +65,7 @@ function EnemyUnit({ enemyStateRef, index }: IEnemyUnit) {
     enemyRef.current.visible = enemyState.active
     enemyRef.current.position.copy(enemyState.position)
     enemyRef.current.rotation.y = enemyState.rotationY
+
     enemyRef.current.position.y +=
       Math.sin(clock.elapsedTime * 3 + enemyState.animationOffset) * 0.06
   })
@@ -71,6 +73,7 @@ function EnemyUnit({ enemyStateRef, index }: IEnemyUnit) {
   return (
     <group ref={enemyRef}>
       <group
+        ref={enemyModelRef}
         position={enemyModelPosition}
         rotation={enemyModelRotation}
         scale={enemyModelScale}
