@@ -89,33 +89,21 @@ function CharacterChooser({
             sx={{
               flex: 1.2,
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'flex-start'
             }}
           >
             <Box sx={{ width: '100%' }}>
               <CharacterPreview characterConfig={selectedCharacterConfig} />
             </Box>
 
-            <Box
-              component="img"
-              alt="VN logo"
-              src={logoVnImage}
-              sx={{
-                width: { xs: 120, md: 168 },
-                maxWidth: '24%',
-                height: 'auto',
-                objectFit: 'contain',
-                filter: `drop-shadow(0 14px 30px ${alpha(theme.palette.common.black, 0.18)})`,
-                borderRadius: 2
-              }}
-            />
-          </Stack>
-
-          <Stack spacing={2.5} sx={{ flex: 0.95, minWidth: 0 }}>
             <Stack
               direction="row"
               spacing={1}
-              sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+              sx={{
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}
             >
               <IconButton
                 aria-label="Show previous character"
@@ -141,11 +129,15 @@ function CharacterChooser({
                 <ChevronRight />
               </IconButton>
             </Stack>
+          </Stack>
 
+          <Stack spacing={2.5} sx={{ flex: 0.95, minWidth: 0 }}>
             <Stack
               spacing={2}
               sx={{
+                position: 'relative',
                 p: 2,
+                pr: { xs: 2, md: 11 },
                 borderRadius: 2,
                 border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
                 ...createInteractiveSurfaceSx({
@@ -158,6 +150,24 @@ function CharacterChooser({
                 })(theme)
               }}
             >
+              <Box
+                component="img"
+                alt="VN logo"
+                src={logoVnImage}
+                sx={{
+                  position: { xs: 'static', md: 'absolute' },
+                  top: { md: 16 },
+                  right: { md: 16 },
+                  alignSelf: { xs: 'flex-start', md: 'auto' },
+                  width: { xs: 72, md: 84 },
+                  height: 'auto',
+                  objectFit: 'contain',
+                  filter: `drop-shadow(0 14px 30px ${alpha(theme.palette.common.black, 0.18)})`,
+                  borderRadius: 2,
+                  mb: { xs: 1.5, md: 0 }
+                }}
+              />
+
               <Box>
                 <Typography variant="h3">
                   {selectedCharacterConfig.label}

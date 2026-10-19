@@ -63,6 +63,66 @@ describe('GamePage', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it('locks the game pointer when fight starts', () => {
+    const requestPointerLockMock = vi.fn()
+    const gameCanvas = document.createElement('canvas')
+
+    Object.defineProperty(gameCanvas, 'requestPointerLock', {
+      configurable: true,
+      value: requestPointerLockMock
+    })
+    Object.defineProperty(document, 'exitPointerLock', {
+      configurable: true,
+      value: vi.fn()
+    })
+
+    const originalGetElementById = document.getElementById.bind(document)
+
+    vi.spyOn(document, 'getElementById').mockImplementation((id) => {
+      if (id === 'game-scene-canvas') {
+        return gameCanvas
+      }
+
+      return originalGetElementById(id)
+    })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    requestPointerLockMock.mockClear()
+
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+
+    expect(requestPointerLockMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('unlocks the game pointer when the round ends', () => {
+    const exitPointerLockMock = vi.fn()
+
+    Object.defineProperty(document, 'exitPointerLock', {
+      configurable: true,
+      value: exitPointerLockMock
+    })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    exitPointerLockMock.mockClear()
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
+
+    expect(exitPointerLockMock).toHaveBeenCalled()
   })
 
   it('renders the desktop game experience and controls', () => {
@@ -238,6 +298,9 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('LOST')).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: /back to portfolio/i })
+    ).toHaveAttribute('href', '/')
 
     const replayButton = screen.getByRole('button', { name: /replay/i })
 

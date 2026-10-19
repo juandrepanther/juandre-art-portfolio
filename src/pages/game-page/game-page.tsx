@@ -12,6 +12,7 @@ import { MusicNote } from '@mui/icons-material'
 import gameOverImage from 'assets/images/over.png'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import winImage from 'assets/images/win.png'
+import { Link as RouterLink } from 'react-router'
 import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
@@ -86,6 +87,36 @@ function GamePage() {
   const resultStatusLabel = gameStatus === 'won' ? 'WIN' : 'LOST'
   const resultStatusColor = gameStatus === 'won' ? '#6ec060' : '#ff5a4a'
 
+  const lockGamePointer = () => {
+    const gameCanvas = document.getElementById('game-scene-canvas')
+
+    if (!(gameCanvas instanceof HTMLCanvasElement)) {
+      return
+    }
+
+    if (document.pointerLockElement === gameCanvas) {
+      return
+    }
+
+    if (typeof gameCanvas.requestPointerLock === 'function') {
+      gameCanvas.requestPointerLock()
+    }
+  }
+
+  const unlockGamePointer = () => {
+    if (typeof document.exitPointerLock === 'function') {
+      document.exitPointerLock()
+    }
+  }
+
+  useEffect(() => {
+    if (gameStatus === 'countdown' || gameStatus === 'playing') {
+      return
+    }
+
+    unlockGamePointer()
+  }, [gameStatus])
+
   useEffect(() => {
     if (!isCountingDown) {
       return undefined
@@ -143,6 +174,7 @@ function GamePage() {
   }
 
   const handleStartGame = () => {
+    lockGamePointer()
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
     setRemainingTime(difficultyConfig.roundTime)
@@ -568,6 +600,16 @@ function GamePage() {
                 </Box>
               </Box>
               <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 2 }}>
+                {gameStatus === 'lost' ? (
+                  <Button
+                    color="primary"
+                    component={RouterLink}
+                    to="/"
+                    variant="outlined"
+                  >
+                    Back to Portfolio
+                  </Button>
+                ) : null}
                 <Button
                   color="secondary"
                   onClick={handleStartGame}
