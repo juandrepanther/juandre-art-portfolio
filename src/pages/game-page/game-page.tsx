@@ -453,6 +453,15 @@ function GamePage() {
                     >
                       STOP
                     </Button>
+                    {shouldShowCenterFightButton ? (
+                      <Button
+                        color="secondary"
+                        onClick={handleChooseDifferentCharacter}
+                        variant="contained"
+                      >
+                        CHOOSE
+                      </Button>
+                    ) : null}
                   </Stack>
                 </Stack>
 

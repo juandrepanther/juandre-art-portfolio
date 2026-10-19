@@ -155,6 +155,9 @@ describe('GamePage', () => {
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
     expect(
+      screen.getByRole('button', { name: /^choose$/i })
+    ).toBeInTheDocument()
+    expect(
       screen.queryByRole('button', { name: /^change$/i })
     ).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^stop$/i })).toBeInTheDocument()
@@ -224,6 +227,9 @@ describe('GamePage', () => {
       screen.queryByRole('button', { name: /^change$/i })
     ).not.toBeInTheDocument()
     expect(
+      screen.queryByRole('button', { name: /^choose$/i })
+    ).not.toBeInTheDocument()
+    expect(
       screen.queryByRole('button', { name: /^fight$/i })
     ).not.toBeInTheDocument()
     expect(
@@ -237,6 +243,9 @@ describe('GamePage', () => {
     expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /^change$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^choose$/i })
     ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /^fight$/i })
