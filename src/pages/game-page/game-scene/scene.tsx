@@ -16,6 +16,7 @@ function GameScene({
   difficulty,
   health,
   isActive,
+  isCameraOrbiting,
   onHealthChange,
   onEnemyHit,
   roundKey,
@@ -55,6 +56,7 @@ function GameScene({
               difficulty={difficulty}
               health={health}
               isActive={isActive}
+              isCameraOrbiting={isCameraOrbiting}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
               key={`${difficulty}-${characterConfig.id}-${roundKey}`}

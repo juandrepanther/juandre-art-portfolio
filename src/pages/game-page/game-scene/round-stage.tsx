@@ -44,7 +44,8 @@ import {
   createInitialPlayerPosition,
   resetCameraState,
   syncCameraState,
-  updateCameraFollowPosition
+  updateCameraFollowPosition,
+  updateCameraOrbitPosition
 } from './camera'
 import { AtmosphereParticles, StormLightning } from './lighting'
 import { GameSceneInstructions } from './overlay'
@@ -150,6 +151,7 @@ export default function RoundStage({
   difficulty,
   health,
   isActive,
+  isCameraOrbiting,
   onHealthChange,
   onEnemyHit,
   roundKey,
@@ -325,6 +327,20 @@ export default function RoundStage({
     }
   }, [characterConfig.weapon, isActive])
 
+  useEffect(() => {
+    if (!isCameraOrbiting) {
+      return undefined
+    }
+
+    if (document.pointerLockElement !== gl.domElement) {
+      return undefined
+    }
+
+    document.exitPointerLock()
+
+    return undefined
+  }, [gl, isCameraOrbiting])
+
   const handlePointerLock = () => {
     isPointerLockedRef.current = true
 
@@ -464,18 +480,34 @@ export default function RoundStage({
       )
     }
 
-    syncCameraState({
-      camera,
-      cameraForward: cameraForwardRef.current,
-      cameraLookDirection: cameraLookDirectionRef.current,
-      cameraRight: cameraRightRef.current
-    })
-    updateCameraFollowPosition(
-      camera.position,
-      playerPositionRef.current,
-      cameraForwardRef.current,
-      delta
-    )
+    if (isCameraOrbiting) {
+      updateCameraOrbitPosition({
+        camera,
+        cameraForward: cameraForwardRef.current,
+        cameraLookDirection: cameraLookDirectionRef.current,
+        cameraRight: cameraRightRef.current,
+        delta,
+        elapsedTime: clock.elapsedTime,
+        playerPosition: playerPositionRef.current
+      })
+    } else {
+      syncCameraState({
+        camera,
+        cameraForward: cameraForwardRef.current,
+        cameraLookDirection: cameraLookDirectionRef.current,
+        cameraRight: cameraRightRef.current
+      })
+      updateCameraFollowPosition(
+        camera.position,
+        playerPositionRef.current,
+        cameraForwardRef.current,
+        delta
+      )
+    }
+
+    if (!isActive) {
+      return
+    }
 
     if (!playerRef.current) {
       return
@@ -500,9 +532,9 @@ export default function RoundStage({
 
       playerBody.setLinvel(
         {
-          x: isActive ? playerVelocityRef.current.x : 0,
+          x: playerVelocityRef.current.x,
           y: currentVelocity.y,
-          z: isActive ? playerVelocityRef.current.z : 0
+          z: playerVelocityRef.current.z
         },
         true
       )
@@ -520,10 +552,6 @@ export default function RoundStage({
       playerDirectionRef.current.x,
       playerDirectionRef.current.z
     )
-
-    if (!isActive) {
-      return
-    }
 
     const now = clock.elapsedTime
     const playerHitboxCenter = playerPositionRef.current
@@ -785,6 +813,7 @@ export default function RoundStage({
 
       <PointerLockControls
         makeDefault
+        enabled={isActive}
         maxPolarAngle={POINTER_LOCK_MAX_POLAR_ANGLE}
         minPolarAngle={POINTER_LOCK_MIN_POLAR_ANGLE}
         onLock={handlePointerLock}

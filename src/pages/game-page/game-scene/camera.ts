@@ -5,6 +5,7 @@ import {
   PLAYER_CAMERA_AIM_PITCH,
   PLAYER_CAMERA_DISTANCE,
   PLAYER_CAMERA_HEIGHT,
+  PLAYER_CAMERA_ORBIT_SPEED,
   WORLD_UP
 } from '../settings'
 import { createLookDirection } from './helpers'
@@ -31,6 +32,20 @@ interface ISyncCameraState {
   cameraForward: Vector3
   cameraLookDirection: Vector3
   cameraRight: Vector3
+}
+
+interface IUpdateCameraOrbitPosition {
+  camera: {
+    getWorldDirection: (target: Vector3) => Vector3
+    lookAt: (target: Vector3) => void
+    position: Vector3
+  }
+  cameraForward: Vector3
+  cameraLookDirection: Vector3
+  cameraRight: Vector3
+  delta: number
+  elapsedTime: number
+  playerPosition: Vector3
 }
 
 export function createInitialPlayerPosition() {
@@ -93,4 +108,37 @@ export function updateCameraFollowPosition(
     .add(cameraForward.clone().multiplyScalar(-PLAYER_CAMERA_DISTANCE))
 
   cameraPosition.lerp(desiredCameraPosition, 1 - Math.exp(-delta * 10))
+}
+
+export function updateCameraOrbitPosition({
+  camera,
+  cameraForward,
+  cameraLookDirection,
+  cameraRight,
+  delta,
+  elapsedTime,
+  playerPosition
+}: IUpdateCameraOrbitPosition) {
+  const orbitTarget = playerPosition
+    .clone()
+    .add(new Vector3(0, PLAYER_CAMERA_HEIGHT, 0))
+  const orbitAngle = elapsedTime * PLAYER_CAMERA_ORBIT_SPEED
+  const desiredCameraPosition = orbitTarget
+    .clone()
+    .add(
+      new Vector3(
+        Math.sin(orbitAngle) * PLAYER_CAMERA_DISTANCE,
+        PLAYER_CAMERA_HEIGHT,
+        Math.cos(orbitAngle) * PLAYER_CAMERA_DISTANCE
+      )
+    )
+
+  camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-delta * 10))
+  camera.lookAt(orbitTarget)
+  syncCameraState({
+    camera,
+    cameraForward,
+    cameraLookDirection,
+    cameraRight
+  })
 }

@@ -7,6 +7,7 @@ import {
   Stack,
   Typography
 } from '@mui/material'
+import { keyframes } from '@mui/material/styles'
 import { MusicNote } from '@mui/icons-material'
 import gameOverImage from 'assets/images/over.png'
 import logoVnImage from 'assets/images/logo_vn.jpg'
@@ -35,6 +36,19 @@ import {
 const SPOTIFY_ARTIST_EMBED_URL =
   'https://open.spotify.com/embed/artist/3ygNOpBpgEmQsKBdcO68li?utm_source=generator&si=38260154709a4925'
 const characterOptions = Object.keys(CHARACTER_CONFIGS) as TCharacterId[]
+const fightButtonPulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.38);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+`
 
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
@@ -60,6 +74,8 @@ function GamePage() {
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
+  const isCameraOrbiting =
+    gameStatus === 'menu' || gameStatus === 'won' || gameStatus === 'lost'
   const isResultDialogOpen =
     hasChosenCharacter && (gameStatus === 'won' || gameStatus === 'lost')
   const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
@@ -245,6 +261,7 @@ function GamePage() {
               difficulty={difficulty}
               health={health}
               isActive={isPlaying}
+              isCameraOrbiting={isCameraOrbiting}
               onEnemyHit={() =>
                 setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
               }
@@ -388,6 +405,13 @@ function GamePage() {
                     <Button
                       color="error"
                       onClick={handleStartGame}
+                      sx={{
+                        animation:
+                          !isPlaying && !isCountingDown
+                            ? `${fightButtonPulse} 1.8s ease-in-out infinite`
+                            : 'none',
+                        transformOrigin: 'center'
+                      }}
                       variant="contained"
                     >
                       {isPlaying || isCountingDown ? 'Restart' : 'Fight'}

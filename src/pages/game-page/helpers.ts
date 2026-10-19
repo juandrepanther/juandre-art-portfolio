@@ -51,6 +51,7 @@ export interface IGameSceneProps {
   difficulty: TDifficultyLevel
   health: number
   isActive: boolean
+  isCameraOrbiting: boolean
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
   roundKey: number

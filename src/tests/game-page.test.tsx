@@ -19,10 +19,15 @@ vi.mock('@react-three/drei', () => ({
 }))
 
 vi.mock('pages/game-page/game-scene/scene', () => ({
-  default: function MockGameScene({ health, onHealthChange }: IGameSceneProps) {
+  default: function MockGameScene({
+    health,
+    isCameraOrbiting,
+    onHealthChange
+  }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
         <div>Scene health: {health}</div>
+        <div>Scene orbit: {String(isCameraOrbiting)}</div>
         <button onClick={() => onHealthChange(65)} type="button">
           Trigger damage
         </button>
@@ -68,6 +73,7 @@ describe('GamePage', () => {
     )
 
     expect(screen.getByTestId('game-scene')).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
     expect(screen.getByTestId('character-preview')).toHaveTextContent(/max/i)
     expect(
@@ -86,6 +92,7 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^hardcore$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
@@ -178,6 +185,7 @@ describe('GamePage', () => {
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
     expect(
       screen.getByText(/the run begins in two seconds/i)
     ).toBeInTheDocument()
@@ -228,6 +236,7 @@ describe('GamePage', () => {
     expect(
       screen.getByRole('img', { name: /game over result/i })
     ).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('LOST')).toBeInTheDocument()
 
     const replayButton = screen.getByRole('button', { name: /replay/i })
@@ -264,6 +273,7 @@ describe('GamePage', () => {
     expect(
       screen.getByRole('img', { name: /victory result/i })
     ).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('WIN')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /replay/i })).toBeInTheDocument()
   })
