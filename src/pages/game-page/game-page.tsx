@@ -75,6 +75,9 @@ function GamePage() {
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
+  const isRoundActive = isCountingDown || isPlaying
+  const shouldShowCenterFightButton =
+    hasChosenCharacter && gameStatus === 'menu'
   const isCameraOrbiting =
     gameStatus === 'menu' || gameStatus === 'won' || gameStatus === 'lost'
   const isResultDialogOpen =
@@ -443,32 +446,8 @@ function GamePage() {
 
                   <Stack direction="row" spacing={1.5}>
                     <Button
-                      color="error"
-                      disabled={isCountingDown}
-                      onClick={handleStartGame}
-                      sx={{
-                        animation:
-                          !isPlaying && !isCountingDown
-                            ? `${fightButtonPulse} 1.8s ease-in-out infinite`
-                            : 'none',
-                        transformOrigin: 'center'
-                      }}
-                      variant="contained"
-                    >
-                      {isPlaying || isCountingDown ? 'Restart' : 'Fight'}
-                    </Button>
-                    <Button
-                      color="success"
-                      onClick={handleChooseDifferentCharacter}
-                      variant="contained"
-                    >
-                      Change
-                    </Button>
-                    <Button
                       color="primary"
-                      disabled={
-                        !isPlaying && !isCountingDown && gameStatus === 'menu'
-                      }
+                      disabled={!isRoundActive && gameStatus === 'menu'}
                       onClick={handleReturnToMenu}
                       variant="outlined"
                     >
@@ -476,6 +455,33 @@ function GamePage() {
                     </Button>
                   </Stack>
                 </Stack>
+
+                {shouldShowCenterFightButton ? (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      zIndex: 3,
+                      pointerEvents: 'auto',
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    <Button
+                      color="error"
+                      onClick={handleStartGame}
+                      sx={{
+                        animation: `${fightButtonPulse} 1.8s ease-in-out infinite`,
+                        px: 4,
+                        py: 1.5,
+                        transformOrigin: 'center'
+                      }}
+                      variant="contained"
+                    >
+                      Fight
+                    </Button>
+                  </Box>
+                ) : null}
 
                 <Box
                   sx={{
@@ -551,6 +557,7 @@ function GamePage() {
               fullWidth
               maxWidth="xs"
               open={isResultDialogOpen}
+              sx={{ zIndex: (theme) => theme.zIndex.tooltip + 1 }}
               slotProps={{
                 paper: {
                   sx: {
@@ -615,10 +622,18 @@ function GamePage() {
                   to="/"
                   variant="outlined"
                 >
-                  Back to Portfolio
+                  Portfolio
                 </Button>
                 <Button
-                  color="secondary"
+                  color="success"
+                  onClick={handleChooseDifferentCharacter}
+                  variant="contained"
+                >
+                  Change
+                </Button>
+
+                <Button
+                  color="error"
                   onClick={handleStartGame}
                   variant="contained"
                 >

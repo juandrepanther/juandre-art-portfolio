@@ -154,7 +154,10 @@ describe('GamePage', () => {
     expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^change$/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^stop$/i })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
     expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
     expect(screen.getByRole('status')).toHaveTextContent(/loading enemy\.glb/i)
@@ -193,7 +196,9 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
   })
 
-  it('reopens the chooser when the player wants a different character', () => {
+  it('hides the change action while the round is active', () => {
+    vi.useFakeTimers()
+
     renderWithProviders(
       <MemoryRouter>
         <GamePage />
@@ -201,12 +206,59 @@ describe('GamePage', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
-    expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
+    expect(screen.getByText('PREPARE')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^change$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^restart$/i })
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /change/i }))
+    act(() => {
+      vi.advanceTimersByTime(2000)
+    })
 
-    expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^change$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^restart$/i })
+    ).not.toBeInTheDocument()
+  })
+
+  it('reopens the chooser from the result dialog change action', async () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
+
+    const changeButton = screen.getByRole('button', { name: /^change$/i })
+
+    expect(changeButton).toBeInTheDocument()
+
+    fireEvent.click(changeButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
+    })
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('img', { name: /game over result/i })
+      ).not.toBeInTheDocument()
+    })
     expect(
       screen.queryByRole('button', { name: /^fight$/i })
     ).not.toBeInTheDocument()
@@ -264,12 +316,16 @@ describe('GamePage', () => {
     })
 
     expect(screen.queryByText('PREPARE')).not.toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^restart$/i })
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^restart$/i })
+    ).not.toBeInTheDocument()
   })
 
-  it('does not restart the countdown from the hud restart control', () => {
+  it('does not show a centered action button during countdown', () => {
     vi.useFakeTimers()
 
     renderWithProviders(
@@ -281,13 +337,14 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
-    const restartButton = screen.getByRole('button', { name: /^restart$/i })
-
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
-    expect(restartButton).toBeDisabled()
-
-    fireEvent.click(restartButton)
+    expect(
+      screen.queryByRole('button', { name: /^fight$/i })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /^restart$/i })
+    ).not.toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(1000)
@@ -326,13 +383,16 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('LOST')).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: /back to portfolio/i })
-    ).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: /portfolio/i })).toHaveAttribute(
+      'href',
+      '/'
+    )
 
     const replayButton = screen.getByRole('button', { name: /replay/i })
+    const changeButton = screen.getByRole('button', { name: /^change$/i })
 
     expect(replayButton).toBeInTheDocument()
+    expect(changeButton).toBeInTheDocument()
 
     fireEvent.click(replayButton)
 
@@ -366,6 +426,9 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('WIN')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^change$/i })
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /replay/i })).toBeInTheDocument()
   })
 })

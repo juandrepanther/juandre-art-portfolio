@@ -17,7 +17,7 @@ function PlayerHealthMeter({ health }: IPlayerHealthMeter) {
       lockZ={false}
       position={[1.3, PLAYER_HEALTH_METER_OFFSET, 0]}
     >
-      <Html center style={{ pointerEvents: 'none' }}>
+      <Html center style={{ pointerEvents: 'none' }} zIndexRange={[100, 0]}>
         <div
           aria-label={`Health ${clampedHealth}%`}
           aria-valuemax={MAX_HEALTH}
