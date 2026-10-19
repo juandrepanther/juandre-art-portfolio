@@ -193,6 +193,7 @@ export const POINTER_MIN_PITCH = -Math.PI / 4.2
 export const POINTER_LOCK_SELECTOR = '#game-scene-canvas'
 export const PLAYER_CAMERA_DISTANCE = 6.5
 export const PLAYER_CAMERA_HEIGHT = 2
+export const PLAYER_HEALTH_METER_OFFSET = 0.4
 export const PLAYER_COLLIDER_HALF_HEIGHT = 1.08
 export const PLAYER_HITBOX_OFFSET = new Vector3(0, 1.2, 0)
 export const PLAYER_COLLISION_RADIUS = 0.58

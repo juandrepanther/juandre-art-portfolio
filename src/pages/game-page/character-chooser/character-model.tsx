@@ -1,12 +1,13 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import type { RefObject } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { Color, Material, Mesh, MeshStandardMaterial } from 'three'
 import type { Group } from 'three'
 import { CHARACTER_CONFIGS, type ICharacterConfig } from '../settings'
 
 interface ICharacterModel {
   characterConfig: ICharacterConfig
+  children?: ReactNode
   groundOffset: number
   groupRef?: RefObject<Group | null>
   isHitFlashing?: boolean
@@ -20,6 +21,7 @@ for (const { modelUrl } of Object.values(CHARACTER_CONFIGS)) {
 
 function CharacterModel({
   characterConfig,
+  children,
   groundOffset,
   groupRef,
   isHitFlashing = false
@@ -99,6 +101,7 @@ function CharacterModel({
       >
         <primitive object={modelScene} />
       </group>
+      {children}
     </group>
   )
 }

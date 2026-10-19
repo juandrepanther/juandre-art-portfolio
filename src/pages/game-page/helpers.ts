@@ -49,10 +49,12 @@ export interface IGameSceneProps {
   characterConfig: ICharacterConfig
   difficultyConfig: IDifficultyConfig
   difficulty: TDifficultyLevel
+  health: number
   isActive: boolean
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
   roundKey: number
+  showHealthMeter: boolean
 }
 
 export function clampHealth(health: number) {

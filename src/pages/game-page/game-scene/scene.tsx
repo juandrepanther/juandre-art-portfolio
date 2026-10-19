@@ -14,10 +14,12 @@ function GameScene({
   characterConfig,
   difficultyConfig,
   difficulty,
+  health,
   isActive,
   onHealthChange,
   onEnemyHit,
-  roundKey
+  roundKey,
+  showHealthMeter
 }: IGameSceneProps) {
   const sunRef = useRef<Mesh | null>(null)
 
@@ -51,11 +53,13 @@ function GameScene({
               characterConfig={characterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}
+              health={health}
               isActive={isActive}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
               key={`${difficulty}-${characterConfig.id}-${roundKey}`}
               roundKey={roundKey}
+              showHealthMeter={showHealthMeter}
             />
           </Physics>
           <EffectComposer enabled={true}>

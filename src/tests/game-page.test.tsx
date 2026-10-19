@@ -19,9 +19,13 @@ vi.mock('@react-three/drei', () => ({
 }))
 
 vi.mock('pages/game-page/game-scene/scene', () => ({
-  default: function MockGameScene({ onHealthChange }: IGameSceneProps) {
+  default: function MockGameScene({ health, onHealthChange }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
+        <div>Scene health: {health}</div>
+        <button onClick={() => onHealthChange(65)} type="button">
+          Trigger damage
+        </button>
         <button onClick={() => onHealthChange(0)} type="button">
           Trigger loss
         </button>
@@ -85,6 +89,7 @@ describe('GamePage', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
     expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
     expect(screen.getByRole('status')).toHaveTextContent(/loading enemy\.glb/i)
+    expect(screen.getByText(/scene health: 100/i)).toBeInTheDocument()
     expect(screen.getByText('00:15')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
@@ -188,6 +193,20 @@ describe('GamePage', () => {
 
     expect(screen.queryByText('PREPARE')).not.toBeInTheDocument()
     expect(screen.getByText(/survive the axe storm/i)).toBeInTheDocument()
+  })
+
+  it('passes updated health back into the scene contract', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText(/scene health: 100/i)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /trigger damage/i }))
+
+    expect(screen.getByText(/scene health: 65/i)).toBeInTheDocument()
   })
 
   it('shows a game over modal with replay when health reaches zero', async () => {

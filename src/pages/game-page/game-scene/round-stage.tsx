@@ -15,6 +15,7 @@ import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { DirectionalLight, Group, SpotLight } from 'three'
 import { MeshBasicMaterial, Vector3 } from 'three'
 import CharacterModel from '../character-chooser/character-model'
+import PlayerHealthMeter from './player-health-meter'
 import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
 import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
@@ -147,10 +148,12 @@ export default function RoundStage({
   characterConfig,
   difficultyConfig,
   difficulty,
+  health,
   isActive,
   onHealthChange,
   onEnemyHit,
-  roundKey
+  roundKey,
+  showHealthMeter
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
   const [subscribeToKeyboard, getKeyboardState] =
@@ -772,7 +775,9 @@ export default function RoundStage({
             groundOffset={PLAYER_BODY_GROUND_OFFSET}
             groupRef={playerRef}
             isHitFlashing={isPlayerHitFlashing}
-          />
+          >
+            {showHealthMeter ? <PlayerHealthMeter health={health} /> : null}
+          </CharacterModel>
         </Suspense>
       </RigidBody>
 

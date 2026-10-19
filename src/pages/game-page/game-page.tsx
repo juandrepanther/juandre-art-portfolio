@@ -6,7 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  LinearProgress,
   Stack,
   Typography
 } from '@mui/material'
@@ -232,12 +231,14 @@ function GamePage() {
               characterConfig={selectedCharacterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}
+              health={health}
               isActive={isPlaying}
               onEnemyHit={() =>
                 setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
               }
               onHealthChange={handleHealthChange}
               roundKey={roundKey}
+              showHealthMeter={hasChosenCharacter}
             />
 
             <GameSceneLoaderOverlay />
@@ -322,28 +323,6 @@ function GamePage() {
                       variant="outlined"
                     />
                   </Stack>
-
-                  <Box>
-                    <Stack
-                      direction="row"
-                      sx={{ justifyContent: 'space-between', mb: 1 }}
-                    >
-                      <Typography variant="body2">Health</Typography>
-                      <Typography variant="body2">{health}%</Typography>
-                    </Stack>
-                    <LinearProgress
-                      color={health > 40 ? 'secondary' : 'primary'}
-                      value={health}
-                      variant="determinate"
-                      sx={{
-                        height: 12,
-                        borderRadius: '999px',
-                        backgroundColor: isDarkMode
-                          ? 'rgba(220, 229, 236, 0.14)'
-                          : 'rgba(20, 32, 44, 0.12)'
-                      }}
-                    />
-                  </Box>
 
                   <Stack
                     direction="row"
