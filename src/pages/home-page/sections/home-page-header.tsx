@@ -71,10 +71,10 @@ function HomePageHeader({
         </Box>
         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
           <Button
-            color="success"
+            color="secondary"
             component={RouterLink}
             to={actionHref}
-            variant="contained"
+            variant="outlined"
             sx={{
               borderColor: isDarkMode
                 ? 'rgba(84, 199, 184, 0.42)'
