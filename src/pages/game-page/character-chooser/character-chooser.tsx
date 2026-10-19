@@ -2,27 +2,36 @@ import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
-import type { ICharacterConfig, TCharacterId } from '../settings'
+import type {
+  ICharacterConfig,
+  TCharacterId,
+  TDifficultyLevel
+} from '../settings'
 import CharacterPreview from './character-preview'
 
 interface ICharacterChooser {
   availableCharacterIds: TCharacterId[]
   onCharacterChange: (characterId: TCharacterId) => void
+  onDifficultyChange: (difficulty: TDifficultyLevel) => void
   onChoose: () => void
   selectedCharacterConfig: ICharacterConfig
+  selectedDifficulty: TDifficultyLevel
 }
 
 function CharacterChooser({
   availableCharacterIds,
   onCharacterChange,
+  onDifficultyChange,
   onChoose,
-  selectedCharacterConfig
+  selectedCharacterConfig,
+  selectedDifficulty
 }: ICharacterChooser) {
   const theme = useTheme()
   const selectedIndex = availableCharacterIds.indexOf(
     selectedCharacterConfig.id
   )
   const totalCharacters = availableCharacterIds.length
+  const difficultyOptions: TDifficultyLevel[] = ['Noob', 'Balls', 'Hardcore']
 
   const moveSelection = (direction: -1 | 1) => {
     if (totalCharacters <= 1) {
@@ -45,6 +54,7 @@ function CharacterChooser({
         placeItems: 'center',
         px: { xs: 2, md: 4 },
         py: { xs: 3, md: 4 },
+        overflowY: 'auto',
         background: `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0.72)} 0%, ${alpha(theme.palette.background.paper, 0.84)} 100%)`,
         backdropFilter: 'blur(20px)'
       }}
@@ -53,8 +63,10 @@ function CharacterChooser({
         spacing={3}
         sx={{
           width: 'min(1120px, 100%)',
+          maxHeight: '100%',
+          overflowY: 'auto',
           p: { xs: 3, md: 4 },
-          borderRadius: 4,
+          borderRadius: 3,
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.88)} 0%, ${alpha(theme.palette.background.default, 0.78)} 100%)`,
           boxShadow: `0 28px 90px ${alpha(theme.palette.common.black, 0.34)}`
@@ -63,14 +75,6 @@ function CharacterChooser({
         <Stack spacing={1.25}>
           <Typography sx={{ color: 'secondary.main', letterSpacing: '0.18em' }}>
             CHARACTER SELECT
-          </Typography>
-          <Typography variant="h2">Choose who enters the grove.</Typography>
-          <Typography
-            sx={{ color: 'text.secondary', maxWidth: '62ch', lineHeight: 1.8 }}
-          >
-            Start the run by locking in a fighter first. Use the carousel to
-            browse available characters, orbit the preview, then choose your
-            loadout and continue into the existing survival flow.
           </Typography>
         </Stack>
 
@@ -117,8 +121,8 @@ function CharacterChooser({
             <Stack
               spacing={2}
               sx={{
-                p: 3,
-                borderRadius: 3,
+                p: 2,
+                borderRadius: 2,
                 border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
                 ...createInteractiveSurfaceSx({
                   backgroundOpacity: 0.04,
@@ -143,6 +147,78 @@ function CharacterChooser({
 
               <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                 <Chip color="primary" label="Brutal kill" variant="outlined" />
+              </Stack>
+            </Stack>
+
+            <Stack
+              spacing={2}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                ...createInteractiveSurfaceSx({
+                  backgroundOpacity: 0.04,
+                  hoverBackgroundOpacity: 0.06,
+                  borderOpacity: 0.14,
+                  hoverBorderOpacity: 0.2,
+                  shadowOpacity: 0.12,
+                  hoverShadowOpacity: 0.18
+                })(theme)
+              }}
+            >
+              <Box>
+                <Typography
+                  sx={{ color: 'text.secondary', mt: 1.25, lineHeight: 1.8 }}
+                >
+                  Pick a difficulty
+                </Typography>
+              </Box>
+
+              <Stack spacing={1.5}>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                  {difficultyOptions.map((difficultyOption) => (
+                    <Button
+                      color="secondary"
+                      key={difficultyOption}
+                      onClick={() => onDifficultyChange(difficultyOption)}
+                      variant={
+                        difficultyOption === selectedDifficulty
+                          ? 'contained'
+                          : 'outlined'
+                      }
+                    >
+                      {difficultyOption}
+                    </Button>
+                  ))}
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+                >
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                    Move:
+                  </Typography>
+                  <Chip color="warning" label="WASD" size="small" />
+                  <Chip color="warning" label="Arrow keys" size="small" />
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                    Jump:
+                  </Typography>
+                  <Chip color="warning" label="Space" size="small" />
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+                >
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                    Pointer:
+                  </Typography>
+                  <Chip color="warning" label="Esc" size="small" />
+                  <Chip color="warning" label="Click the scene" size="small" />
+                </Stack>
               </Stack>
             </Stack>
 

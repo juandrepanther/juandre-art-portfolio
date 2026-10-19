@@ -73,24 +73,29 @@ describe('GamePage', () => {
     expect(
       screen.getByRole('link', { name: /back to portfolio/i })
     ).toHaveAttribute('href', '/')
-    expect(screen.getByText(/choose who enters the grove/i)).toBeInTheDocument()
+    expect(screen.getByText(/pick a difficulty/i)).toBeInTheDocument()
+    expect(screen.getByText(/character select/i)).toBeInTheDocument()
+    expect(screen.getByText(/click the scene/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^noob$/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^hardcore$/i })
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /^fight$/i })
     ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^hardcore$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     expect(
-      screen.getByText(/hold the grove for 15 seconds/i)
+      screen.getByText(/hold the grove for 60 seconds/i)
     ).toBeInTheDocument()
+    expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /choose fighter/i })
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /noob/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/loading game/i)
     expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
     expect(screen.getByRole('status')).toHaveTextContent(/loading enemy\.glb/i)
     expect(screen.getByText(/scene health: 100/i)).toBeInTheDocument()
-    expect(screen.getByText('00:15')).toBeInTheDocument()
+    expect(screen.getByText('01:00')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
     expect(
@@ -133,11 +138,9 @@ describe('GamePage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
 
-    expect(
-      screen.getByRole('button', { name: /choose fighter/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /choose fighter/i }))
+    fireEvent.click(screen.getByRole('button', { name: /change/i }))
 
     expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
     expect(
@@ -178,21 +181,27 @@ describe('GamePage', () => {
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText(/run starts in 2/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/the run begins in two seconds/i)
+    ).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(1000)
     })
 
     expect(screen.getByText('1')).toBeInTheDocument()
-    expect(screen.getByText(/run starts in 1/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/the run begins in two seconds/i)
+    ).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(1000)
     })
 
     expect(screen.queryByText('PREPARE')).not.toBeInTheDocument()
-    expect(screen.getByText(/survive the axe storm/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^restart$/i })
+    ).toBeInTheDocument()
   })
 
   it('passes updated health back into the scene contract', () => {

@@ -64,7 +64,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     id: 'viking-raider',
     label: 'Max',
     description:
-      'A brutal axe-runner built for the grove. Heavy stance, clean silhouette, and the current default combat rig.',
+      'A brutal sword-runner built for the grove. Heavy stance, clean silhouette, and the current default combat rig.',
     modelUrl: lowPolyVikingModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],

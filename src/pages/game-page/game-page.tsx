@@ -26,7 +26,6 @@ import {
   START_RUN_COUNTDOWN_SECONDS,
   clampHealth,
   formatTimeLabel,
-  getGameStatusLabel,
   type TCharacterId,
   type TGameStatus,
   type TDifficultyLevel
@@ -126,6 +125,11 @@ function GamePage() {
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
     setGameStatus('countdown')
+  }
+
+  const handleDifficultyChange = (nextDifficulty: TDifficultyLevel) => {
+    setDifficulty(nextDifficulty)
+    setRemainingTime(DIFFICULTY_CONFIGS[nextDifficulty].roundTime)
   }
 
   const handleReturnToMenu = () => {
@@ -247,8 +251,10 @@ function GamePage() {
               <CharacterChooser
                 availableCharacterIds={characterOptions}
                 onCharacterChange={setSelectedCharacter}
+                onDifficultyChange={handleDifficultyChange}
                 onChoose={handleChooseCharacter}
                 selectedCharacterConfig={selectedCharacterConfig}
+                selectedDifficulty={difficulty}
               />
             ) : null}
 
@@ -318,10 +324,6 @@ function GamePage() {
                       color="primary"
                       label={selectedCharacterConfig.label}
                     />
-                    <Chip
-                      label={getGameStatusLabel(gameStatus, countdownSeconds)}
-                      variant="outlined"
-                    />
                   </Stack>
 
                   <Stack
@@ -354,31 +356,6 @@ function GamePage() {
                     <Typography variant="h5">{enemyHits}</Typography>
                   </Stack>
 
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                    {(
-                      Object.keys(DIFFICULTY_CONFIGS) as TDifficultyLevel[]
-                    ).map((difficultyOption) => (
-                      <Button
-                        key={difficultyOption}
-                        color="secondary"
-                        disabled={isPlaying || isCountingDown}
-                        onClick={() => {
-                          setDifficulty(difficultyOption)
-                          setRemainingTime(
-                            DIFFICULTY_CONFIGS[difficultyOption].roundTime
-                          )
-                        }}
-                        variant={
-                          difficultyOption === difficulty
-                            ? 'contained'
-                            : 'outlined'
-                        }
-                      >
-                        {difficultyOption}
-                      </Button>
-                    ))}
-                  </Stack>
-
                   <Stack direction="row" spacing={1.5}>
                     <Button
                       color="error"
@@ -392,7 +369,7 @@ function GamePage() {
                       onClick={handleChooseDifferentCharacter}
                       variant="contained"
                     >
-                      Choose Fighter
+                      Change
                     </Button>
                     <Button
                       color="primary"
