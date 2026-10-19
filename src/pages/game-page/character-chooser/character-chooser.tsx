@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
+import logoVnImage from 'assets/images/logo_vn.jpg'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
 import type {
   ICharacterConfig,
@@ -83,9 +84,32 @@ function CharacterChooser({
           spacing={3}
           sx={{ alignItems: 'stretch' }}
         >
-          <Box sx={{ flex: 1.2 }}>
-            <CharacterPreview characterConfig={selectedCharacterConfig} />
-          </Box>
+          <Stack
+            spacing={2.5}
+            sx={{
+              flex: 1.2,
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ width: '100%' }}>
+              <CharacterPreview characterConfig={selectedCharacterConfig} />
+            </Box>
+
+            <Box
+              component="img"
+              alt="VN logo"
+              src={logoVnImage}
+              sx={{
+                width: { xs: 120, md: 168 },
+                maxWidth: '24%',
+                height: 'auto',
+                objectFit: 'contain',
+                filter: `drop-shadow(0 14px 30px ${alpha(theme.palette.common.black, 0.18)})`,
+                borderRadius: 2
+              }}
+            />
+          </Stack>
 
           <Stack spacing={2.5} sx={{ flex: 0.95, minWidth: 0 }}>
             <Stack

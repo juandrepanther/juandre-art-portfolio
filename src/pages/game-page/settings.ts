@@ -64,7 +64,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     id: 'viking-raider',
     label: 'Max',
     description:
-      'A brutal sword-runner built for the grove. Heavy stance, clean silhouette, and the current default combat rig.',
+      'A brutal sword-runner has ability to chop down enemies with his mighty sword.',
     modelUrl: lowPolyVikingModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],
@@ -74,8 +74,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
   lena: {
     id: 'lena',
     label: 'Lena',
-    description:
-      'A nimble grove fighter with a lighter stance and a fresh look for the arena. More characters can follow the same shared config pattern.',
+    description: 'Her accordion will smash your enemies into pieces. ',
     modelUrl: lenaModelUrl,
     modelScale: 1,
     modelOffset: [0.25, -0.08, -0.1065],

@@ -9,6 +9,7 @@ import {
 } from '@mui/material'
 import { MusicNote } from '@mui/icons-material'
 import gameOverImage from 'assets/images/over.png'
+import logoVnImage from 'assets/images/logo_vn.jpg'
 import winImage from 'assets/images/win.png'
 import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
@@ -335,7 +336,11 @@ function GamePage() {
 
                   <Stack
                     direction="row"
-                    sx={{ justifyContent: 'space-between' }}
+                    sx={{
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: 2
+                    }}
                   >
                     <Box>
                       <Typography
@@ -348,6 +353,22 @@ function GamePage() {
                         {formatTimeLabel(remainingTime)}
                       </Typography>
                     </Box>
+
+                    <Box
+                      component="img"
+                      alt="VN logo"
+                      src={logoVnImage}
+                      sx={{
+                        width: { xs: 84, sm: 112 },
+                        height: { xs: 84, sm: 112 },
+                        objectFit: 'contain',
+                        borderRadius: 3,
+                        alignSelf: 'center',
+                        filter: isDarkMode
+                          ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.28))'
+                          : 'drop-shadow(0 10px 20px rgba(16, 24, 40, 0.14))'
+                      }}
+                    />
                   </Stack>
 
                   <Stack
