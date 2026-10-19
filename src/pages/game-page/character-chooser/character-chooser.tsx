@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material'
-import { alpha, useTheme } from '@mui/material/styles'
+import { alpha, keyframes, useTheme } from '@mui/material/styles'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
 import type {
@@ -18,6 +18,20 @@ interface ICharacterChooser {
   selectedCharacterConfig: ICharacterConfig
   selectedDifficulty: TDifficultyLevel
 }
+
+const difficultyLabelPulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+`
 
 function CharacterChooser({
   availableCharacterIds,
@@ -206,7 +220,9 @@ function CharacterChooser({
                     color: 'text.secondary',
                     mt: 1.25,
                     lineHeight: 1.8,
-                    fontWeight: 800
+                    fontWeight: 800,
+                    display: 'inline-block',
+                    animation: `${difficultyLabelPulse} 1.8s ease-in-out infinite`
                   }}
                 >
                   Pick a difficulty
