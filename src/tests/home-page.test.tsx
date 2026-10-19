@@ -48,7 +48,7 @@ describe('HomePage', () => {
       expect.stringContaining('Janis_Dregeris_CV')
     )
     expect(
-      screen.getByRole('link', { name: /play varang kill/i })
+      screen.getByRole('link', { name: /play varang kill \(alpha\)/i })
     ).toHaveAttribute('href', '/game')
   })
 
