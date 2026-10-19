@@ -600,16 +600,14 @@ function GamePage() {
                 </Box>
               </Box>
               <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 2 }}>
-                {gameStatus === 'lost' ? (
-                  <Button
-                    color="primary"
-                    component={RouterLink}
-                    to="/"
-                    variant="outlined"
-                  >
-                    Back to Portfolio
-                  </Button>
-                ) : null}
+                <Button
+                  color="primary"
+                  component={RouterLink}
+                  to="/"
+                  variant="outlined"
+                >
+                  Back to Portfolio
+                </Button>
                 <Button
                   color="secondary"
                   onClick={handleStartGame}
