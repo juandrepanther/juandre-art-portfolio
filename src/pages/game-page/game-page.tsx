@@ -173,7 +173,7 @@ function GamePage() {
     }
   }
 
-  const handleStartGame = () => {
+  const startRound = () => {
     lockGamePointer()
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
@@ -181,6 +181,14 @@ function GamePage() {
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
     setGameStatus('countdown')
+  }
+
+  const handleStartGame = () => {
+    if (isCountingDown) {
+      return
+    }
+
+    startRound()
   }
 
   const handleDifficultyChange = (nextDifficulty: TDifficultyLevel) => {
@@ -436,6 +444,7 @@ function GamePage() {
                   <Stack direction="row" spacing={1.5}>
                     <Button
                       color="error"
+                      disabled={isCountingDown}
                       onClick={handleStartGame}
                       sx={{
                         animation:
@@ -512,7 +521,7 @@ function GamePage() {
                   py: 3.5,
                   textAlign: 'center',
                   transform: 'translate(-50%, -50%)',
-                  borderRadius: 5,
+                  borderRadius: 3,
                   backdropFilter: 'blur(18px)',
                   backgroundColor: isDarkMode
                     ? 'rgba(12, 17, 23, 0.72)'

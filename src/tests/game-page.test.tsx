@@ -269,6 +269,34 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
   })
 
+  it('does not restart the countdown from the hud restart control', () => {
+    vi.useFakeTimers()
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+
+    const restartButton = screen.getByRole('button', { name: /^restart$/i })
+
+    expect(screen.getByText('PREPARE')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(restartButton).toBeDisabled()
+
+    fireEvent.click(restartButton)
+
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.queryByText('2')).not.toBeInTheDocument()
+  })
+
   it('passes updated health back into the scene contract', () => {
     renderWithProviders(
       <MemoryRouter>
