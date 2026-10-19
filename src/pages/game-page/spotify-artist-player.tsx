@@ -1,5 +1,6 @@
 import { Close } from '@mui/icons-material'
-import { Box, IconButton } from '@mui/material'
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material'
+import { useState } from 'react'
 
 interface ISpotifyArtistPlayer {
   artistEmbedUrl: string
@@ -14,6 +15,9 @@ function SpotifyArtistPlayer({
   isDarkMode,
   isVisible
 }: ISpotifyArtistPlayer) {
+  const [loadedEmbedUrl, setLoadedEmbedUrl] = useState<string | null>(null)
+  const isEmbedLoading = loadedEmbedUrl !== artistEmbedUrl
+
   return (
     <Box
       data-testid="spotify-artist-player"
@@ -64,11 +68,45 @@ function SpotifyArtistPlayer({
         </IconButton>
       ) : null}
 
+      {isVisible && isEmbedLoading ? (
+        <Box
+          data-testid="spotify-player-loader"
+          role="status"
+          aria-busy="true"
+          aria-live="polite"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            display: 'grid',
+            placeItems: 'center',
+            borderRadius: 2,
+            backgroundColor: isDarkMode
+              ? 'rgba(9, 14, 20, 0.48)'
+              : 'rgba(255, 255, 255, 0.54)',
+            backdropFilter: 'blur(6px)',
+            pointerEvents: 'none'
+          }}
+        >
+          <Box sx={{ display: 'grid', justifyItems: 'center', gap: 1 }}>
+            <CircularProgress
+              aria-label="Loading Spotify player"
+              color="success"
+              size={28}
+            />
+            <Typography sx={{ color: 'text.secondary', fontSize: 12 }}>
+              Loading Spotify...
+            </Typography>
+          </Box>
+        </Box>
+      ) : null}
+
       <Box
         component="iframe"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
         loading="lazy"
+        onLoad={() => setLoadedEmbedUrl(artistEmbedUrl)}
         src={artistEmbedUrl}
         title="Spotify artist player"
         sx={{

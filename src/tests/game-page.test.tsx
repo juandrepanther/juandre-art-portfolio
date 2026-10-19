@@ -172,10 +172,21 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^spotify$/i }))
 
     expect(screen.getByTestId('spotify-artist-player')).toBeInTheDocument()
+    expect(screen.getByTestId('spotify-player-loader')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /close spotify player/i })
     ).toBeInTheDocument()
-    expect(screen.getByTitle(/spotify artist player/i)).toHaveAttribute(
+
+    const spotifyIframe = screen.getByTitle(
+      /spotify artist player/i
+    ) as HTMLIFrameElement
+
+    fireEvent.load(spotifyIframe)
+
+    expect(
+      screen.queryByTestId('spotify-player-loader')
+    ).not.toBeInTheDocument()
+    expect(spotifyIframe).toHaveAttribute(
       'src',
       expect.stringContaining('/embed/artist/3ygNOpBpgEmQsKBdcO68li')
     )
