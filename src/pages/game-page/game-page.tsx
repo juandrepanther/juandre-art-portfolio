@@ -4,12 +4,12 @@ import {
   Chip,
   Dialog,
   DialogActions,
-  DialogContent,
-  DialogTitle,
   Stack,
   Typography
 } from '@mui/material'
 import { MusicNote } from '@mui/icons-material'
+import gameOverImage from 'assets/images/over.png'
+import winImage from 'assets/images/win.png'
 import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
 import { useThemeStore } from 'lib/zustand/theme-store'
@@ -59,8 +59,15 @@ function GamePage() {
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
+  const isResultDialogOpen =
+    hasChosenCharacter && (gameStatus === 'won' || gameStatus === 'lost')
   const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
+  const resultImageAlt =
+    gameStatus === 'won' ? 'Victory result' : 'Game over result'
+  const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
+  const resultStatusLabel = gameStatus === 'won' ? 'WIN' : 'LOST'
+  const resultStatusColor = gameStatus === 'won' ? '#6ec060' : '#ff5a4a'
 
   useEffect(() => {
     if (!isCountingDown) {
@@ -454,55 +461,15 @@ function GamePage() {
               </Stack>
             ) : null}
 
-            {hasChosenCharacter &&
-            gameStatus !== 'playing' &&
-            gameStatus !== 'lost' &&
-            !isCountingDown ? (
-              <Stack
-                spacing={2.5}
-                sx={{
-                  position: 'absolute',
-                  right: 24,
-                  bottom: 24,
-                  width: 420,
-                  maxWidth: 'calc(100% - 48px)',
-                  p: 5,
-                  borderRadius: 3,
-                  backdropFilter: 'blur(18px)',
-                  backgroundColor: isDarkMode
-                    ? 'rgba(12, 17, 23, 0.58)'
-                    : 'rgba(255, 255, 255, 0.72)',
-                  border: isDarkMode
-                    ? '1px solid rgba(220, 229, 236, 0.12)'
-                    : '1px solid rgba(20, 32, 44, 0.12)'
-                }}
-              >
-                <Typography
-                  sx={{ color: 'secondary.main', letterSpacing: '0.14em' }}
-                >
-                  VALHALLA AWAITS
-                </Typography>
-                <Typography variant="h4" sx={{ maxWidth: '12ch' }}>
-                  {gameStatus === 'won'
-                    ? 'You lasted the full round.'
-                    : `Hold the grove for ${difficultyConfig.roundTime} seconds.`}
-                </Typography>
-                <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                  Beer and mead await the victorious. Survive the onslaught of
-                  raiders and prove your mettle in the arena.
-                </Typography>
-              </Stack>
-            ) : null}
-
             <Dialog
               fullWidth
               maxWidth="xs"
-              open={hasChosenCharacter && gameStatus === 'lost'}
+              open={isResultDialogOpen}
               slotProps={{
                 paper: {
                   sx: {
                     borderRadius: 2,
-                    p: 1,
+                    p: 1.5,
                     background: isDarkMode
                       ? 'linear-gradient(180deg, rgba(23, 33, 43, 0.98) 0%, rgba(12, 17, 23, 0.98) 100%)'
                       : 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(243, 245, 248, 0.98) 100%)',
@@ -516,20 +483,46 @@ function GamePage() {
                 }
               }}
             >
-              <DialogTitle sx={{ px: 4, pt: 4, pb: 1.5 }}>
-                GAME OVER
-              </DialogTitle>
-              <DialogContent sx={{ px: 4, pb: 1.5 }}>
-                <Stack spacing={1.5}>
-                  <Typography sx={{ color: 'text.secondary' }}>
-                    The raiders drained your health to 0%.
+              <Box sx={{ px: 2.5, pt: 2.5 }}>
+                <Box
+                  sx={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: 1.5
+                  }}
+                >
+                  <Box
+                    alt={resultImageAlt}
+                    component="img"
+                    src={resultImageSource}
+                    sx={{
+                      display: 'block',
+                      width: '100%',
+                      height: 'auto'
+                    }}
+                  />
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      color: resultStatusColor,
+                      fontWeight: 800,
+                      letterSpacing: '0.18em',
+                      textShadow: '0 10px 24px rgba(0, 0, 0, 0.55)',
+                      textAlign: 'center',
+                      backgroundColor: 'white',
+                      borderRadius: 1,
+                      p: 1
+                    }}
+                  >
+                    {resultStatusLabel}
                   </Typography>
-                  <Typography variant="body2">
-                    Enemies defeated: {enemyHits}
-                  </Typography>
-                </Stack>
-              </DialogContent>
-              <DialogActions sx={{ px: 4, pb: 4, pt: 1 }}>
+                </Box>
+              </Box>
+              <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 2 }}>
                 <Button
                   color="secondary"
                   onClick={handleStartGame}

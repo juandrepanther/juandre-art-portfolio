@@ -85,9 +85,6 @@ describe('GamePage', () => {
     ).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /^hardcore$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
-    expect(
-      screen.getByText(/hold the grove for 60 seconds/i)
-    ).toBeInTheDocument()
     expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument()
@@ -218,7 +215,7 @@ describe('GamePage', () => {
     expect(screen.getByText(/scene health: 65/i)).toBeInTheDocument()
   })
 
-  it('shows a game over modal with replay when health reaches zero', async () => {
+  it('shows a game over image popup with replay when health reaches zero', async () => {
     renderWithProviders(
       <MemoryRouter>
         <GamePage />
@@ -228,8 +225,10 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
-    expect(screen.getByText('GAME OVER')).toBeInTheDocument()
-    expect(screen.getByText(/health to 0%/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('img', { name: /game over result/i })
+    ).toBeInTheDocument()
+    expect(screen.getByText('LOST')).toBeInTheDocument()
 
     const replayButton = screen.getByRole('button', { name: /replay/i })
 
@@ -238,7 +237,34 @@ describe('GamePage', () => {
     fireEvent.click(replayButton)
 
     await waitFor(() => {
-      expect(screen.queryByText('GAME OVER')).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('img', { name: /game over result/i })
+      ).not.toBeInTheDocument()
     })
+  })
+
+  it('shows a victory image popup with replay when the round ends', async () => {
+    vi.useFakeTimers()
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+
+    for (let second = 0; second < 18; second += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000)
+      })
+    }
+
+    expect(
+      screen.getByRole('img', { name: /victory result/i })
+    ).toBeInTheDocument()
+    expect(screen.getByText('WIN')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /replay/i })).toBeInTheDocument()
   })
 })
