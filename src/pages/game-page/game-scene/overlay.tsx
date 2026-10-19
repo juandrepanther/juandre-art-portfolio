@@ -28,11 +28,11 @@ export function GameSceneInstructions() {
       lockZ={false}
       position={[0, 6.8, -2]}
     >
-      <Html center zIndexRange={[100, 0]}>
+      <Html center zIndexRange={[0, 0]}>
         <div
           style={{
             border: '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '999px',
+            borderRadius: '555px',
             color: '#234038',
             fontFamily: 'Montserrat, sans-serif',
             fontSize: '14px',
