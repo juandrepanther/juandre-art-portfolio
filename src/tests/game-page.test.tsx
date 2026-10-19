@@ -227,7 +227,7 @@ describe('GamePage', () => {
       screen.queryByTestId('spotify-artist-player')
     ).not.toBeInTheDocument()
     expect(
-      screen.getByText(/viking run is tuned for desktop controls only/i)
+      screen.getByText(/varang kill is tuned for desktop controls only/i)
     ).toBeInTheDocument()
   })
 

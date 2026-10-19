@@ -242,7 +242,7 @@ function GamePage() {
               mt: 8,
               px: { xs: 4, md: 6 },
               py: { xs: 5, md: 6 },
-              borderRadius: 3,
+              borderRadius: 1,
               border: isDarkMode
                 ? '1px solid rgba(220, 229, 236, 0.12)'
                 : '1px solid rgba(20, 32, 44, 0.12)',
@@ -260,7 +260,7 @@ function GamePage() {
               DESKTOP EXPERIENCE
             </Typography>
             <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
-              Viking Run is tuned for desktop controls only.
+              Varang Kill is tuned for desktop controls only.
             </Typography>
             <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
               Open this route on a desktop-sized viewport to play the
