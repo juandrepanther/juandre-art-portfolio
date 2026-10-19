@@ -441,7 +441,11 @@ function GamePage() {
                     >
                       Enemies defeated
                     </Typography>
-                    <Typography variant="h5">{enemyHits}</Typography>
+                    <Chip
+                      color="warning"
+                      label={enemyHits}
+                      variant="outlined"
+                    />
                   </Stack>
 
                   <Stack direction="row" spacing={1.5}>
