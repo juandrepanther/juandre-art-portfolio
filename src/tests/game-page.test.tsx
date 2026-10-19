@@ -264,6 +264,44 @@ describe('GamePage', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('keeps spotify mounted when switching character from the result dialog', async () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^spotify$/i }))
+
+    const spotifyIframeBefore = screen.getByTitle(
+      /spotify artist player/i
+    ) as HTMLIFrameElement
+
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^change$/i }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('character-chooser')).toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('img', { name: /game over result/i })
+      ).not.toBeInTheDocument()
+    })
+
+    const spotifyIframeAfter = screen.getByTitle(
+      /spotify artist player/i
+    ) as HTMLIFrameElement
+
+    expect(spotifyIframeAfter).toBe(spotifyIframeBefore)
+    expect(screen.getByTestId('spotify-artist-player')).toHaveAttribute(
+      'aria-hidden',
+      'false'
+    )
+  })
+
   it('shows the desktop-only fallback on small viewports', () => {
     mockedUseWindowSize.mockReturnValue({ height: 768, width: 900 })
 

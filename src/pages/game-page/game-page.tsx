@@ -482,37 +482,37 @@ function GamePage() {
                     </Button>
                   </Box>
                 ) : null}
-
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: 24,
-                    bottom: 24,
-                    zIndex: 2,
-                    pointerEvents: 'auto'
-                  }}
-                >
-                  {hasSpotifyPlayerOpened ? (
-                    <SpotifyArtistPlayer
-                      artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
-                      isDarkMode={isDarkMode}
-                      isVisible={isSpotifyPlayerOpen}
-                      onClose={handleCloseSpotifyPlayer}
-                    />
-                  ) : null}
-                  {!isSpotifyPlayerOpen ? (
-                    <Button
-                      color="secondary"
-                      onClick={handleOpenSpotifyPlayer}
-                      startIcon={<MusicNote />}
-                      variant="contained"
-                    >
-                      Spotify
-                    </Button>
-                  ) : null}
-                </Box>
               </>
             ) : null}
+
+            <Box
+              sx={{
+                position: 'absolute',
+                left: 24,
+                bottom: 24,
+                zIndex: 2,
+                pointerEvents: 'auto'
+              }}
+            >
+              {hasSpotifyPlayerOpened ? (
+                <SpotifyArtistPlayer
+                  artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
+                  isDarkMode={isDarkMode}
+                  isVisible={isSpotifyPlayerOpen}
+                  onClose={handleCloseSpotifyPlayer}
+                />
+              ) : null}
+              {!isSpotifyPlayerOpen ? (
+                <Button
+                  color="secondary"
+                  onClick={handleOpenSpotifyPlayer}
+                  startIcon={<MusicNote />}
+                  variant="contained"
+                >
+                  Spotify
+                </Button>
+              ) : null}
+            </Box>
 
             {isCountingDown ? (
               <Stack

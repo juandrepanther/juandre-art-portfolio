@@ -202,7 +202,12 @@ function CharacterChooser({
             >
               <Box>
                 <Typography
-                  sx={{ color: 'text.secondary', mt: 1.25, lineHeight: 1.8 }}
+                  sx={{
+                    color: 'text.secondary',
+                    mt: 1.25,
+                    lineHeight: 1.8,
+                    fontWeight: 800
+                  }}
                 >
                   Pick a difficulty
                 </Typography>
