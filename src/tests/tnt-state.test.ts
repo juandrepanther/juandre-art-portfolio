@@ -33,8 +33,9 @@ describe('tnt state helpers', () => {
   it('creates active TNT boxes on the ground without overlapping hazards', () => {
     vi.spyOn(Math, 'random').mockImplementation(
       createRandomSequence([
-        0.12, 0.12, 0.88, 0.12, 0.12, 0.88, 0.88, 0.88, 0.25, 0.25, 0.75, 0.25,
-        0.25, 0.75
+        0.06, 0.08, 0.13, 0.08, 0.2, 0.08, 0.27, 0.08, 0.34, 0.08, 0.41, 0.08,
+        0.48, 0.08, 0.55, 0.08, 0.62, 0.08, 0.69, 0.08, 0.76, 0.08, 0.83, 0.08,
+        0.9, 0.08, 0.97, 0.08
       ])
     )
 
