@@ -16,6 +16,7 @@ export function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
       position={crateLayout.position}
       rotation={[0, crateLayout.rotationY, 0]}
       type="fixed"
+      friction={0}
     >
       <CuboidCollider args={[width / 2, height / 2, depth / 2]} />
       <RoundedBox

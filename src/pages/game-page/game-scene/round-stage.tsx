@@ -796,7 +796,7 @@ export default function RoundStage({
       >
         <CapsuleCollider
           args={[PLAYER_COLLIDER_HALF_HEIGHT, PLAYER_COLLISION_RADIUS]}
-          friction={0.8}
+          friction={0}
         />
         <Suspense fallback={null}>
           <CharacterModel

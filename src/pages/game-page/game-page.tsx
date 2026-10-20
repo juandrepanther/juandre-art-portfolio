@@ -475,7 +475,7 @@ function GamePage() {
                 >
                   <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                     <Chip
-                      color="secondary"
+                      color="warning"
                       label={`Mode: ${difficultyConfig.label}`}
                     />
                     <Chip
