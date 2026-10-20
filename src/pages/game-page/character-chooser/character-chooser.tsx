@@ -274,6 +274,16 @@ function CharacterChooser({
                   <Chip color="warning" label="Esc" size="small" />
                   <Chip color="warning" label="Click the scene" size="small" />
                 </Stack>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+                >
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                    Shot:
+                  </Typography>
+                  <Chip color="warning" label="Left Click" size="small" />
+                </Stack>
               </Stack>
             </Stack>
 
