@@ -4,10 +4,17 @@ import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
 import percModelUrl from 'assets/models/perc.glb?url'
 import valModelUrl from 'assets/models/val.glb?url'
+import khurModelUrl from 'assets/models/khur.glb?url'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
-export type TCharacterId = 'viking-raider' | 'lena' | 'juan' | 'perc' | 'val'
+export type TCharacterId =
+  | 'viking-raider'
+  | 'lena'
+  | 'juan'
+  | 'perc'
+  | 'val'
+  | 'khur'
 export type TWeapon =
   | 'axe'
   | 'sword'
@@ -15,6 +22,7 @@ export type TWeapon =
   | 'mic'
   | 'drum_stick'
   | 'wild_boar'
+  | 'spear'
 export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
@@ -125,6 +133,19 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     modelOffset: [0, 0.5, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'wild_boar'
+  },
+  khur: {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1.4,
+    id: 'khur',
+    label: 'Khur',
+    description: 'He is a very serious warrior.',
+    modelUrl: khurModelUrl,
+    modelScale: 1,
+    modelOffset: [0, -0.08, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'spear'
   },
   juan: {
     chooserModelOffset: [0.25, 0, -0.1065],

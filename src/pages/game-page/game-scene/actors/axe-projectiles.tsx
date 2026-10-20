@@ -6,6 +6,7 @@ import accordionModelUrl from 'assets/models/accordion.glb?url'
 import axeModelUrl from 'assets/models/axe.glb?url'
 import drumStickModelUrl from 'assets/models/drum_stick.glb?url'
 import micModelUrl from 'assets/models/mic.glb?url'
+import spearModelUrl from 'assets/models/spear.glb?url'
 import swordModelUrl from 'assets/models/sword.glb?url'
 import wildBoarModelUrl from 'assets/models/wild_boar.glb?url'
 import { Mesh, MeshStandardMaterial, type Group } from 'three'
@@ -62,6 +63,11 @@ const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
     position: [0.2725, 0.06, 0],
     rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
     scale: 0.62
+  },
+  spear: {
+    position: [0.2725, 0.06, 0],
+    rotation: [0, 0, 0],
+    scale: 0.62
   }
 }
 
@@ -70,6 +76,7 @@ const projectileModelUrls: Record<TWeapon, string> = {
   accordion: accordionModelUrl,
   drum_stick: drumStickModelUrl,
   mic: micModelUrl,
+  spear: spearModelUrl,
   sword: swordModelUrl,
   wild_boar: wildBoarModelUrl
 }
