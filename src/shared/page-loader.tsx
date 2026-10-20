@@ -1,74 +1,8 @@
-import { keyframes } from '@emotion/react'
-import { Box, LinearProgress, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
-import { useEffect, useState } from 'react'
-import useReducedMotion from 'hooks/use-reduced-motion'
-
-const loaderLabels = [
-  'Preparing gallery atmosphere',
-  'Warming shader layers',
-  'Composing portfolio route',
-  'Balancing glass reflections'
-]
-
-const progressStops = [18, 34, 52, 71, 88, 94]
-
-const haloDrift = keyframes`
-  0% {
-    transform: translate3d(-3%, -2%, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(3%, 2%, 0) scale(1.08);
-  }
-  100% {
-    transform: translate3d(-2%, 1%, 0) scale(0.98);
-  }
-`
-
-const cardFloat = keyframes`
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -10px, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-`
-
-const beamSweep = keyframes`
-  0% {
-    transform: translate3d(-120%, 0, 0);
-  }
-  100% {
-    transform: translate3d(220%, 0, 0);
-  }
-`
 
 function ImmersivePageLoader() {
   const theme = useTheme()
-  const isReducedMotion = useReducedMotion()
-  const [phaseIndex, setPhaseIndex] = useState(0)
-
-  useEffect(() => {
-    if (isReducedMotion) {
-      return undefined
-    }
-
-    const intervalId = window.setInterval(() => {
-      setPhaseIndex((currentPhaseIndex) => currentPhaseIndex + 1)
-    }, 520)
-
-    return () => {
-      window.clearInterval(intervalId)
-    }
-  }, [isReducedMotion])
-
-  const loaderLabel = loaderLabels[phaseIndex % loaderLabels.length]
-  const progressValue = isReducedMotion
-    ? 32
-    : progressStops[Math.min(phaseIndex, progressStops.length - 1)]
 
   return (
     <Box
@@ -92,10 +26,7 @@ function ImmersivePageLoader() {
           position: 'absolute',
           inset: '-12%',
           background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.2)} 0%, transparent 56%), radial-gradient(circle at 70% 30%, ${alpha(theme.palette.primary.main, 0.18)} 0%, transparent 42%)`,
-          filter: 'blur(24px)',
-          animation: isReducedMotion
-            ? 'none'
-            : `${haloDrift} 6.2s ease-in-out infinite`
+          filter: 'blur(24px)'
         }}
       />
 
@@ -123,83 +54,29 @@ function ImmersivePageLoader() {
           border: `1px solid ${alpha(theme.palette.common.white, 0.08)}`,
           backgroundColor: alpha(theme.palette.background.paper, 0.36),
           backdropFilter: 'blur(22px)',
-          boxShadow: `0 32px 90px ${alpha(theme.palette.common.black, 0.28)}`,
-          animation: isReducedMotion
-            ? 'none'
-            : `${cardFloat} 4.2s ease-in-out infinite`
+          boxShadow: `0 32px 90px ${alpha(theme.palette.common.black, 0.28)}`
         }}
       >
-        <Stack spacing={1.5}>
-          <Typography
-            sx={{
-              color: 'secondary.main',
-              fontSize: '0.8rem',
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase'
-            }}
-          >
-            Janis Dregeris
-          </Typography>
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: { xs: '2.5rem', md: '3.6rem' },
-              lineHeight: 0.92,
-              maxWidth: '10ch'
-            }}
-          >
-            Entering the portfolio.
-          </Typography>
-          <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-            {loaderLabel}
-          </Typography>
-        </Stack>
-
-        <Box
+        <Stack
+          spacing={2}
           sx={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: '999px',
-            p: 0.75,
-            backgroundColor: alpha(theme.palette.common.white, 0.05)
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'text.secondary'
           }}
         >
-          <Box
-            aria-hidden="true"
+          <CircularProgress
+            color="secondary"
+            size={72}
+            thickness={4}
             sx={{
-              position: 'absolute',
-              inset: 0,
-              background: `linear-gradient(110deg, transparent 0%, ${alpha(theme.palette.common.white, 0.18)} 50%, transparent 100%)`,
-              animation: isReducedMotion
-                ? 'none'
-                : `${beamSweep} 1.8s linear infinite`
-            }}
-          />
-          <LinearProgress
-            value={progressValue}
-            variant="determinate"
-            sx={{
-              height: 10,
-              borderRadius: '999px',
-              backgroundColor: alpha(theme.palette.common.white, 0.06),
-              '& .MuiLinearProgress-bar': {
-                borderRadius: '999px',
-                background: `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`
+              '& .MuiCircularProgress-circle': {
+                strokeLinecap: 'round'
               }
             }}
           />
-        </Box>
-
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.5}
-          sx={{ justifyContent: 'space-between', color: 'text.secondary' }}
-        >
           <Typography sx={{ fontSize: '0.95rem' }}>
-            Visual system boot sequence in progress
-          </Typography>
-          <Typography sx={{ fontSize: '0.95rem', color: 'text.primary' }}>
-            {progressValue}%
+            Loading portfolio assets
           </Typography>
         </Stack>
       </Stack>
