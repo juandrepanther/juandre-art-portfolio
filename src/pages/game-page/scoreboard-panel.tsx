@@ -3,6 +3,7 @@ import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import type { IScoreboardEntry } from 'lib/zustand/game-scoreboard-store'
 
 interface IScoreboardPanel {
+  currentPlayerName: string
   isDarkMode: boolean
   isVisible: boolean
   onClose: () => void
@@ -37,12 +38,14 @@ function groupEntriesByDifficulty(scoreboardEntries: IScoreboardEntry[]) {
 }
 
 function ScoreboardPanel({
+  currentPlayerName,
   isDarkMode,
   isVisible,
   onClose,
   onDeleteClick,
   scoreboardEntries
 }: IScoreboardPanel) {
+  const normalizedCurrentPlayerName = currentPlayerName.trim()
   const groupedEntries = groupEntriesByDifficulty(scoreboardEntries)
 
   return (
@@ -137,32 +140,52 @@ function ScoreboardPanel({
             </Stack>
 
             <Stack spacing={0.6}>
-              {difficultyGroup.entries.map((scoreboardEntry) => (
-                <Stack
-                  direction="row"
-                  key={`${scoreboardEntry.playerName}-${scoreboardEntry.difficulty ?? 'no-difficulty'}`}
-                  spacing={1}
-                  sx={{
-                    alignItems: 'center',
-                    borderRadius: 1,
-                    px: 0.75,
-                    py: 0.5,
-                    backgroundColor: isDarkMode
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(20, 32, 44, 0.06)'
-                  }}
-                >
-                  <Typography sx={{ flex: 1.2 }} variant="body2">
-                    {scoreboardEntry.playerName}
-                  </Typography>
-                  <Typography
-                    sx={{ width: 70, textAlign: 'right' }}
-                    variant="body2"
+              {difficultyGroup.entries.map((scoreboardEntry) => {
+                const isCurrentPlayer =
+                  normalizedCurrentPlayerName.length > 0 &&
+                  scoreboardEntry.playerName === normalizedCurrentPlayerName
+
+                return (
+                  <Stack
+                    data-current-player={isCurrentPlayer ? 'true' : 'false'}
+                    direction="row"
+                    key={`${scoreboardEntry.playerName}-${scoreboardEntry.difficulty ?? 'no-difficulty'}`}
+                    spacing={1}
+                    sx={{
+                      alignItems: 'center',
+                      borderRadius: 1,
+                      px: 0.75,
+                      py: 0.5,
+                      border: isCurrentPlayer
+                        ? '1px solid rgba(109, 219, 132, 0.95)'
+                        : '1px solid transparent',
+                      backgroundColor: isCurrentPlayer
+                        ? isDarkMode
+                          ? 'rgba(109, 219, 132, 0.18)'
+                          : 'rgba(72, 148, 87, 0.2)'
+                        : isDarkMode
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(20, 32, 44, 0.06)'
+                    }}
                   >
-                    {scoreboardEntry.enemiesDefeated}
-                  </Typography>
-                </Stack>
-              ))}
+                    <Typography
+                      sx={{
+                        flex: 1.2,
+                        fontWeight: isCurrentPlayer ? 700 : 400
+                      }}
+                      variant="body2"
+                    >
+                      {scoreboardEntry.playerName}
+                    </Typography>
+                    <Typography
+                      sx={{ width: 70, textAlign: 'right' }}
+                      variant="body2"
+                    >
+                      {scoreboardEntry.enemiesDefeated}
+                    </Typography>
+                  </Stack>
+                )
+              })}
             </Stack>
           </Stack>
         ))}

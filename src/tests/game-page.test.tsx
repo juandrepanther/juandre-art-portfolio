@@ -322,6 +322,45 @@ describe('GamePage', () => {
     expect(screen.queryByText('N/A')).not.toBeInTheDocument()
   })
 
+  it('highlights the scoreboard row for the current player', () => {
+    useGameScoreboardStore.getState().saveWonRun({
+      difficulty: 'Noob',
+      enemiesDefeated: 8,
+      playerName: 'Player1'
+    })
+    useGameScoreboardStore.getState().saveWonRun({
+      difficulty: 'Noob',
+      enemiesDefeated: 5,
+      playerName: 'Player2'
+    })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+
+    const scoreboardPanel = screen.getByTestId('scoreboard-panel')
+    const playerOneLabel = screen
+      .getAllByText('Player1')
+      .find((node) => scoreboardPanel.contains(node))
+    const playerTwoLabel = screen
+      .getAllByText('Player2')
+      .find((node) => scoreboardPanel.contains(node))
+
+    expect(playerOneLabel?.closest('div')).toHaveAttribute(
+      'data-current-player',
+      'true'
+    )
+    expect(playerTwoLabel?.closest('div')).toHaveAttribute(
+      'data-current-player',
+      'false'
+    )
+  })
+
   it('hides the change action while the round is active', () => {
     vi.useFakeTimers()
 

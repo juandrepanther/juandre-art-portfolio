@@ -605,6 +605,7 @@ function GamePage() {
               }}
             >
               <ScoreboardPanel
+                currentPlayerName={trimmedPlayerName}
                 isDarkMode={isDarkMode}
                 isVisible={isScoreboardOpen}
                 onClose={handleCloseScoreboard}
