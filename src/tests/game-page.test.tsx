@@ -2,6 +2,8 @@ import { act, fireEvent, waitFor } from '@testing-library/react'
 import { screen } from 'shadow-dom-testing-library'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useGameScoreboardStore } from 'lib/zustand/game-scoreboard-store'
+import { useGameTemporaryScoreStore } from 'lib/zustand/game-temporary-score-store'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import GamePage from 'pages/game-page/game-page'
 import type { IGameSceneProps } from 'pages/game-page/helpers'
@@ -22,12 +24,16 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
   default: function MockGameScene({
     health,
     isCameraOrbiting,
+    onEnemyHit,
     onHealthChange
   }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
         <div>Scene health: {health}</div>
         <div>Scene orbit: {String(isCameraOrbiting)}</div>
+        <button onClick={() => onEnemyHit()} type="button">
+          Trigger enemy defeat
+        </button>
         <button onClick={() => onHealthChange(65)} type="button">
           Trigger damage
         </button>
@@ -47,9 +53,17 @@ vi.mock('pages/game-page/character-chooser/character-preview', () => ({
 }))
 
 describe('GamePage', () => {
+  const setPlayerName = (playerName: string) => {
+    fireEvent.change(screen.getByRole('combobox', { name: /player name/i }), {
+      target: { value: playerName }
+    })
+  }
+
   beforeEach(() => {
     vi.useRealTimers()
     useThemeStore.setState({ isDarkMode: true })
+    useGameScoreboardStore.getState().resetScoreboard()
+    useGameTemporaryScoreStore.getState().clearAllTemporary()
     mockedUseWindowSize.mockReturnValue({ height: 1200, width: 1440 })
     mockedUseProgress.mockReturnValue({
       active: true,
@@ -95,6 +109,8 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     requestPointerLockMock.mockClear()
 
@@ -119,6 +135,8 @@ describe('GamePage', () => {
 
     exitPointerLockMock.mockClear()
 
+    setPlayerName('Player1')
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
@@ -140,6 +158,12 @@ describe('GamePage', () => {
       screen.getByRole('link', { name: /back to portfolio/i })
     ).toHaveAttribute('href', '/')
     expect(screen.getByText(/pick a difficulty/i)).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: /player name/i })).toHaveValue(
+      ''
+    )
+    expect(
+      screen.getByText(/type any player name to start/i)
+    ).toBeInTheDocument()
     expect(screen.getByText(/character select/i)).toBeInTheDocument()
     expect(screen.getByText(/click the scene/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^noob$/i })).toBeInTheDocument()
@@ -149,7 +173,9 @@ describe('GamePage', () => {
     expect(
       screen.queryByRole('button', { name: /^fight$/i })
     ).not.toBeInTheDocument()
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^hardcore$/i }))
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
@@ -167,7 +193,7 @@ describe('GamePage', () => {
     expect(screen.getByText(/scene health: 100/i)).toBeInTheDocument()
     expect(screen.getByText('01:00')).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
-    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.getAllByText('0').length).toBeGreaterThan(0)
     expect(
       screen.getByRole('button', { name: /^spotify$/i })
     ).toBeInTheDocument()
@@ -210,6 +236,92 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
   })
 
+  it('disables choose when player name is empty', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    const playerNameInput = screen.getByRole('combobox', {
+      name: /player name/i
+    })
+    const chooseButton = screen.getByRole('button', { name: /^choose$/i })
+
+    expect(chooseButton).toBeDisabled()
+
+    fireEvent.change(playerNameInput, { target: { value: 'Player77' } })
+
+    expect(chooseButton).toBeEnabled()
+
+    fireEvent.change(playerNameInput, { target: { value: '' } })
+
+    expect(chooseButton).toBeDisabled()
+  })
+
+  it('shows red validation helper for player name when scoreboard has no data', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    expect(
+      screen.getByText(/type any player name to start/i)
+    ).toBeInTheDocument()
+  })
+
+  it('keeps scoreboard open-close behavior and confirms delete action', async () => {
+    useGameScoreboardStore.getState().saveWonRun({
+      difficulty: 'Noob',
+      enemiesDefeated: 5,
+      playerName: 'Player99'
+    })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByTestId('scoreboard-panel')).toHaveAttribute(
+      'aria-hidden',
+      'false'
+    )
+    expect(screen.getByText('Player99')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /close scoreboard/i }))
+
+    expect(screen.getByTestId('scoreboard-panel')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    )
+    expect(
+      screen.getByRole('button', { name: /^scoreboard$/i })
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /^scoreboard$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /delete scoreboard data/i })
+    )
+
+    expect(screen.getByText('Sure to delete data?')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /^no$/i }))
+
+    await waitFor(() => {
+      expect(screen.queryByText('Sure to delete data?')).not.toBeInTheDocument()
+    })
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /delete scoreboard data/i })
+    )
+    fireEvent.click(screen.getByRole('button', { name: /^yes$/i }))
+
+    expect(screen.queryByText('Player99')).not.toBeInTheDocument()
+    expect(screen.queryByText('N/A')).not.toBeInTheDocument()
+  })
+
   it('hides the change action while the round is active', () => {
     vi.useFakeTimers()
 
@@ -219,6 +331,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
@@ -262,6 +375,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
@@ -297,6 +411,7 @@ describe('GamePage', () => {
       /spotify artist player/i
     ) as HTMLIFrameElement
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
     fireEvent.click(screen.getByRole('button', { name: /^change$/i }))
@@ -350,6 +465,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
@@ -392,6 +508,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
@@ -433,6 +550,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
@@ -461,6 +579,69 @@ describe('GamePage', () => {
     })
   })
 
+  it('saves enemies defeated to persistent scoreboard only when the round is won', async () => {
+    vi.useFakeTimers()
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /trigger enemy defeat/i })
+    )
+
+    for (let second = 0; second < 18; second += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000)
+      })
+    }
+
+    const wonEntry = useGameScoreboardStore
+      .getState()
+      .scoreboardEntries.find(
+        (scoreboardEntry) =>
+          scoreboardEntry.playerName === 'Player1' &&
+          scoreboardEntry.difficulty === 'Noob'
+      )
+
+    expect(wonEntry).toMatchObject({
+      enemiesDefeated: 1,
+      playerName: 'Player1',
+      difficulty: 'Noob'
+    })
+  })
+
+  it('does not save temporary score on loss and clears the temporary run', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /trigger enemy defeat/i })
+    )
+    fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
+
+    const lostEntry = useGameScoreboardStore
+      .getState()
+      .scoreboardEntries.find(
+        (scoreboardEntry) =>
+          scoreboardEntry.playerName === 'Player1' &&
+          scoreboardEntry.difficulty === 'Noob'
+      )
+
+    expect(lostEntry).toBeUndefined()
+    expect(useGameTemporaryScoreStore.getState().pendingRun).toBeNull()
+  })
+
   it('shows a victory image popup with replay when the round ends', async () => {
     vi.useFakeTimers()
 
@@ -470,6 +651,7 @@ describe('GamePage', () => {
       </MemoryRouter>
     )
 
+    setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 

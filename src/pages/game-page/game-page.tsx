@@ -4,22 +4,26 @@ import {
   Chip,
   Dialog,
   DialogActions,
+  DialogContent,
   Stack,
   Typography
 } from '@mui/material'
 import { keyframes } from '@mui/material/styles'
-import { MusicNote } from '@mui/icons-material'
+import { EmojiEvents, MusicNote } from '@mui/icons-material'
 import gameOverImage from 'assets/images/over.png'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import winImage from 'assets/images/win.png'
 import { Link as RouterLink } from 'react-router'
 import { useEffect, useState } from 'react'
 import useWindowSize from 'hooks/useWindowSize'
+import { useGameScoreboardStore } from 'lib/zustand/game-scoreboard-store'
+import { useGameTemporaryScoreStore } from 'lib/zustand/game-temporary-score-store'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import HomePageHeader from 'pages/home-page/sections/home-page-header'
 import CharacterChooser from './character-chooser/character-chooser'
 import GameScene from './game-scene/scene'
 import GameSceneLoaderOverlay from './game-scene/game-scene-loader'
+import ScoreboardPanel from './scoreboard-panel'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   CHARACTER_CONFIGS,
@@ -58,6 +62,7 @@ function GamePage() {
     characterOptions[0]
   )
   const [hasChosenCharacter, setHasChosenCharacter] = useState(false)
+  const [playerName, setPlayerName] = useState('')
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [health, setHealth] = useState(MAX_HEALTH)
@@ -71,6 +76,34 @@ function GamePage() {
     START_RUN_COUNTDOWN_SECONDS
   )
   const [roundKey, setRoundKey] = useState(0)
+  const [isScoreboardOpen, setIsScoreboardOpen] = useState(true)
+  const [isDeleteScoreboardDialogOpen, setIsDeleteScoreboardDialogOpen] =
+    useState(false)
+
+  const scoreboardEntries = useGameScoreboardStore(
+    (state) => state.scoreboardEntries
+  )
+  const playerNameOptions = useGameScoreboardStore(
+    (state) => state.playerNameOptions
+  )
+  const saveWonRun = useGameScoreboardStore((state) => state.saveWonRun)
+  const resetScoreboard = useGameScoreboardStore(
+    (state) => state.resetScoreboard
+  )
+
+  const pendingRun = useGameTemporaryScoreStore((state) => state.pendingRun)
+  const clearPendingRun = useGameTemporaryScoreStore(
+    (state) => state.clearPendingRun
+  )
+  const incrementEnemiesDefeated = useGameTemporaryScoreStore(
+    (state) => state.incrementEnemiesDefeated
+  )
+  const setEnemiesDefeatedCount = useGameTemporaryScoreStore(
+    (state) => state.setEnemiesDefeatedCount
+  )
+  const setPendingRun = useGameTemporaryScoreStore(
+    (state) => state.setPendingRun
+  )
 
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
   const isCountingDown = gameStatus === 'countdown'
@@ -89,6 +122,7 @@ function GamePage() {
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
   const resultStatusLabel = gameStatus === 'won' ? 'WIN' : 'LOST'
   const resultStatusColor = gameStatus === 'won' ? '#6ec060' : '#ff5a4a'
+  const trimmedPlayerName = playerName.trim()
 
   const lockGamePointer = () => {
     const gameCanvas = document.getElementById('game-scene-canvas')
@@ -119,6 +153,25 @@ function GamePage() {
 
     unlockGamePointer()
   }, [gameStatus])
+
+  useEffect(() => {
+    if (gameStatus === 'won') {
+      if (pendingRun) {
+        saveWonRun({
+          difficulty: pendingRun.difficulty,
+          enemiesDefeated: pendingRun.enemiesDefeated,
+          playerName: pendingRun.playerName
+        })
+      }
+
+      clearPendingRun()
+      return
+    }
+
+    if (gameStatus === 'lost') {
+      clearPendingRun()
+    }
+  }, [clearPendingRun, gameStatus, pendingRun, saveWonRun])
 
   useEffect(() => {
     if (!isCountingDown) {
@@ -177,9 +230,14 @@ function GamePage() {
   }
 
   const startRound = () => {
+    if (trimmedPlayerName.length > 0) {
+      setPendingRun({ difficulty, playerName: trimmedPlayerName })
+    }
+
     lockGamePointer()
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
+    setEnemiesDefeatedCount(0)
     setRemainingTime(difficultyConfig.roundTime)
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
@@ -200,6 +258,7 @@ function GamePage() {
   }
 
   const handleReturnToMenu = () => {
+    clearPendingRun()
     setGameStatus('menu')
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
@@ -209,6 +268,17 @@ function GamePage() {
   }
 
   const handleChooseCharacter = () => {
+    const normalizedPlayerName = playerName.trim()
+
+    if (normalizedPlayerName.length === 0) {
+      return
+    }
+
+    setPlayerName(normalizedPlayerName)
+    setPendingRun({
+      difficulty,
+      playerName: normalizedPlayerName
+    })
     setHasChosenCharacter(true)
     setRemainingTime(difficultyConfig.roundTime)
   }
@@ -216,6 +286,28 @@ function GamePage() {
   const handleChooseDifferentCharacter = () => {
     handleReturnToMenu()
     setHasChosenCharacter(false)
+  }
+
+  const handleOpenScoreboard = () => {
+    setIsScoreboardOpen(true)
+  }
+
+  const handleCloseScoreboard = () => {
+    setIsScoreboardOpen(false)
+  }
+
+  const handleOpenDeleteScoreboardDialog = () => {
+    setIsDeleteScoreboardDialogOpen(true)
+  }
+
+  const handleCloseDeleteScoreboardDialog = () => {
+    setIsDeleteScoreboardDialogOpen(false)
+  }
+
+  const handleConfirmDeleteScoreboard = () => {
+    resetScoreboard()
+    setPlayerName('')
+    setIsDeleteScoreboardDialogOpen(false)
   }
 
   const handleOpenSpotifyPlayer = () => {
@@ -306,7 +398,11 @@ function GamePage() {
               isActive={isPlaying}
               isCameraOrbiting={isCameraOrbiting}
               onEnemyHit={() =>
-                setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
+                setEnemyHits((currentEnemyHits) => {
+                  incrementEnemiesDefeated()
+
+                  return currentEnemyHits + 1
+                })
               }
               onHealthChange={handleHealthChange}
               roundKey={roundKey}
@@ -320,7 +416,10 @@ function GamePage() {
                 availableCharacterIds={characterOptions}
                 onCharacterChange={setSelectedCharacter}
                 onDifficultyChange={handleDifficultyChange}
+                onPlayerNameChange={setPlayerName}
                 onChoose={handleChooseCharacter}
+                playerName={playerName}
+                playerNameOptions={playerNameOptions}
                 selectedCharacterConfig={selectedCharacterConfig}
                 selectedDifficulty={difficulty}
               />
@@ -501,6 +600,35 @@ function GamePage() {
             <Box
               sx={{
                 position: 'absolute',
+                right: 24,
+                top: 24,
+                zIndex: 8,
+                pointerEvents: 'auto'
+              }}
+            >
+              <ScoreboardPanel
+                isDarkMode={isDarkMode}
+                isVisible={isScoreboardOpen}
+                onClose={handleCloseScoreboard}
+                onDeleteClick={handleOpenDeleteScoreboardDialog}
+                scoreboardEntries={scoreboardEntries}
+              />
+
+              {!isScoreboardOpen ? (
+                <Button
+                  color="secondary"
+                  onClick={handleOpenScoreboard}
+                  startIcon={<EmojiEvents />}
+                  variant="contained"
+                >
+                  Scoreboard
+                </Button>
+              ) : null}
+            </Box>
+
+            <Box
+              sx={{
+                position: 'absolute',
                 left: 24,
                 bottom: 24,
                 zIndex: 2,
@@ -526,6 +654,23 @@ function GamePage() {
                 </Button>
               ) : null}
             </Box>
+
+            <Dialog
+              fullWidth
+              maxWidth="xs"
+              onClose={handleCloseDeleteScoreboardDialog}
+              open={isDeleteScoreboardDialogOpen}
+            >
+              <DialogContent>
+                <Typography>Sure to delete data?</Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDeleteScoreboardDialog}>No</Button>
+                <Button color="error" onClick={handleConfirmDeleteScoreboard}>
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
 
             {isCountingDown ? (
               <Stack

@@ -1,5 +1,15 @@
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
-import { Box, Button, Chip, IconButton, Stack, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material'
 import { alpha, keyframes, useTheme } from '@mui/material/styles'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
@@ -14,7 +24,10 @@ interface ICharacterChooser {
   availableCharacterIds: TCharacterId[]
   onCharacterChange: (characterId: TCharacterId) => void
   onDifficultyChange: (difficulty: TDifficultyLevel) => void
+  onPlayerNameChange: (playerName: string) => void
   onChoose: () => void
+  playerName: string
+  playerNameOptions: string[]
   selectedCharacterConfig: ICharacterConfig
   selectedDifficulty: TDifficultyLevel
 }
@@ -37,7 +50,10 @@ function CharacterChooser({
   availableCharacterIds,
   onCharacterChange,
   onDifficultyChange,
+  onPlayerNameChange,
   onChoose,
+  playerName,
+  playerNameOptions,
   selectedCharacterConfig,
   selectedDifficulty
 }: ICharacterChooser) {
@@ -47,6 +63,9 @@ function CharacterChooser({
   )
   const totalCharacters = availableCharacterIds.length
   const difficultyOptions: TDifficultyLevel[] = ['Noob', 'Balls', 'Hardcore']
+  const isChooseDisabled = playerName.trim().length === 0
+  const shouldShowPlayerNameError =
+    playerNameOptions.length === 0 && playerName.trim().length === 0
 
   const moveSelection = (direction: -1 | 1) => {
     if (totalCharacters <= 1) {
@@ -143,6 +162,35 @@ function CharacterChooser({
                 <ChevronRight />
               </IconButton>
             </Stack>
+
+            <Autocomplete
+              freeSolo
+              fullWidth
+              inputValue={playerName}
+              onChange={(_, nextPlayerName) => {
+                onPlayerNameChange(nextPlayerName ?? '')
+              }}
+              onInputChange={(_, nextPlayerNameInput) => {
+                onPlayerNameChange(nextPlayerNameInput)
+              }}
+              options={playerNameOptions}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  color="secondary"
+                  error={shouldShowPlayerNameError}
+                  helperText={
+                    shouldShowPlayerNameError
+                      ? 'Type any player name to start'
+                      : undefined
+                  }
+                  label="Player name"
+                  size="small"
+                />
+              )}
+              sx={{ width: '100%' }}
+              value={playerName}
+            />
           </Stack>
 
           <Stack spacing={2.5} sx={{ flex: 0.95, minWidth: 0 }}>
@@ -292,14 +340,22 @@ function CharacterChooser({
               spacing={1.5}
               sx={{ justifyContent: 'center', alignItems: 'center' }}
             >
-              <Button
-                color="error"
-                onClick={onChoose}
-                size="large"
-                variant="contained"
+              <Tooltip
+                disableHoverListener={!isChooseDisabled}
+                title="Type a player name or choose one from the list"
               >
-                Choose
-              </Button>
+                <span>
+                  <Button
+                    color="error"
+                    disabled={isChooseDisabled}
+                    onClick={onChoose}
+                    size="large"
+                    variant="contained"
+                  >
+                    Choose
+                  </Button>
+                </span>
+              </Tooltip>
             </Stack>
           </Stack>
         </Stack>
