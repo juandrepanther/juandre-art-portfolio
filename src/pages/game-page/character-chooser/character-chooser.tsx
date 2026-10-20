@@ -108,7 +108,7 @@ function CharacterChooser({
       >
         <Stack spacing={1.25}>
           <Typography sx={{ color: 'secondary.main', letterSpacing: '0.18em' }}>
-            CHARACTER SELECT
+            SELECT A WARRIOR
           </Typography>
         </Stack>
 
@@ -242,7 +242,7 @@ function CharacterChooser({
               </Box>
 
               <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                <Chip color="primary" label="Brutal kill" variant="outlined" />
+                <Chip color="primary" label="Great choice" variant="outlined" />
               </Stack>
             </Stack>
 
@@ -281,7 +281,7 @@ function CharacterChooser({
                 <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                   {difficultyOptions.map((difficultyOption) => (
                     <Button
-                      color="secondary"
+                      color="info"
                       key={difficultyOption}
                       onClick={() => onDifficultyChange(difficultyOption)}
                       variant={

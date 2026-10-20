@@ -1,6 +1,6 @@
-import { OrbitControls } from '@react-three/drei'
+import { Html, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { Box } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
 import { Suspense } from 'react'
 import type { ICharacterConfig } from '../settings'
@@ -8,6 +8,36 @@ import CharacterModel from './character-model'
 
 interface ICharacterPreview {
   characterConfig: ICharacterConfig
+}
+
+function CharacterPreviewLoader() {
+  return (
+    <Html center>
+      <Box
+        role="status"
+        aria-busy="true"
+        aria-live="polite"
+        sx={{
+          display: 'grid',
+          justifyItems: 'center',
+          gap: 1,
+          px: 2,
+          py: 1.5,
+          borderRadius: 2,
+          border: '1px solid rgba(238, 246, 255, 0.24)',
+          backgroundColor: 'rgba(7, 12, 20, 0.66)',
+          backdropFilter: 'blur(8px)',
+          color: 'rgba(240, 247, 255, 0.92)',
+          pointerEvents: 'none'
+        }}
+      >
+        <CircularProgress aria-label="Loading character model" size={28} />
+        <Typography sx={{ fontSize: 12, letterSpacing: '0.04em' }}>
+          Loading character...
+        </Typography>
+      </Box>
+    </Html>
+  )
 }
 
 function CharacterPreview({ characterConfig }: ICharacterPreview) {
@@ -39,7 +69,7 @@ function CharacterPreview({ characterConfig }: ICharacterPreview) {
           penumbra={0.8}
           position={[-4, 7, 5]}
         />
-        <Suspense fallback={null}>
+        <Suspense fallback={<CharacterPreviewLoader />}>
           <group key={characterConfig.id} position={[-0.2, -1.8, 0]}>
             <CharacterModel
               characterConfig={characterConfig}

@@ -114,7 +114,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     chooserModelScale: 1,
     id: 'perc',
     label: 'Bear',
-    description: 'His sticks will gona go through your eyes',
+    description: 'His sticks will go through your eyes',
     modelUrl: percModelUrl,
     modelScale: 1,
     modelOffset: [0, -0.08, -0.1065],

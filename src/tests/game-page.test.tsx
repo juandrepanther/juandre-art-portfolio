@@ -164,7 +164,7 @@ describe('GamePage', () => {
     expect(
       screen.getByText(/type any player name to start/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/character select/i)).toBeInTheDocument()
+    expect(screen.getByText(/select a warrior/i)).toBeInTheDocument()
     expect(screen.getByText(/click the scene/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^noob$/i })).toBeInTheDocument()
     expect(

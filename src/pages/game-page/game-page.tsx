@@ -362,18 +362,8 @@ function GamePage() {
                 : '0 24px 70px rgba(20, 32, 44, 0.14)'
             }}
           >
-            <Typography
-              sx={{ color: 'secondary.main', letterSpacing: '0.16em' }}
-            >
-              DESKTOP EXPERIENCE
-            </Typography>
-            <Typography variant="h2" sx={{ maxWidth: '12ch' }}>
-              Varang Kill is tuned for desktop controls only.
-            </Typography>
-            <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-              Open this route on a desktop-sized viewport to play the
-              third-person survival mode with smooth camera movement,
-              shader-driven characters, and arena combat.
+            <Typography variant="h4" sx={{ maxWidth: '12ch' }}>
+              Varang Kill is tuned for desktop controls only
             </Typography>
           </Stack>
         ) : (
