@@ -15,6 +15,7 @@ import logoVnImage from 'assets/images/logo_vn.jpg'
 import winImage from 'assets/images/win.png'
 import { Link as RouterLink } from 'react-router'
 import { useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 import useWindowSize from 'hooks/useWindowSize'
 import { useGameScoreboardStore } from 'lib/zustand/game-scoreboard-store'
 import { useGameTemporaryScoreStore } from 'lib/zustand/game-temporary-score-store'
@@ -29,6 +30,7 @@ import {
   CHARACTER_CONFIGS,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
+  GAME_POINTER_COLOR,
   MAX_HEALTH,
   START_RUN_COUNTDOWN_SECONDS,
   clampHealth,
@@ -230,18 +232,21 @@ function GamePage() {
   }
 
   const startRound = () => {
-    if (trimmedPlayerName.length > 0) {
-      setPendingRun({ difficulty, playerName: trimmedPlayerName })
-    }
+    flushSync(() => {
+      if (trimmedPlayerName.length > 0) {
+        setPendingRun({ difficulty, playerName: trimmedPlayerName })
+      }
+
+      setHealth(MAX_HEALTH)
+      setEnemyHits(0)
+      setEnemiesDefeatedCount(0)
+      setRemainingTime(difficultyConfig.roundTime)
+      setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
+      setRoundKey((currentRoundKey) => currentRoundKey + 1)
+      setGameStatus('countdown')
+    })
 
     lockGamePointer()
-    setHealth(MAX_HEALTH)
-    setEnemyHits(0)
-    setEnemiesDefeatedCount(0)
-    setRemainingTime(difficultyConfig.roundTime)
-    setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
-    setRoundKey((currentRoundKey) => currentRoundKey + 1)
-    setGameStatus('countdown')
   }
 
   const handleStartGame = () => {
@@ -441,9 +446,7 @@ function GamePage() {
                       position: 'absolute',
                       left: '50%',
                       top: '50%',
-                      backgroundColor: isDarkMode
-                        ? 'rgba(244, 252, 248, 0.9)'
-                        : 'rgba(20, 32, 44, 0.82)',
+                      backgroundColor: GAME_POINTER_COLOR,
                       boxShadow: isDarkMode
                         ? '0 0 16px rgba(84, 199, 184, 0.4)'
                         : '0 0 16px rgba(31, 138, 122, 0.25)'
@@ -756,7 +759,7 @@ function GamePage() {
                     sx={{
                       position: 'absolute',
                       left: '50%',
-                      top: '85%',
+                      top: '80%',
                       transform: 'translate(-50%, -50%)',
                       color: resultStatusColor,
                       fontWeight: 800,

@@ -96,7 +96,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     chooserModelRotation: [-Math.PI / 2, 0, 0],
     chooserModelScale: 1.7,
     id: 'juan',
-    label: 'Janis Dregeris',
+    label: 'Janis',
     description: 'This man will explode your enemies with his mic.',
     modelUrl: juanModelUrl,
     modelScale: 1.7,
@@ -209,6 +209,7 @@ export const PLAYER_FACING_TURN_SPEED = 10
 export const PLAYER_JUMP_GRAVITY = 26
 export const PLAYER_JUMP_VELOCITY = 11
 export const PLAYER_MOVE_SPEED = 12
+export const GAME_POINTER_COLOR = '#ffffff'
 export const POINTER_LOOK_SENSITIVITY = 0.0022
 export const POINTER_MAX_PITCH = Math.PI / 3.1
 export const POINTER_MIN_PITCH = -Math.PI / 4.2
