@@ -2,11 +2,19 @@ import type { KeyboardControlsEntry } from '@react-three/drei'
 import juanModelUrl from 'assets/models/juan.glb?url'
 import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
+import percModelUrl from 'assets/models/perc.glb?url'
+import valModelUrl from 'assets/models/val.glb?url'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
-export type TCharacterId = 'viking-raider' | 'lena' | 'juan'
-export type TWeapon = 'axe' | 'sword' | 'accordion' | 'mic'
+export type TCharacterId = 'viking-raider' | 'lena' | 'juan' | 'perc' | 'val'
+export type TWeapon =
+  | 'axe'
+  | 'sword'
+  | 'accordion'
+  | 'mic'
+  | 'drum_stick'
+  | 'wild_boar'
 export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
@@ -69,7 +77,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     chooserModelRotation: [-Math.PI / 2, 0, 0],
     chooserModelScale: 1,
     id: 'viking-raider',
-    label: 'Max',
+    label: 'Max Wolf',
     description:
       'A brutal sword-runner has ability to chop down enemies with his mighty sword.',
     modelUrl: lowPolyVikingModelUrl,
@@ -83,13 +91,40 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     chooserModelRotation: [-Math.PI / 2, 0, 0],
     chooserModelScale: 1,
     id: 'lena',
-    label: 'Lena',
+    label: 'Jelena',
     description: 'Her accordion will smash your enemies into pieces. ',
     modelUrl: lenaModelUrl,
     modelScale: 1,
     modelOffset: [0, -0.08, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'accordion'
+  },
+
+  perc: {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1,
+    id: 'perc',
+    label: 'Bear',
+    description: 'His sticks will gona go through your eyes',
+    modelUrl: percModelUrl,
+    modelScale: 1,
+    modelOffset: [0, -0.08, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'drum_stick'
+  },
+  val: {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1.4,
+    id: 'val',
+    label: 'Valera',
+    description: 'After lunch, he is especially angry.',
+    modelUrl: valModelUrl,
+    modelScale: 1.5,
+    modelOffset: [0, 0.5, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'wild_boar'
   },
   juan: {
     chooserModelOffset: [0.25, 0, -0.1065],

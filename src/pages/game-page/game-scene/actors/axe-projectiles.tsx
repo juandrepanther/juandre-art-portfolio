@@ -4,8 +4,10 @@ import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import accordionModelUrl from 'assets/models/accordion.glb?url'
 import axeModelUrl from 'assets/models/axe.glb?url'
+import drumStickModelUrl from 'assets/models/drum_stick.glb?url'
 import micModelUrl from 'assets/models/mic.glb?url'
 import swordModelUrl from 'assets/models/sword.glb?url'
+import wildBoarModelUrl from 'assets/models/wild_boar.glb?url'
 import { Mesh, MeshStandardMaterial, type Group } from 'three'
 import { PROJECTILE_POOL_SIZE, type TWeapon } from '../../settings'
 import type { IProjectileState } from '../types'
@@ -50,14 +52,26 @@ const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
     position: [0.2725, 0.06, 0],
     rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
     scale: 0.62
+  },
+  drum_stick: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
+    scale: 4.62
+  },
+  wild_boar: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
+    scale: 0.62
   }
 }
 
 const projectileModelUrls: Record<TWeapon, string> = {
   axe: axeModelUrl,
   accordion: accordionModelUrl,
+  drum_stick: drumStickModelUrl,
   mic: micModelUrl,
-  sword: swordModelUrl
+  sword: swordModelUrl,
+  wild_boar: wildBoarModelUrl
 }
 
 for (const modelUrl of Object.values(projectileModelUrls)) {
