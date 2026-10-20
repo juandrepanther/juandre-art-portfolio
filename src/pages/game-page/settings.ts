@@ -1,16 +1,20 @@
 import type { KeyboardControlsEntry } from '@react-three/drei'
+import juanModelUrl from 'assets/models/juan.glb?url'
 import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
 import { Vector3 } from 'three'
 import type { ICrateLayout, TWorldPosition } from './world-layout'
 
-export type TCharacterId = 'viking-raider' | 'lena'
-export type TWeapon = 'axe' | 'sword' | 'accordion'
+export type TCharacterId = 'viking-raider' | 'lena' | 'juan'
+export type TWeapon = 'axe' | 'sword' | 'accordion' | 'mic'
 export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 
 export interface ICharacterConfig {
+  chooserModelOffset: [number, number, number]
+  chooserModelRotation: [number, number, number]
+  chooserModelScale: number
   description: string
   id: TCharacterId
   label: string
@@ -61,25 +65,44 @@ export const TNT_EXPLOSION_PARTICLE_COLOR = '#ff5a4a'
 export const TNT_EXPLOSION_PARTICLE_EMISSIVE = '#ff2c1c'
 export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
   'viking-raider': {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1,
     id: 'viking-raider',
     label: 'Max',
     description:
       'A brutal sword-runner has ability to chop down enemies with his mighty sword.',
     modelUrl: lowPolyVikingModelUrl,
     modelScale: 1,
-    modelOffset: [0.25, -0.08, -0.1065],
+    modelOffset: [0, -0.08, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'sword'
   },
   lena: {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1,
     id: 'lena',
     label: 'Lena',
     description: 'Her accordion will smash your enemies into pieces. ',
     modelUrl: lenaModelUrl,
     modelScale: 1,
-    modelOffset: [0.25, -0.08, -0.1065],
+    modelOffset: [0, -0.08, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'accordion'
+  },
+  juan: {
+    chooserModelOffset: [0.25, 0, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1.7,
+    id: 'juan',
+    label: 'Janis Dregeris',
+    description: 'This man will explode your enemies with his mic.',
+    modelUrl: juanModelUrl,
+    modelScale: 1.7,
+    modelOffset: [0, 0.7, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'mic'
   }
 }
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {

@@ -11,6 +11,11 @@ interface ICharacterModel {
   groundOffset: number
   groupRef?: RefObject<Group | null>
   isHitFlashing?: boolean
+  modelTransformOverride?: {
+    offset: [number, number, number]
+    rotation: [number, number, number]
+    scale: number
+  }
 }
 
 const playerHitFlashColor = new Color('#ff3b30')
@@ -24,7 +29,8 @@ function CharacterModel({
   children,
   groundOffset,
   groupRef,
-  isHitFlashing = false
+  isHitFlashing = false,
+  modelTransformOverride
 }: ICharacterModel) {
   const { scene } = useGLTF(characterConfig.modelUrl)
   const [modelScene] = useState(() => scene.clone(true))
@@ -89,15 +95,21 @@ function CharacterModel({
     }
   }, [isHitFlashing])
 
+  const modelScale = modelTransformOverride?.scale ?? characterConfig.modelScale
+  const modelOffset =
+    modelTransformOverride?.offset ?? characterConfig.modelOffset
+  const modelRotation =
+    modelTransformOverride?.rotation ?? characterConfig.modelRotation
+
   return (
-    <group ref={groupRef} scale={characterConfig.modelScale}>
+    <group ref={groupRef} scale={modelScale}>
       <group
         position={[
-          characterConfig.modelOffset[0],
-          -groundOffset + characterConfig.modelOffset[1],
-          characterConfig.modelOffset[2]
+          modelOffset[0],
+          -groundOffset + modelOffset[1],
+          modelOffset[2]
         ]}
-        rotation={characterConfig.modelRotation}
+        rotation={modelRotation}
       >
         <primitive object={modelScene} />
       </group>

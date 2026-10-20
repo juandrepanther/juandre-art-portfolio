@@ -397,14 +397,12 @@ function GamePage() {
               health={health}
               isActive={isPlaying}
               isCameraOrbiting={isCameraOrbiting}
-              onEnemyHit={() =>
-                setEnemyHits((currentEnemyHits) => {
-                  incrementEnemiesDefeated()
-
-                  return currentEnemyHits + 1
-                })
-              }
+              onEnemyHit={() => {
+                incrementEnemiesDefeated()
+                setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
+              }}
               onHealthChange={handleHealthChange}
+              playerName={playerName}
               roundKey={roundKey}
               showHealthMeter={hasChosenCharacter}
             />
@@ -757,7 +755,7 @@ function GamePage() {
                     sx={{
                       position: 'absolute',
                       left: '50%',
-                      top: '50%',
+                      top: '85%',
                       transform: 'translate(-50%, -50%)',
                       color: resultStatusColor,
                       fontWeight: 800,

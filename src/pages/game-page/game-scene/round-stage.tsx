@@ -154,6 +154,7 @@ export default function RoundStage({
   isCameraOrbiting,
   onHealthChange,
   onEnemyHit,
+  playerName,
   roundKey,
   showHealthMeter
 }: IGameSceneProps) {
@@ -804,7 +805,9 @@ export default function RoundStage({
             groupRef={playerRef}
             isHitFlashing={isPlayerHitFlashing}
           >
-            {showHealthMeter ? <PlayerHealthMeter health={health} /> : null}
+            {showHealthMeter ? (
+              <PlayerHealthMeter health={health} playerName={playerName} />
+            ) : null}
           </CharacterModel>
         </Suspense>
       </RigidBody>

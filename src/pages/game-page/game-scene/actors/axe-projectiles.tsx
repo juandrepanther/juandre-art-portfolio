@@ -4,6 +4,7 @@ import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import accordionModelUrl from 'assets/models/accordion.glb?url'
 import axeModelUrl from 'assets/models/axe.glb?url'
+import micModelUrl from 'assets/models/mic.glb?url'
 import swordModelUrl from 'assets/models/sword.glb?url'
 import { Mesh, MeshStandardMaterial, type Group } from 'three'
 import { PROJECTILE_POOL_SIZE, type TWeapon } from '../../settings'
@@ -44,12 +45,18 @@ const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
     position: [0.2725, 0.06, 0],
     rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
     scale: 0.62
+  },
+  mic: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
+    scale: 0.62
   }
 }
 
 const projectileModelUrls: Record<TWeapon, string> = {
   axe: axeModelUrl,
   accordion: accordionModelUrl,
+  mic: micModelUrl,
   sword: swordModelUrl
 }
 

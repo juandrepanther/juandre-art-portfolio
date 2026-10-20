@@ -44,6 +44,11 @@ function CharacterPreview({ characterConfig }: ICharacterPreview) {
             <CharacterModel
               characterConfig={characterConfig}
               groundOffset={0}
+              modelTransformOverride={{
+                offset: characterConfig.chooserModelOffset,
+                rotation: characterConfig.chooserModelRotation,
+                scale: characterConfig.chooserModelScale
+              }}
             />
           </group>
         </Suspense>

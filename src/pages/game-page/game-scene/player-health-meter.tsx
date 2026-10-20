@@ -3,9 +3,10 @@ import { MAX_HEALTH, PLAYER_HEALTH_METER_OFFSET } from '../settings'
 
 interface IPlayerHealthMeter {
   health: number
+  playerName: string
 }
 
-function PlayerHealthMeter({ health }: IPlayerHealthMeter) {
+function PlayerHealthMeter({ health, playerName }: IPlayerHealthMeter) {
   const clampedHealth = Math.max(0, Math.min(MAX_HEALTH, Math.round(health)))
   const isHealthy = clampedHealth > 40
 
@@ -52,6 +53,7 @@ function PlayerHealthMeter({ health }: IPlayerHealthMeter) {
               textTransform: 'uppercase'
             }}
           >
+            <span>{playerName}</span>
             <span>HP</span>
             <span>{clampedHealth}%</span>
           </div>

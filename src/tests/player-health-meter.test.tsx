@@ -17,7 +17,7 @@ vi.mock('@react-three/drei', () => ({
 
 describe('PlayerHealthMeter', () => {
   it('renders the current health as progress and text', () => {
-    render(<PlayerHealthMeter health={65} />)
+    render(<PlayerHealthMeter health={65} playerName="Lena" />)
 
     const progressbar = screen.getByRole('progressbar', { name: /health 65%/i })
     const fill = screen.getByTestId('player-health-meter-fill')
@@ -25,12 +25,13 @@ describe('PlayerHealthMeter', () => {
     expect(progressbar).toHaveAttribute('aria-valuenow', '65')
     expect(progressbar).toHaveAttribute('data-health-tone', 'healthy')
     expect(fill).toHaveStyle({ width: '65%' })
+    expect(screen.getByText('Lena')).toBeInTheDocument()
     expect(screen.getByText('HP')).toBeInTheDocument()
     expect(screen.getByText('65%')).toBeInTheDocument()
   })
 
   it('switches to the critical variant at low health', () => {
-    render(<PlayerHealthMeter health={20} />)
+    render(<PlayerHealthMeter health={20} playerName="Lena" />)
 
     expect(screen.getByRole('progressbar')).toHaveAttribute(
       'data-health-tone',
@@ -42,7 +43,9 @@ describe('PlayerHealthMeter', () => {
   })
 
   it('clamps out-of-range health values', () => {
-    const { rerender } = render(<PlayerHealthMeter health={140} />)
+    const { rerender } = render(
+      <PlayerHealthMeter health={140} playerName="Lena" />
+    )
 
     expect(screen.getByRole('progressbar')).toHaveAttribute(
       'aria-valuenow',
@@ -52,7 +55,7 @@ describe('PlayerHealthMeter', () => {
       width: '100%'
     })
 
-    rerender(<PlayerHealthMeter health={-5} />)
+    rerender(<PlayerHealthMeter health={-5} playerName="Lena" />)
 
     expect(screen.getByRole('progressbar')).toHaveAttribute(
       'aria-valuenow',

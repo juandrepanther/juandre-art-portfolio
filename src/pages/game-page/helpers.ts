@@ -54,6 +54,7 @@ export interface IGameSceneProps {
   isCameraOrbiting: boolean
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
+  playerName: string
   roundKey: number
   showHealthMeter: boolean
 }

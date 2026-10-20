@@ -19,6 +19,7 @@ function GameScene({
   isCameraOrbiting,
   onHealthChange,
   onEnemyHit,
+  playerName,
   roundKey,
   showHealthMeter
 }: IGameSceneProps) {
@@ -59,6 +60,7 @@ function GameScene({
               isCameraOrbiting={isCameraOrbiting}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
+              playerName={playerName}
               key={`${difficulty}-${characterConfig.id}-${roundKey}`}
               roundKey={roundKey}
               showHealthMeter={showHealthMeter}
