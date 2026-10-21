@@ -190,6 +190,7 @@ export default function RoundStage({
   showHealthMeter
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
+  const shouldRenderVisualEffects = !isMobileViewport
   const [subscribeToKeyboard, getKeyboardState] =
     useKeyboardControls<TGameControl>()
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
@@ -318,11 +319,13 @@ export default function RoundStage({
 
     tntBoxState.active = false
     triggerPlayerHitFlash()
-    spawnExplosionParticles(
-      tntExplosionParticleStateRef.current,
-      tntBoxState.position.clone(),
-      TNT_EXPLOSION_PARTICLES_PER_BURST
-    )
+    if (shouldRenderVisualEffects) {
+      spawnExplosionParticles(
+        tntExplosionParticleStateRef.current,
+        tntBoxState.position.clone(),
+        TNT_EXPLOSION_PARTICLES_PER_BURST
+      )
+    }
 
     const nextHealth = Math.max(0, healthRef.current - TNT_BOX_DAMAGE)
     const healthDelta = nextHealth - healthRef.current
@@ -846,10 +849,12 @@ export default function RoundStage({
           })
 
           if (hitEnemy) {
-            spawnEnemyExplosionParticles(
-              enemyExplosionParticleStateRef.current,
-              hitEnemy.position.clone().add(ENEMY_HITBOX_OFFSET)
-            )
+            if (shouldRenderVisualEffects) {
+              spawnEnemyExplosionParticles(
+                enemyExplosionParticleStateRef.current,
+                hitEnemy.position.clone().add(ENEMY_HITBOX_OFFSET)
+              )
+            }
             hitEnemy.active = false
             hitEnemy.respawnAt =
               difficulty === 'Noob'
@@ -918,22 +923,24 @@ export default function RoundStage({
   return (
     <>
       <ArenaBounds />
-      <AtmosphereParticles />
+      {shouldRenderVisualEffects ? <AtmosphereParticles /> : null}
 
       <mesh
         position={[0, -0.02, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
+        receiveShadow={shouldRenderVisualEffects}
       >
         <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
         <meshStandardMaterial color="green" />
       </mesh>
-      <StormLightning
-        directionalLightRef={directionalLightRef}
-        spotlightRef={spotlightRef}
-      />
+      {shouldRenderVisualEffects ? (
+        <StormLightning
+          directionalLightRef={directionalLightRef}
+          spotlightRef={spotlightRef}
+        />
+      ) : null}
       <directionalLight
-        castShadow
+        castShadow={shouldRenderVisualEffects}
         color={DIRECTIONAL_LIGHT_BASE_COLOR}
         intensity={DIRECTIONAL_LIGHT_BASE_INTENSITY}
         position={DIRECTIONAL_LIGHT_POSITION}
@@ -954,21 +961,28 @@ export default function RoundStage({
       />
 
       <TreeCluster treeLayouts={treeLayouts} />
-      <CrateField crateLayouts={crateLayouts} />
+      <CrateField
+        crateLayouts={crateLayouts}
+        shouldRenderVisualEffects={shouldRenderVisualEffects}
+      />
       <Enemy
         enemyCount={difficultyConfig.enemyCount}
         enemyStateRef={enemyStateRef}
       />
-      <EnemyExplosionParticles
-        particleStatesRef={enemyExplosionParticleStateRef}
-      />
-      <ExplosionParticles
-        color={TNT_EXPLOSION_PARTICLE_COLOR}
-        emissive={TNT_EXPLOSION_PARTICLE_EMISSIVE}
-        emissiveIntensity={1.5}
-        particlePoolSize={TNT_EXPLOSION_PARTICLE_POOL_SIZE}
-        particleStatesRef={tntExplosionParticleStateRef}
-      />
+      {shouldRenderVisualEffects ? (
+        <EnemyExplosionParticles
+          particleStatesRef={enemyExplosionParticleStateRef}
+        />
+      ) : null}
+      {shouldRenderVisualEffects ? (
+        <ExplosionParticles
+          color={TNT_EXPLOSION_PARTICLE_COLOR}
+          emissive={TNT_EXPLOSION_PARTICLE_EMISSIVE}
+          emissiveIntensity={1.5}
+          particlePoolSize={TNT_EXPLOSION_PARTICLE_POOL_SIZE}
+          particleStatesRef={tntExplosionParticleStateRef}
+        />
+      ) : null}
       <PainkillerPickups
         painkillerStateRef={painkillerStateRef}
         treeLayouts={treeLayouts}
@@ -979,25 +993,29 @@ export default function RoundStage({
         tntBoxStateRef={tntBoxStateRef}
       />
       <AxeProjectiles projectilesRef={projectilesRef} />
-      <FloatingCombatText
-        floatingCombatTextStateRef={floatingCombatTextStateRef}
-        playerPositionRef={playerPositionRef}
-      />
-      <Clouds material={MeshBasicMaterial}>
-        {cloudConfigs.map((cloudConfig) => (
-          <Cloud
-            bounds={cloudConfig.bounds}
-            color={cloudConfig.color}
-            fade={cloudConfig.fade}
-            key={cloudConfig.seed}
-            position={cloudConfig.position}
-            scale={cloudConfig.scale}
-            seed={cloudConfig.seed}
-            segments={cloudConfig.segments}
-            volume={cloudConfig.volume}
-          />
-        ))}
-      </Clouds>
+      {shouldRenderVisualEffects ? (
+        <FloatingCombatText
+          floatingCombatTextStateRef={floatingCombatTextStateRef}
+          playerPositionRef={playerPositionRef}
+        />
+      ) : null}
+      {shouldRenderVisualEffects ? (
+        <Clouds material={MeshBasicMaterial}>
+          {cloudConfigs.map((cloudConfig) => (
+            <Cloud
+              bounds={cloudConfig.bounds}
+              color={cloudConfig.color}
+              fade={cloudConfig.fade}
+              key={cloudConfig.seed}
+              position={cloudConfig.position}
+              scale={cloudConfig.scale}
+              seed={cloudConfig.seed}
+              segments={cloudConfig.segments}
+              volume={cloudConfig.volume}
+            />
+          ))}
+        </Clouds>
+      ) : null}
       <RigidBody
         canSleep={false}
         colliders={false}

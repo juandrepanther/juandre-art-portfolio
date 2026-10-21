@@ -5,9 +5,14 @@ import { RoundedBox, Sparkles } from '@react-three/drei'
 interface ICrateObstacle {
   crateLayout: ICrateLayout
   index: number
+  shouldRenderVisualEffects: boolean
 }
 
-export function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
+export function CrateObstacle({
+  crateLayout,
+  index,
+  shouldRenderVisualEffects
+}: ICrateObstacle) {
   const [width, height, depth] = crateLayout.size
 
   return (
@@ -30,7 +35,9 @@ export function CrateObstacle({ crateLayout, index }: ICrateObstacle) {
           roughness={0.9}
         />
       </RoundedBox>
-      <Sparkles count={50} scale={5} size={8} speed={2.4} />
+      {shouldRenderVisualEffects ? (
+        <Sparkles count={50} scale={5} size={8} speed={2.4} />
+      ) : null}
     </RigidBody>
   )
 }

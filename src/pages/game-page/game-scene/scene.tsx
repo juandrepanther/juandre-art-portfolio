@@ -34,6 +34,7 @@ function GameScene({
   showHealthMeter
 }: IGameSceneProps) {
   const sunRef = useRef<Mesh | null>(null)
+  const shouldRenderVisualEffects = !isMobileViewport
 
   return (
     <KeyboardControls map={GAME_CONTROL_MAP}>
@@ -42,11 +43,15 @@ function GameScene({
         dpr={[1, 1.8]}
         fallback={<div>WebGL is unavailable.</div>}
         id="game-scene-canvas"
-        shadows
+        shadows={shouldRenderVisualEffects}
       >
         <Suspense fallback={null}>
           {import.meta.env.DEV ? <Perf position="top-right" /> : null}
-          <Environment preset="forest" background backgroundBlurriness={0.4} />
+          <Environment
+            preset="forest"
+            background={shouldRenderVisualEffects}
+            backgroundBlurriness={shouldRenderVisualEffects ? 0.4 : 0}
+          />
           <Physics
             colliders={false}
             debug={import.meta.env.DEV}
@@ -86,32 +91,34 @@ function GameScene({
               showHealthMeter={showHealthMeter}
             />
           </Physics>
-          <EffectComposer enabled={true} autoClear={false}>
-            <GodRays
-              blur={true}
-              blendFunction={BlendFunction.SCREEN}
-              clampMax={11}
-              decay={0.9}
-              density={0.96}
-              exposure={0.6}
-              kernelSize={KernelSize.SMALL}
-              resolutionX={Resolution.AUTO_SIZE}
-              resolutionY={Resolution.AUTO_SIZE}
-              samples={60}
-              sun={sunRef}
-              weight={2.4}
-            />
+          {shouldRenderVisualEffects ? (
+            <EffectComposer enabled={true} autoClear={false}>
+              <GodRays
+                blur={true}
+                blendFunction={BlendFunction.SCREEN}
+                clampMax={11}
+                decay={0.9}
+                density={0.96}
+                exposure={0.6}
+                kernelSize={KernelSize.SMALL}
+                resolutionX={Resolution.AUTO_SIZE}
+                resolutionY={Resolution.AUTO_SIZE}
+                samples={60}
+                sun={sunRef}
+                weight={2.4}
+              />
 
-            <Bloom
-              intensity={10}
-              kernelSize={KernelSize.LARGE}
-              luminanceThreshold={0.8}
-              luminanceSmoothing={0.025}
-              mipmapBlur={false}
-              resolutionX={Resolution.AUTO_SIZE}
-              resolutionY={Resolution.AUTO_SIZE}
-            />
-          </EffectComposer>
+              <Bloom
+                intensity={10}
+                kernelSize={KernelSize.LARGE}
+                luminanceThreshold={0.8}
+                luminanceSmoothing={0.025}
+                mipmapBlur={false}
+                resolutionX={Resolution.AUTO_SIZE}
+                resolutionY={Resolution.AUTO_SIZE}
+              />
+            </EffectComposer>
+          ) : null}
         </Suspense>
       </Canvas>
     </KeyboardControls>
