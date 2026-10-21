@@ -483,8 +483,8 @@ describe('GamePage', () => {
     )
   })
 
-  it('shows the desktop-only fallback on small viewports', () => {
-    mockedUseWindowSize.mockReturnValue({ height: 768, width: 900 })
+  it('shows the rotate-device fallback on mobile portrait viewports', () => {
+    mockedUseWindowSize.mockReturnValue({ height: 900, width: 500 })
 
     renderWithProviders(
       <MemoryRouter>
@@ -498,7 +498,7 @@ describe('GamePage', () => {
       screen.queryByTestId('spotify-artist-player')
     ).not.toBeInTheDocument()
     expect(
-      screen.getByText(/varang kill is tuned for desktop controls only/i)
+      screen.getByText(/rotate your phone to landscape to play/i)
     ).toBeInTheDocument()
   })
 

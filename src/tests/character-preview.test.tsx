@@ -50,7 +50,10 @@ describe('CharacterPreview', () => {
     modelState.shouldSuspend = true
 
     renderWithProviders(
-      <CharacterPreview characterConfig={CHARACTER_CONFIGS['viking-raider']} />
+      <CharacterPreview
+        characterConfig={CHARACTER_CONFIGS['viking-raider']}
+        isMobileViewport={false}
+      />
     )
 
     expect(screen.getByRole('status')).toHaveTextContent(/loading character/i)
@@ -64,7 +67,10 @@ describe('CharacterPreview', () => {
     modelState.shouldSuspend = false
 
     renderWithProviders(
-      <CharacterPreview characterConfig={CHARACTER_CONFIGS['viking-raider']} />
+      <CharacterPreview
+        characterConfig={CHARACTER_CONFIGS['viking-raider']}
+        isMobileViewport={false}
+      />
     )
 
     expect(screen.getByTestId('character-model')).toBeInTheDocument()

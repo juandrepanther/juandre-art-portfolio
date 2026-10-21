@@ -54,6 +54,15 @@ export interface IGameSceneProps {
   health: number
   isActive: boolean
   isCameraOrbiting: boolean
+  isLandscapeMobile: boolean
+  isMobileViewport: boolean
+  mobileJumpPressCount: number
+  mobileLookAccumulatorX: number
+  mobileLookAccumulatorY: number
+  mobileMoveVectorX: number
+  mobileMoveVectorY: number
+  mobileShootPressCount: number
+  showMobileControls: boolean
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
   playerName: string

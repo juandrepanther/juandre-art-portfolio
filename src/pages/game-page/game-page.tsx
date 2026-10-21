@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  IconButton,
   Stack,
   Typography
 } from '@mui/material'
@@ -24,6 +25,7 @@ import HomePageHeader from 'pages/home-page/sections/home-page-header'
 import CharacterChooser from './character-chooser/character-chooser'
 import GameScene from './game-scene/scene'
 import GameSceneLoaderOverlay from './game-scene/game-scene-loader'
+import MobileControlsOverlay from './game-scene/mobile-controls-overlay'
 import ScoreboardPanel from './scoreboard-panel'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
@@ -43,6 +45,12 @@ import {
 const SPOTIFY_ARTIST_EMBED_URL =
   'https://open.spotify.com/embed/artist/3ygNOpBpgEmQsKBdcO68li?utm_source=generator&si=38260154709a4925'
 const characterOptions = Object.keys(CHARACTER_CONFIGS) as TCharacterId[]
+
+interface IJoystickVector {
+  x: number
+  y: number
+}
+
 const fightButtonPulse = keyframes`
   0% {
     transform: scale(1);
@@ -59,7 +67,7 @@ const fightButtonPulse = keyframes`
 
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
-  const { width } = useWindowSize()
+  const { height, width } = useWindowSize()
   const [selectedCharacter, setSelectedCharacter] = useState<TCharacterId>(
     characterOptions[0]
   )
@@ -79,9 +87,25 @@ function GamePage() {
   )
   const [cameraHorizontalSnapKey, setCameraHorizontalSnapKey] = useState(0)
   const [roundKey, setRoundKey] = useState(0)
-  const [isScoreboardOpen, setIsScoreboardOpen] = useState(true)
+  const [isScoreboardOpen, setIsScoreboardOpen] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true
+    }
+
+    return window.innerWidth >= DESKTOP_BREAKPOINT
+  })
   const [isDeleteScoreboardDialogOpen, setIsDeleteScoreboardDialogOpen] =
     useState(false)
+  const [mobileMoveVector, setMobileMoveVector] = useState<IJoystickVector>({
+    x: 0,
+    y: 0
+  })
+  const [mobileLookAccumulator, setMobileLookAccumulator] = useState({
+    x: 0,
+    y: 0
+  })
+  const [mobileJumpPressCount, setMobileJumpPressCount] = useState(0)
+  const [mobileShootPressCount, setMobileShootPressCount] = useState(0)
 
   const scoreboardEntries = useGameScoreboardStore(
     (state) => state.scoreboardEntries
@@ -109,6 +133,13 @@ function GamePage() {
   )
 
   const isDesktop = width === undefined || width >= DESKTOP_BREAKPOINT
+  const isMobileViewport = !isDesktop
+  const isLandscapeMobile =
+    !isMobileViewport ||
+    width === undefined ||
+    height === undefined ||
+    width > height
+  const isMobilePortrait = isMobileViewport && !isLandscapeMobile
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
   const isRoundActive = isCountingDown || isPlaying
@@ -126,8 +157,33 @@ function GamePage() {
   const resultStatusLabel = gameStatus === 'won' ? 'WIN' : 'LOST'
   const resultStatusColor = gameStatus === 'won' ? '#6ec060' : '#ff5a4a'
   const trimmedPlayerName = playerName.trim()
+  const shouldShowMobileControlsOverlay =
+    isMobileViewport && isLandscapeMobile && isRoundActive
+
+  const handleMobileMoveChange = (vector: IJoystickVector) => {
+    setMobileMoveVector(vector)
+  }
+
+  const handleMobileLookDelta = (deltaX: number, deltaY: number) => {
+    setMobileLookAccumulator((currentAccumulator) => ({
+      x: currentAccumulator.x + deltaX,
+      y: currentAccumulator.y + deltaY
+    }))
+  }
+
+  const handleMobileJumpPress = () => {
+    setMobileJumpPressCount((currentCount) => currentCount + 1)
+  }
+
+  const handleMobileShootPress = () => {
+    setMobileShootPressCount((currentCount) => currentCount + 1)
+  }
 
   const lockGamePointer = () => {
+    if (isMobileViewport) {
+      return
+    }
+
     const gameCanvas = document.getElementById('game-scene-canvas')
 
     if (!(gameCanvas instanceof HTMLCanvasElement)) {
@@ -251,7 +307,7 @@ function GamePage() {
   }
 
   const handleStartGame = () => {
-    if (isCountingDown) {
+    if (isCountingDown || isMobilePortrait) {
       return
     }
 
@@ -339,11 +395,11 @@ function GamePage() {
         component="main"
         sx={{
           minHeight: 'calc(100vh - 88px)',
-          px: { xs: 2, md: 3 },
-          py: { xs: 2, md: 3 }
+          px: isMobileViewport ? 0 : { xs: 2, md: 3 },
+          py: isMobileViewport ? 0 : { xs: 2, md: 3 }
         }}
       >
-        {!isDesktop ? (
+        {!isDesktop && isMobilePortrait ? (
           <Stack
             spacing={3}
             sx={{
@@ -365,26 +421,37 @@ function GamePage() {
             }}
           >
             <Typography variant="h4" sx={{ maxWidth: '12ch' }}>
-              Varang Kill is tuned for desktop controls only
+              Rotate your phone to landscape to play
+            </Typography>
+            <Typography sx={{ color: 'text.secondary' }}>
+              Mobile controls are enabled in horizontal orientation only.
             </Typography>
           </Stack>
         ) : (
           <Box
             sx={{
               position: 'relative',
-              height: 'calc(100vh - 112px)',
-              minHeight: 'calc(100vh - 112px)',
+              height: isMobileViewport
+                ? 'calc(100vh - 88px)'
+                : 'calc(100vh - 112px)',
+              minHeight: isMobileViewport
+                ? 'calc(100vh - 88px)'
+                : 'calc(100vh - 112px)',
               overflow: 'hidden',
-              borderRadius: 3,
-              border: isDarkMode
-                ? '1px solid rgba(220, 229, 236, 0.12)'
-                : '1px solid rgba(20, 32, 44, 0.12)',
+              borderRadius: isMobileViewport ? 0.5 : 3,
+              border: isMobileViewport
+                ? 'none'
+                : isDarkMode
+                  ? '1px solid rgba(220, 229, 236, 0.12)'
+                  : '1px solid rgba(20, 32, 44, 0.12)',
               background: isDarkMode
                 ? 'linear-gradient(180deg, rgba(23, 33, 43, 0.92) 0%, rgba(12, 17, 23, 0.96) 100%)'
                 : 'linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(231, 240, 236, 0.92) 100%)',
-              boxShadow: isDarkMode
-                ? '0 30px 90px rgba(0, 0, 0, 0.35)'
-                : '0 30px 90px rgba(20, 32, 44, 0.18)'
+              boxShadow: isMobileViewport
+                ? 'none'
+                : isDarkMode
+                  ? '0 30px 90px rgba(0, 0, 0, 0.35)'
+                  : '0 30px 90px rgba(20, 32, 44, 0.18)'
             }}
           >
             <GameScene
@@ -395,6 +462,19 @@ function GamePage() {
               health={health}
               isActive={isPlaying}
               isCameraOrbiting={isCameraOrbiting}
+              isLandscapeMobile={isLandscapeMobile}
+              isMobileViewport={isMobileViewport}
+              mobileJumpPressCount={mobileJumpPressCount}
+              mobileLookAccumulatorX={mobileLookAccumulator.x}
+              mobileLookAccumulatorY={mobileLookAccumulator.y}
+              mobileMoveVectorX={
+                shouldShowMobileControlsOverlay ? mobileMoveVector.x : 0
+              }
+              mobileMoveVectorY={
+                shouldShowMobileControlsOverlay ? mobileMoveVector.y : 0
+              }
+              mobileShootPressCount={mobileShootPressCount}
+              showMobileControls={isRoundActive}
               onEnemyHit={() => {
                 incrementEnemiesDefeated()
                 setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
@@ -410,6 +490,7 @@ function GamePage() {
             {!hasChosenCharacter ? (
               <CharacterChooser
                 availableCharacterIds={characterOptions}
+                isMobileViewport={isMobileViewport}
                 onCharacterChange={setSelectedCharacter}
                 onDifficultyChange={handleDifficultyChange}
                 onPlayerNameChange={setPlayerName}
@@ -457,110 +538,148 @@ function GamePage() {
                   }}
                 />
 
-                <Stack
-                  spacing={2}
-                  sx={{
-                    position: 'absolute',
-                    left: 24,
-                    top: 24,
-                    width: 360,
-                    maxWidth: 'calc(100% - 48px)',
-                    p: 3.25,
-                    borderRadius: 2,
-                    backdropFilter: 'blur(18px)',
-                    backgroundColor: isDarkMode
-                      ? 'rgba(12, 17, 23, 0.62)'
-                      : 'rgba(243, 245, 248, 0.72)',
-                    border: isDarkMode
-                      ? '1px solid rgba(220, 229, 236, 0.12)'
-                      : '1px solid rgba(20, 32, 44, 0.12)'
-                  }}
-                >
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                    <Chip
-                      color="warning"
-                      label={`Mode: ${difficultyConfig.label}`}
-                    />
-                    <Chip
-                      color="primary"
-                      label={selectedCharacterConfig.label}
-                    />
-                  </Stack>
-
+                {isMobileViewport ? (
                   <Stack
                     direction="row"
+                    spacing={0.75}
                     sx={{
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      gap: 2
+                      position: 'absolute',
+                      left: '50%',
+                      top: 10,
+                      transform: 'translateX(-50%)',
+                      zIndex: 12,
+                      p: 0.6,
+                      borderRadius: 999,
+                      backdropFilter: 'blur(12px)',
+                      backgroundColor: isDarkMode
+                        ? 'rgba(12, 17, 23, 0.52)'
+                        : 'rgba(243, 245, 248, 0.72)',
+                      border: isDarkMode
+                        ? '1px solid rgba(220, 229, 236, 0.2)'
+                        : '1px solid rgba(20, 32, 44, 0.16)'
                     }}
                   >
-                    <Box>
+                    <Chip
+                      color="primary"
+                      label={`${remainingTime}s`}
+                      size="small"
+                    />
+                    <Chip
+                      color="warning"
+                      label={`Defeated: ${enemyHits}`}
+                      size="small"
+                    />
+                  </Stack>
+                ) : (
+                  <Stack
+                    spacing={2}
+                    sx={{
+                      position: 'absolute',
+                      left: 24,
+                      top: 24,
+                      width: 360,
+                      maxWidth: 'calc(100% - 48px)',
+                      p: 3.25,
+                      borderRadius: 2,
+                      backdropFilter: 'blur(18px)',
+                      backgroundColor: isDarkMode
+                        ? 'rgba(12, 17, 23, 0.62)'
+                        : 'rgba(243, 245, 248, 0.72)',
+                      border: isDarkMode
+                        ? '1px solid rgba(220, 229, 236, 0.12)'
+                        : '1px solid rgba(20, 32, 44, 0.12)'
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ flexWrap: 'wrap' }}
+                    >
+                      <Chip
+                        color="warning"
+                        label={`Mode: ${difficultyConfig.label}`}
+                      />
+                      <Chip
+                        color="primary"
+                        label={selectedCharacterConfig.label}
+                      />
+                    </Stack>
+
+                    <Stack
+                      direction="row"
+                      sx={{
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: 2
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          sx={{ color: 'text.secondary' }}
+                          variant="body2"
+                        >
+                          Time left
+                        </Typography>
+                        <Typography variant="h3">
+                          {formatTimeLabel(remainingTime)}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        component="img"
+                        alt="VN logo"
+                        src={logoVnImage}
+                        sx={{
+                          width: { xs: 84, sm: 112 },
+                          height: { xs: 84, sm: 112 },
+                          objectFit: 'contain',
+                          borderRadius: 3,
+                          alignSelf: 'center',
+                          filter: isDarkMode
+                            ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.28))'
+                            : 'drop-shadow(0 10px 20px rgba(16, 24, 40, 0.14))'
+                        }}
+                      />
+                    </Stack>
+
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: 'space-between' }}
+                    >
                       <Typography
                         sx={{ color: 'text.secondary' }}
                         variant="body2"
                       >
-                        Time left
+                        Enemies defeated
                       </Typography>
-                      <Typography variant="h3">
-                        {formatTimeLabel(remainingTime)}
-                      </Typography>
-                    </Box>
+                      <Chip
+                        color="warning"
+                        label={enemyHits}
+                        variant="outlined"
+                      />
+                    </Stack>
 
-                    <Box
-                      component="img"
-                      alt="VN logo"
-                      src={logoVnImage}
-                      sx={{
-                        width: { xs: 84, sm: 112 },
-                        height: { xs: 84, sm: 112 },
-                        objectFit: 'contain',
-                        borderRadius: 3,
-                        alignSelf: 'center',
-                        filter: isDarkMode
-                          ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.28))'
-                          : 'drop-shadow(0 10px 20px rgba(16, 24, 40, 0.14))'
-                      }}
-                    />
-                  </Stack>
-
-                  <Stack
-                    direction="row"
-                    sx={{ justifyContent: 'space-between' }}
-                  >
-                    <Typography
-                      sx={{ color: 'text.secondary' }}
-                      variant="body2"
-                    >
-                      Enemies defeated
-                    </Typography>
-                    <Chip
-                      color="warning"
-                      label={enemyHits}
-                      variant="outlined"
-                    />
-                  </Stack>
-
-                  <Stack direction="row" spacing={1.5}>
-                    <Button
-                      color="primary"
-                      disabled={!isRoundActive && gameStatus === 'menu'}
-                      onClick={handleReturnToMenu}
-                      variant="outlined"
-                    >
-                      STOP
-                    </Button>
-                    {shouldShowCenterFightButton ? (
+                    <Stack direction="row" spacing={1.5}>
                       <Button
-                        color="secondary"
-                        onClick={handleChooseDifferentCharacter}
-                        variant="contained"
+                        color="primary"
+                        disabled={!isRoundActive && gameStatus === 'menu'}
+                        onClick={handleReturnToMenu}
+                        variant="outlined"
                       >
-                        CHOOSE
+                        STOP
                       </Button>
-                    ) : null}
+                      {shouldShowCenterFightButton ? (
+                        <Button
+                          color="secondary"
+                          onClick={handleChooseDifferentCharacter}
+                          variant="contained"
+                        >
+                          CHOOSE
+                        </Button>
+                      ) : null}
+                    </Stack>
                   </Stack>
-                </Stack>
+                )}
 
                 {shouldShowCenterFightButton ? (
                   <Box
@@ -591,6 +710,15 @@ function GamePage() {
               </>
             ) : null}
 
+            {shouldShowMobileControlsOverlay ? (
+              <MobileControlsOverlay
+                onJumpPress={handleMobileJumpPress}
+                onLookDelta={handleMobileLookDelta}
+                onMoveChange={handleMobileMoveChange}
+                onShootPress={handleMobileShootPress}
+              />
+            ) : null}
+
             <Box
               sx={{
                 position: 'absolute',
@@ -610,45 +738,66 @@ function GamePage() {
               />
 
               {!isScoreboardOpen ? (
-                <Button
-                  color="secondary"
-                  onClick={handleOpenScoreboard}
-                  startIcon={<EmojiEvents />}
-                  variant="contained"
-                >
-                  Scoreboard
-                </Button>
+                isMobileViewport ? (
+                  <IconButton
+                    aria-label="Open scoreboard"
+                    color="secondary"
+                    onClick={handleOpenScoreboard}
+                    sx={{
+                      border: isDarkMode
+                        ? '1px solid rgba(220, 229, 236, 0.32)'
+                        : '1px solid rgba(20, 32, 44, 0.24)',
+                      borderRadius: 2,
+                      backgroundColor: isDarkMode
+                        ? 'rgba(12, 17, 23, 0.62)'
+                        : 'rgba(255, 255, 255, 0.72)'
+                    }}
+                  >
+                    <EmojiEvents />
+                  </IconButton>
+                ) : (
+                  <Button
+                    color="secondary"
+                    onClick={handleOpenScoreboard}
+                    startIcon={<EmojiEvents />}
+                    variant="contained"
+                  >
+                    Scoreboard
+                  </Button>
+                )
               ) : null}
             </Box>
 
-            <Box
-              sx={{
-                position: 'absolute',
-                left: 24,
-                bottom: 24,
-                zIndex: 2,
-                pointerEvents: 'auto'
-              }}
-            >
-              {hasSpotifyPlayerOpened ? (
-                <SpotifyArtistPlayer
-                  artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
-                  isDarkMode={isDarkMode}
-                  isVisible={isSpotifyPlayerOpen}
-                  onClose={handleCloseSpotifyPlayer}
-                />
-              ) : null}
-              {!isSpotifyPlayerOpen ? (
-                <Button
-                  color="secondary"
-                  onClick={handleOpenSpotifyPlayer}
-                  startIcon={<MusicNote />}
-                  variant="contained"
-                >
-                  Spotify
-                </Button>
-              ) : null}
-            </Box>
+            {!isMobileViewport ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  left: 24,
+                  bottom: 24,
+                  zIndex: 2,
+                  pointerEvents: 'auto'
+                }}
+              >
+                {hasSpotifyPlayerOpened ? (
+                  <SpotifyArtistPlayer
+                    artistEmbedUrl={SPOTIFY_ARTIST_EMBED_URL}
+                    isDarkMode={isDarkMode}
+                    isVisible={isSpotifyPlayerOpen}
+                    onClose={handleCloseSpotifyPlayer}
+                  />
+                ) : null}
+                {!isSpotifyPlayerOpen ? (
+                  <Button
+                    color="secondary"
+                    onClick={handleOpenSpotifyPlayer}
+                    startIcon={<MusicNote />}
+                    variant="contained"
+                  >
+                    Spotify
+                  </Button>
+                ) : null}
+              </Box>
+            ) : null}
 
             <Dialog
               fullWidth
@@ -675,12 +824,12 @@ function GamePage() {
                   left: '50%',
                   top: '50%',
                   zIndex: 3,
-                  minWidth: 240,
-                  px: 4,
-                  py: 3.5,
+                  minWidth: isMobileViewport ? 170 : 240,
+                  px: isMobileViewport ? 2 : 4,
+                  py: isMobileViewport ? 2 : 3.5,
                   textAlign: 'center',
                   transform: 'translate(-50%, -50%)',
-                  borderRadius: 3,
+                  borderRadius: isMobileViewport ? 0.5 : 3,
                   backdropFilter: 'blur(18px)',
                   backgroundColor: isDarkMode
                     ? 'rgba(12, 17, 23, 0.72)'
@@ -695,11 +844,20 @@ function GamePage() {
               >
                 <Typography
                   sx={{ color: 'secondary.main', letterSpacing: '0.16em' }}
+                  variant={isMobileViewport ? 'caption' : 'body1'}
                 >
                   PREPARE
                 </Typography>
-                <Typography variant="h1">{countdownSeconds}</Typography>
-                <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                <Typography variant={isMobileViewport ? 'h3' : 'h1'}>
+                  {countdownSeconds}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'text.secondary',
+                    lineHeight: 1.6,
+                    fontSize: isMobileViewport ? 12 : undefined
+                  }}
+                >
                   The run begins in two seconds. Get ready to move, aim, and
                   throw.
                 </Typography>
@@ -708,14 +866,18 @@ function GamePage() {
 
             <Dialog
               fullWidth
-              maxWidth="xs"
+              maxWidth={isMobileViewport ? false : 'xs'}
               open={isResultDialogOpen}
               sx={{ zIndex: (theme) => theme.zIndex.tooltip + 1 }}
               slotProps={{
                 paper: {
                   sx: {
-                    borderRadius: 2,
-                    p: 1.5,
+                    borderRadius: isMobileViewport ? 0.5 : 2,
+                    p: isMobileViewport ? 0.7 : 1.5,
+                    width: isMobileViewport
+                      ? 'min(300px, calc(100% - 20px))'
+                      : undefined,
+                    m: isMobileViewport ? 1 : undefined,
                     background: isDarkMode
                       ? 'linear-gradient(180deg, rgba(23, 33, 43, 0.98) 0%, rgba(12, 17, 23, 0.98) 100%)'
                       : 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(243, 245, 248, 0.98) 100%)',
@@ -734,7 +896,7 @@ function GamePage() {
                   sx={{
                     position: 'relative',
                     overflow: 'hidden',
-                    borderRadius: 1.5
+                    borderRadius: isMobileViewport ? 0.5 : 1.5
                   }}
                 >
                   <Box
@@ -743,12 +905,27 @@ function GamePage() {
                     src={resultImageSource}
                     sx={{
                       display: 'block',
-                      width: '100%',
+                      width:
+                        isMobileViewport && gameStatus === 'won'
+                          ? '82%'
+                          : '100%',
+                      maxHeight:
+                        isMobileViewport && gameStatus === 'won'
+                          ? 140
+                          : undefined,
+                      mx:
+                        isMobileViewport && gameStatus === 'won'
+                          ? 'auto'
+                          : undefined,
+                      objectFit:
+                        isMobileViewport && gameStatus === 'won'
+                          ? 'contain'
+                          : undefined,
                       height: 'auto'
                     }}
                   />
                   <Typography
-                    variant="h2"
+                    variant={isMobileViewport ? 'h4' : 'h2'}
                     sx={{
                       position: 'absolute',
                       left: '50%',
@@ -756,19 +933,32 @@ function GamePage() {
                       transform: 'translate(-50%, -50%)',
                       color: resultStatusColor,
                       fontWeight: 800,
-                      letterSpacing: '0.18em',
+                      letterSpacing: isMobileViewport ? '0.12em' : '0.18em',
                       textShadow: '0 10px 24px rgba(0, 0, 0, 0.55)',
                       textAlign: 'center',
                       backgroundColor: 'white',
-                      borderRadius: 1,
-                      p: 1
+                      borderRadius: isMobileViewport ? 0.5 : 1,
+                      p: isMobileViewport ? 0.6 : 1,
+                      fontSize: isMobileViewport ? 22 : undefined
                     }}
                   >
                     {resultStatusLabel}
                   </Typography>
                 </Box>
               </Box>
-              <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 2 }}>
+              <DialogActions
+                sx={{
+                  px: isMobileViewport ? 1.25 : 2.5,
+                  pb: isMobileViewport ? 1.25 : 2.5,
+                  pt: isMobileViewport ? 1 : 2,
+                  '& .MuiButton-root': {
+                    minWidth: isMobileViewport ? 76 : undefined,
+                    px: isMobileViewport ? 1 : undefined,
+                    py: isMobileViewport ? 0.6 : undefined,
+                    fontSize: isMobileViewport ? 11 : undefined
+                  }
+                }}
+              >
                 <Button
                   color="primary"
                   component={RouterLink}

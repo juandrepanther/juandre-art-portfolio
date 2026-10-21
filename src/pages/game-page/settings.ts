@@ -318,6 +318,7 @@ export const PLAYER_JUMP_VELOCITY = 11
 export const PLAYER_MOVE_SPEED = 12
 export const GAME_POINTER_COLOR = '#ffffff'
 export const POINTER_LOOK_SENSITIVITY = 0.0022
+export const MOBILE_TOUCH_LOOK_SENSITIVITY = 0.0034
 export const POINTER_MAX_PITCH = Math.PI / 3.1
 export const POINTER_MIN_PITCH = -Math.PI / 4.2
 export const POINTER_LOCK_SELECTOR = '#game-scene-canvas'

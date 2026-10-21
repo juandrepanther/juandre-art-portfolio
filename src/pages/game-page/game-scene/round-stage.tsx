@@ -82,8 +82,11 @@ import {
   ENEMY_EXPLOSION_PARTICLE_POOL_SIZE,
   PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
+  MOBILE_TOUCH_LOOK_SENSITIVITY,
   PLAYER_AXE_SPEED,
   PLAYER_CAMERA_HEIGHT,
+  POINTER_MAX_PITCH,
+  POINTER_MIN_PITCH,
   PLAYER_COLLIDER_HALF_HEIGHT,
   PLAYER_COLLISION_RADIUS,
   PLAYER_HIT_FLASH_DURATION_MS,
@@ -127,6 +130,19 @@ interface ICloudConfig {
   volume: number
 }
 
+interface ILookDelta {
+  x: number
+  y: number
+}
+
+function getYawFromDirection(direction: Vector3) {
+  return Math.atan2(direction.x, -direction.z)
+}
+
+function getPitchFromDirection(direction: Vector3) {
+  return Math.asin(direction.y)
+}
+
 const createRandomCloudConfigs = (): ICloudConfig[] => {
   const cloudCount = Math.floor(Math.random() * 2) + 1
 
@@ -158,6 +174,15 @@ export default function RoundStage({
   health,
   isActive,
   isCameraOrbiting,
+  isLandscapeMobile,
+  isMobileViewport,
+  mobileJumpPressCount,
+  mobileLookAccumulatorX,
+  mobileLookAccumulatorY,
+  mobileMoveVectorX,
+  mobileMoveVectorY,
+  mobileShootPressCount,
+  showMobileControls,
   onHealthChange,
   onEnemyHit,
   playerName,
@@ -221,6 +246,12 @@ export default function RoundStage({
   const hitFlashTimeoutRef = useRef<number | null>(null)
   const directionalLightRef = useRef<DirectionalLight | null>(null)
   const spotlightRef = useRef<SpotLight | null>(null)
+  const mobileLookDeltaRef = useRef<ILookDelta>({ x: 0, y: 0 })
+  const consumedLookAccumulatorRef = useRef({ x: 0, y: 0 })
+  const consumedJumpCountRef = useRef(0)
+  const consumedShootCountRef = useRef(0)
+  const cameraYawRef = useRef(0)
+  const cameraPitchRef = useRef(0)
 
   const setHealth = (health: number) => {
     healthRef.current = health
@@ -422,7 +453,9 @@ export default function RoundStage({
       pendingPointerShotRef.current = false
     }
 
-    window.addEventListener('pointerdown', handlePointerDown)
+    if (!isMobileViewport) {
+      window.addEventListener('pointerdown', handlePointerDown)
+    }
     window.addEventListener('blur', handleBlur)
 
     return () => {
@@ -433,7 +466,7 @@ export default function RoundStage({
       resetControlsState(controls)
       pendingPointerShotRef.current = false
     }
-  }, [getKeyboardState, isActive, subscribeToKeyboard])
+  }, [getKeyboardState, isActive, isMobileViewport, subscribeToKeyboard])
 
   useEffect(() => {
     playerPositionRef.current.copy(createInitialPlayerPosition())
@@ -449,6 +482,12 @@ export default function RoundStage({
       cameraRight: cameraRightRef.current,
       playerPosition: playerPositionRef.current
     })
+    cameraYawRef.current = getYawFromDirection(cameraLookDirectionRef.current)
+    cameraPitchRef.current = getPitchFromDirection(
+      cameraLookDirectionRef.current
+    )
+    mobileLookDeltaRef.current = { x: 0, y: 0 }
+    consumedLookAccumulatorRef.current = { x: 0, y: 0 }
     resetControlsState(controlsRef.current)
     enemyStateRef.current = createEnemyState(
       difficultyConfig.enemyCount,
@@ -498,6 +537,46 @@ export default function RoundStage({
   ])
 
   useEffect(() => {
+    const lookAccumulatorDiffX =
+      mobileLookAccumulatorX - consumedLookAccumulatorRef.current.x
+    const lookAccumulatorDiffY =
+      mobileLookAccumulatorY - consumedLookAccumulatorRef.current.y
+
+    consumedLookAccumulatorRef.current = {
+      x: mobileLookAccumulatorX,
+      y: mobileLookAccumulatorY
+    }
+
+    mobileLookDeltaRef.current.x += lookAccumulatorDiffX
+    mobileLookDeltaRef.current.y += lookAccumulatorDiffY
+  }, [mobileLookAccumulatorX, mobileLookAccumulatorY])
+
+  useEffect(() => {
+    if (
+      !isLandscapeMobile ||
+      mobileJumpPressCount <= consumedJumpCountRef.current
+    ) {
+      return
+    }
+
+    consumedJumpCountRef.current = mobileJumpPressCount
+    triggerPlayerJump()
+  }, [isLandscapeMobile, mobileJumpPressCount])
+
+  useEffect(() => {
+    if (
+      !isActive ||
+      !isLandscapeMobile ||
+      mobileShootPressCount <= consumedShootCountRef.current
+    ) {
+      return
+    }
+
+    consumedShootCountRef.current = mobileShootPressCount
+    shootPlayerProjectileRef.current()
+  }, [isActive, isLandscapeMobile, mobileShootPressCount])
+
+  useEffect(() => {
     if (cameraHorizontalSnapKey <= 0 || isCameraOrbiting) {
       return
     }
@@ -523,6 +602,10 @@ export default function RoundStage({
       cameraLookDirection: cameraLookDirectionRef.current,
       cameraRight: cameraRightRef.current
     })
+    cameraYawRef.current = getYawFromDirection(cameraLookDirectionRef.current)
+    cameraPitchRef.current = getPitchFromDirection(
+      cameraLookDirectionRef.current
+    )
   }, [camera, cameraHorizontalSnapKey, isCameraOrbiting])
 
   useFrame((_, delta) => {
@@ -551,6 +634,29 @@ export default function RoundStage({
         playerPosition: playerPositionRef.current
       })
     } else {
+      if (isMobileViewport && isLandscapeMobile && showMobileControls) {
+        const deltaLook = mobileLookDeltaRef.current
+
+        if (deltaLook.x !== 0 || deltaLook.y !== 0) {
+          cameraYawRef.current -= deltaLook.x * MOBILE_TOUCH_LOOK_SENSITIVITY
+          cameraPitchRef.current = Math.max(
+            POINTER_MIN_PITCH,
+            Math.min(
+              POINTER_MAX_PITCH,
+              cameraPitchRef.current -
+                deltaLook.y * MOBILE_TOUCH_LOOK_SENSITIVITY
+            )
+          )
+          camera.rotation.set(
+            cameraPitchRef.current,
+            cameraYawRef.current,
+            0,
+            'YXZ'
+          )
+          mobileLookDeltaRef.current = { x: 0, y: 0 }
+        }
+      }
+
       syncCameraState({
         camera,
         cameraForward: cameraForwardRef.current,
@@ -573,10 +679,42 @@ export default function RoundStage({
       return
     }
 
+    const mobileForward = mobileMoveVectorY < -0.28
+    const mobileBackward = mobileMoveVectorY > 0.28
+    const mobileLeft = mobileMoveVectorX < -0.28
+    const mobileRight = mobileMoveVectorX > 0.28
+
+    const mergedControls = {
+      backward:
+        controlsRef.current.backward ||
+        (isMobileViewport &&
+          isLandscapeMobile &&
+          showMobileControls &&
+          mobileBackward),
+      forward:
+        controlsRef.current.forward ||
+        (isMobileViewport &&
+          isLandscapeMobile &&
+          showMobileControls &&
+          mobileForward),
+      left:
+        controlsRef.current.left ||
+        (isMobileViewport &&
+          isLandscapeMobile &&
+          showMobileControls &&
+          mobileLeft),
+      right:
+        controlsRef.current.right ||
+        (isMobileViewport &&
+          isLandscapeMobile &&
+          showMobileControls &&
+          mobileRight)
+    }
+
     updatePlayerMovement({
       cameraForward: cameraForwardRef.current,
       cameraRight: cameraRightRef.current,
-      controls: controlsRef.current,
+      controls: mergedControls,
       delta,
       playerVelocity: playerVelocityRef.current
     })
@@ -891,18 +1029,20 @@ export default function RoundStage({
         </Suspense>
       </RigidBody>
 
-      <GameSceneInstructions key={roundKey} />
+      {!isMobileViewport ? <GameSceneInstructions key={roundKey} /> : null}
 
-      <PointerLockControls
-        makeDefault
-        enabled={isActive}
-        maxPolarAngle={POINTER_LOCK_MAX_POLAR_ANGLE}
-        minPolarAngle={POINTER_LOCK_MIN_POLAR_ANGLE}
-        onLock={handlePointerLock}
-        onUnlock={handlePointerUnlock}
-        pointerSpeed={POINTER_LOCK_SPEED}
-        selector={POINTER_LOCK_SELECTOR}
-      />
+      {!isMobileViewport ? (
+        <PointerLockControls
+          makeDefault
+          enabled={isActive}
+          maxPolarAngle={POINTER_LOCK_MAX_POLAR_ANGLE}
+          minPolarAngle={POINTER_LOCK_MIN_POLAR_ANGLE}
+          onLock={handlePointerLock}
+          onUnlock={handlePointerUnlock}
+          pointerSpeed={POINTER_LOCK_SPEED}
+          selector={POINTER_LOCK_SELECTOR}
+        />
+      ) : null}
     </>
   )
 }

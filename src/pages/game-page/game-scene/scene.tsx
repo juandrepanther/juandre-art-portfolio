@@ -18,6 +18,15 @@ function GameScene({
   health,
   isActive,
   isCameraOrbiting,
+  isLandscapeMobile,
+  isMobileViewport,
+  mobileJumpPressCount,
+  mobileLookAccumulatorX,
+  mobileLookAccumulatorY,
+  mobileMoveVectorX,
+  mobileMoveVectorY,
+  mobileShootPressCount,
+  showMobileControls,
   onHealthChange,
   onEnemyHit,
   playerName,
@@ -60,6 +69,15 @@ function GameScene({
               health={health}
               isActive={isActive}
               isCameraOrbiting={isCameraOrbiting}
+              isLandscapeMobile={isLandscapeMobile}
+              isMobileViewport={isMobileViewport}
+              mobileJumpPressCount={mobileJumpPressCount}
+              mobileLookAccumulatorX={mobileLookAccumulatorX}
+              mobileLookAccumulatorY={mobileLookAccumulatorY}
+              mobileMoveVectorX={mobileMoveVectorX}
+              mobileMoveVectorY={mobileMoveVectorY}
+              mobileShootPressCount={mobileShootPressCount}
+              showMobileControls={showMobileControls}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
               playerName={playerName}

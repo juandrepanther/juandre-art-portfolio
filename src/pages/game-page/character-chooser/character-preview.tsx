@@ -8,6 +8,7 @@ import CharacterModel from './character-model'
 
 interface ICharacterPreview {
   characterConfig: ICharacterConfig
+  isMobileViewport: boolean
 }
 
 function CharacterPreviewLoader() {
@@ -40,7 +41,10 @@ function CharacterPreviewLoader() {
   )
 }
 
-function CharacterPreview({ characterConfig }: ICharacterPreview) {
+function CharacterPreview({
+  characterConfig,
+  isMobileViewport
+}: ICharacterPreview) {
   const theme = useTheme()
 
   return (
@@ -48,7 +52,7 @@ function CharacterPreview({ characterConfig }: ICharacterPreview) {
       sx={{
         position: 'relative',
         overflow: 'hidden',
-        minHeight: 420,
+        minHeight: isMobileViewport ? 178 : 420,
         borderRadius: 3,
         border: `1px solid ${alpha(theme.palette.common.white, 0.12)}`,
         background:
@@ -57,8 +61,17 @@ function CharacterPreview({ characterConfig }: ICharacterPreview) {
       }}
     >
       <Canvas
-        camera={{ fov: 34, near: 0.1, far: 10, position: [0, 1.65, 5.4] }}
-        dpr={[1, 1.6]}
+        camera={{
+          fov: isMobileViewport ? 38 : 34,
+          near: 0.1,
+          far: 10,
+          position: [
+            0,
+            isMobileViewport ? 1.5 : 1.65,
+            isMobileViewport ? 4.7 : 5.4
+          ]
+        }}
+        dpr={isMobileViewport ? [1, 1.3] : [1, 1.6]}
         style={{ position: 'absolute', inset: 0 }}
       >
         <ambientLight intensity={1.6} />

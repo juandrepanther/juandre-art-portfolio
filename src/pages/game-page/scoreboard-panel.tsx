@@ -58,6 +58,7 @@ function ScoreboardPanel({
           ? {
               width: 340,
               maxWidth: 'calc(100vw - 40px)',
+              maxHeight: { xs: '56vh', md: 'unset' },
               p: 1.5,
               borderRadius: 1.5,
               backdropFilter: 'blur(18px)',
@@ -70,6 +71,7 @@ function ScoreboardPanel({
               boxShadow: isDarkMode
                 ? '0 20px 60px rgba(0, 0, 0, 0.32)'
                 : '0 20px 60px rgba(20, 32, 44, 0.18)',
+              overflow: 'hidden',
               pointerEvents: 'auto'
             }
           : {
@@ -100,7 +102,14 @@ function ScoreboardPanel({
         ) : null}
       </Stack>
 
-      <Stack spacing={1}>
+      <Stack
+        spacing={1}
+        sx={{
+          overflowY: { xs: 'auto', md: 'visible' },
+          pr: { xs: 0.25, md: 0 },
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         {groupedEntries.map((difficultyGroup) => (
           <Stack
             key={difficultyGroup.difficulty ?? 'no-difficulty'}
