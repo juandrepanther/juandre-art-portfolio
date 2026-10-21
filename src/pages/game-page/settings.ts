@@ -51,6 +51,15 @@ export interface IDifficultyConfig {
   roundTime: number
 }
 
+export type TInteriorWallAxis = 'x' | 'z'
+
+export interface IInteriorArenaWallSegment {
+  axis: TInteriorWallAxis
+  center: [number, number]
+  id: string
+  length: number
+}
+
 export const GAME_ARENA_HALF_SIZE = 38
 export const GAME_GROUND_SIZE = 104
 export const GAME_BACKGROUND_COLOR = '#7f8b92'
@@ -199,6 +208,37 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
 }
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8
 export const ARENA_BOUNDARY_COLLIDER_THICKNESS = 2
+export const INTERIOR_ARENA_WALL_THICKNESS = 0.4
+export const INTERIOR_ARENA_WALL_HEIGHT = 4
+export const INTERIOR_ARENA_WALL_LONG_LENGTH = 15
+export const INTERIOR_ARENA_WALL_SHORT_LENGTH = 15
+export const INTERIOR_ARENA_WALL_COLOR = '#cf7e31'
+export const INTERIOR_ARENA_WALL_SEGMENTS: IInteriorArenaWallSegment[] = [
+  {
+    axis: 'x',
+    center: [-30.5, -24],
+    id: 'upper-left-horizontal',
+    length: INTERIOR_ARENA_WALL_LONG_LENGTH
+  },
+  {
+    axis: 'z',
+    center: [19, -30.5],
+    id: 'upper-middle-vertical',
+    length: INTERIOR_ARENA_WALL_LONG_LENGTH
+  },
+  {
+    axis: 'z',
+    center: [-5, 30.5],
+    id: 'lower-middle-vertical',
+    length: INTERIOR_ARENA_WALL_LONG_LENGTH
+  },
+  {
+    axis: 'x',
+    center: [30.5, 14],
+    id: 'right-lower-horizontal',
+    length: INTERIOR_ARENA_WALL_SHORT_LENGTH
+  }
+]
 export const TREE_TRUNK_COLLIDER_ARGS: [number, number, number] = [
   0.85, 1.95, 0.85
 ]
