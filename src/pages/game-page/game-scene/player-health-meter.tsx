@@ -3,10 +3,15 @@ import { MAX_HEALTH, PLAYER_HEALTH_METER_OFFSET } from '../settings'
 
 interface IPlayerHealthMeter {
   health: number
+  isMobileViewport?: boolean
   playerName: string
 }
 
-function PlayerHealthMeter({ health, playerName }: IPlayerHealthMeter) {
+function PlayerHealthMeter({
+  health,
+  isMobileViewport = false,
+  playerName
+}: IPlayerHealthMeter) {
   const clampedHealth = Math.max(0, Math.min(MAX_HEALTH, Math.round(health)))
   const isHealthy = clampedHealth > 40
 
@@ -27,7 +32,7 @@ function PlayerHealthMeter({ health, playerName }: IPlayerHealthMeter) {
           data-health-tone={isHealthy ? 'healthy' : 'critical'}
           role="progressbar"
           style={{
-            width: '232px',
+            width: isMobileViewport ? '125px' : '232px',
             padding: '8px 10px 10px',
             border: '1px solid rgba(255, 255, 255, 0.32)',
             borderRadius: '18px',

@@ -1041,7 +1041,11 @@ export default function RoundStage({
             isHitFlashing={isPlayerHitFlashing}
           >
             {showHealthMeter ? (
-              <PlayerHealthMeter health={health} playerName={playerName} />
+              <PlayerHealthMeter
+                health={health}
+                isMobileViewport={isMobileViewport}
+                playerName={playerName}
+              />
             ) : null}
           </CharacterModel>
         </Suspense>
