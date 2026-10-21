@@ -67,7 +67,7 @@ export const GAME_FOG_COLOR = '#98a2a8'
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_HEALTH = 100
 export const PAINKILLER_HEAL = 20
-export const START_RUN_COUNTDOWN_SECONDS = 2
+export const START_RUN_COUNTDOWN_SECONDS = 3
 export const PROJECTILE_LIFETIME_SECONDS = 3.2
 export const PAINKILLER_RESPAWN_SECONDS = 10
 export const ENEMY_RESPAWN_SECONDS = 5
@@ -185,7 +185,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 2.2,
     enemyProjectileSpeed: 8,
     enemyThrowInterval: 2.6,
-    roundTime: 15
+    roundTime: 40
   },
   Balls: {
     label: 'Balls',
@@ -194,7 +194,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 4.2,
     enemyProjectileSpeed: 13,
     enemyThrowInterval: 1.95,
-    roundTime: 30
+    roundTime: 60
   },
   Hardcore: {
     label: 'Hardcore',
@@ -203,7 +203,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 7.4,
     enemyProjectileSpeed: 18,
     enemyThrowInterval: 1.3,
-    roundTime: 60
+    roundTime: 80
   }
 }
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8

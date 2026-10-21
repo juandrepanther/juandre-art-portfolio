@@ -6,7 +6,12 @@ import { useGameScoreboardStore } from 'lib/zustand/game-scoreboard-store'
 import { useGameTemporaryScoreStore } from 'lib/zustand/game-temporary-score-store'
 import { useThemeStore } from 'lib/zustand/theme-store'
 import GamePage from 'pages/game-page/game-page'
+import { formatTimeLabel } from 'pages/game-page/helpers'
 import type { IGameSceneProps } from 'pages/game-page/helpers'
+import {
+  DIFFICULTY_CONFIGS,
+  START_RUN_COUNTDOWN_SECONDS
+} from 'pages/game-page/settings'
 import { renderWithProviders } from './tests-helpers'
 
 const mockedUseWindowSize = vi.fn()
@@ -191,7 +196,9 @@ describe('GamePage', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/60%/i)
     expect(screen.getByRole('status')).toHaveTextContent(/loading enemy\.glb/i)
     expect(screen.getByText(/scene health: 100/i)).toBeInTheDocument()
-    expect(screen.getByText('01:00')).toBeInTheDocument()
+    expect(
+      screen.getByText(formatTimeLabel(DIFFICULTY_CONFIGS.Hardcore.roundTime))
+    ).toBeInTheDocument()
     expect(screen.getByText(/enemies defeated/i)).toBeInTheDocument()
     expect(screen.getAllByText('0').length).toBeGreaterThan(0)
     expect(
@@ -495,7 +502,7 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
   })
 
-  it('starts with a two second preparation countdown', () => {
+  it('starts with the configured preparation countdown', async () => {
     vi.useFakeTimers()
 
     renderWithProviders(
@@ -509,24 +516,30 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(
+      screen.getByText(String(START_RUN_COUNTDOWN_SECONDS))
+    ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
     expect(
       screen.getByText(/the run begins in two seconds/i)
     ).toBeInTheDocument()
 
-    act(() => {
-      vi.advanceTimersByTime(1000)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000)
     })
 
-    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(
+      screen.getByText(String(START_RUN_COUNTDOWN_SECONDS - 1))
+    ).toBeInTheDocument()
     expect(
       screen.getByText(/the run begins in two seconds/i)
     ).toBeInTheDocument()
 
-    act(() => {
-      vi.advanceTimersByTime(1000)
-    })
+    for (let second = 0; second < START_RUN_COUNTDOWN_SECONDS; second += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000)
+      })
+    }
 
     expect(screen.queryByText('PREPARE')).not.toBeInTheDocument()
     expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
@@ -552,7 +565,9 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
     expect(screen.getByText('PREPARE')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(
+      screen.getByText(String(START_RUN_COUNTDOWN_SECONDS))
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /^fight$/i })
     ).not.toBeInTheDocument()
@@ -564,8 +579,12 @@ describe('GamePage', () => {
       vi.advanceTimersByTime(1000)
     })
 
-    expect(screen.getByText('1')).toBeInTheDocument()
-    expect(screen.queryByText('2')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(String(START_RUN_COUNTDOWN_SECONDS - 1))
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(String(START_RUN_COUNTDOWN_SECONDS))
+    ).not.toBeInTheDocument()
   })
 
   it('passes updated health back into the scene contract', () => {
@@ -634,7 +653,10 @@ describe('GamePage', () => {
       screen.getByRole('button', { name: /trigger enemy defeat/i })
     )
 
-    for (let second = 0; second < 18; second += 1) {
+    const roundCompletionSeconds =
+      START_RUN_COUNTDOWN_SECONDS + DIFFICULTY_CONFIGS.Noob.roundTime + 1
+
+    for (let second = 0; second < roundCompletionSeconds; second += 1) {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1000)
       })
@@ -694,7 +716,10 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
 
-    for (let second = 0; second < 18; second += 1) {
+    const roundCompletionSeconds =
+      START_RUN_COUNTDOWN_SECONDS + DIFFICULTY_CONFIGS.Noob.roundTime + 1
+
+    for (let second = 0; second < roundCompletionSeconds; second += 1) {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1000)
       })
