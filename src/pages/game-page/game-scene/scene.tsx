@@ -11,6 +11,7 @@ import type { Mesh } from 'three'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
 
 function GameScene({
+  cameraHorizontalSnapKey,
   characterConfig,
   difficultyConfig,
   difficulty,
@@ -52,6 +53,7 @@ function GameScene({
               />
             </mesh>
             <RoundStage
+              cameraHorizontalSnapKey={cameraHorizontalSnapKey}
               characterConfig={characterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}

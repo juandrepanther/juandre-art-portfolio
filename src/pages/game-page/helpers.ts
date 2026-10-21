@@ -47,6 +47,7 @@ export {
 export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
 
 export interface IGameSceneProps {
+  cameraHorizontalSnapKey?: number
   characterConfig: ICharacterConfig
   difficultyConfig: IDifficultyConfig
   difficulty: TDifficultyLevel

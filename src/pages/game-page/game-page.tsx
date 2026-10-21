@@ -77,6 +77,7 @@ function GamePage() {
   const [countdownSeconds, setCountdownSeconds] = useState(
     START_RUN_COUNTDOWN_SECONDS
   )
+  const [cameraHorizontalSnapKey, setCameraHorizontalSnapKey] = useState(0)
   const [roundKey, setRoundKey] = useState(0)
   const [isScoreboardOpen, setIsScoreboardOpen] = useState(true)
   const [isDeleteScoreboardDialogOpen, setIsDeleteScoreboardDialogOpen] =
@@ -254,6 +255,7 @@ function GamePage() {
       return
     }
 
+    setCameraHorizontalSnapKey((currentSnapKey) => currentSnapKey + 1)
     startRound()
   }
 
@@ -386,6 +388,7 @@ function GamePage() {
             }}
           >
             <GameScene
+              cameraHorizontalSnapKey={cameraHorizontalSnapKey}
               characterConfig={selectedCharacterConfig}
               difficultyConfig={difficultyConfig}
               difficulty={difficulty}

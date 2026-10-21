@@ -83,6 +83,7 @@ import {
   PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
   PLAYER_AXE_SPEED,
+  PLAYER_CAMERA_HEIGHT,
   PLAYER_COLLIDER_HALF_HEIGHT,
   PLAYER_COLLISION_RADIUS,
   PLAYER_HIT_FLASH_DURATION_MS,
@@ -152,6 +153,7 @@ const createRandomCloudConfigs = (): ICloudConfig[] => {
 }
 
 export default function RoundStage({
+  cameraHorizontalSnapKey = 0,
   characterConfig,
   difficultyConfig,
   difficulty,
@@ -496,6 +498,34 @@ export default function RoundStage({
     roundKey,
     treeLayouts
   ])
+
+  useEffect(() => {
+    if (cameraHorizontalSnapKey <= 0 || isCameraOrbiting) {
+      return
+    }
+
+    const horizontalLookDirection = cameraLookDirectionRef.current.clone()
+    horizontalLookDirection.y = 0
+
+    if (horizontalLookDirection.lengthSq() <= 0.0001) {
+      horizontalLookDirection.set(0, 0, -1)
+    } else {
+      horizontalLookDirection.normalize()
+    }
+
+    const horizontalLookTarget = playerPositionRef.current
+      .clone()
+      .add(new Vector3(0, PLAYER_CAMERA_HEIGHT, 0))
+      .add(horizontalLookDirection.multiplyScalar(18))
+
+    camera.lookAt(horizontalLookTarget)
+    syncCameraState({
+      camera,
+      cameraForward: cameraForwardRef.current,
+      cameraLookDirection: cameraLookDirectionRef.current,
+      cameraRight: cameraRightRef.current
+    })
+  }, [camera, cameraHorizontalSnapKey, isCameraOrbiting])
 
   useFrame((_, delta) => {
     updateFloatingCombatTextStates(floatingCombatTextStateRef.current, delta)
