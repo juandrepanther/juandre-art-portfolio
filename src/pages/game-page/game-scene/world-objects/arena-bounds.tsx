@@ -22,6 +22,11 @@ const wallTextureUrls = [
   wallTextureDUrl
 ]
 
+interface IOuterBoundaryWall {
+  args: [number, number, number]
+  position: [number, number, number]
+}
+
 export function ArenaBounds() {
   const outerHalfThickness = ARENA_BOUNDARY_COLLIDER_THICKNESS / 2
   const outerSideLength = ARENA_HALF_SIZE + ARENA_BOUNDARY_COLLIDER_THICKNESS
@@ -40,24 +45,47 @@ export function ArenaBounds() {
     }
   }, [wallTextures])
 
+  const outerBoundaryWalls: IOuterBoundaryWall[] = [
+    {
+      args: [outerHalfThickness, outerHalfHeight, outerSideLength],
+      position: [ARENA_HALF_SIZE + outerHalfThickness, outerHalfHeight, 0]
+    },
+    {
+      args: [outerHalfThickness, outerHalfHeight, outerSideLength],
+      position: [-ARENA_HALF_SIZE - outerHalfThickness, outerHalfHeight, 0]
+    },
+    {
+      args: [outerSideLength, outerHalfHeight, outerHalfThickness],
+      position: [0, outerHalfHeight, ARENA_HALF_SIZE + outerHalfThickness]
+    },
+    {
+      args: [outerSideLength, outerHalfHeight, outerHalfThickness],
+      position: [0, outerHalfHeight, -ARENA_HALF_SIZE - outerHalfThickness]
+    }
+  ]
+
   return (
     <group>
-      <CuboidCollider
-        args={[outerHalfThickness, outerHalfHeight, outerSideLength]}
-        position={[ARENA_HALF_SIZE + outerHalfThickness, outerHalfHeight, 0]}
-      />
-      <CuboidCollider
-        args={[outerHalfThickness, outerHalfHeight, outerSideLength]}
-        position={[-ARENA_HALF_SIZE - outerHalfThickness, outerHalfHeight, 0]}
-      />
-      <CuboidCollider
-        args={[outerSideLength, outerHalfHeight, outerHalfThickness]}
-        position={[0, outerHalfHeight, ARENA_HALF_SIZE + outerHalfThickness]}
-      />
-      <CuboidCollider
-        args={[outerSideLength, outerHalfHeight, outerHalfThickness]}
-        position={[0, outerHalfHeight, -ARENA_HALF_SIZE - outerHalfThickness]}
-      />
+      {outerBoundaryWalls.map(({ args, position }, index) => {
+        const width = args[0] * 2
+        const height = args[1] * 2
+        const depth = args[2] * 2
+
+        return (
+          <group key={`outer-boundary-collider-${index}`}>
+            <CuboidCollider args={args} position={position} />
+            <mesh position={position}>
+              <boxGeometry args={[width, height, depth]} />
+              <meshBasicMaterial
+                color="#85ffd2"
+                depthWrite={false}
+                opacity={0.18}
+                transparent
+              />
+            </mesh>
+          </group>
+        )
+      })}
       {INTERIOR_ARENA_WALL_SEGMENTS.map((segment, index) => {
         const primaryTexture = wallTextures[index]
         const secondaryTexture = wallTextures[(index + 1) % wallTextures.length]
