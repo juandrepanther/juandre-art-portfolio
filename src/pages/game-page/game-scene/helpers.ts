@@ -6,6 +6,8 @@ import {
   type ITreeLayout
 } from '../helpers'
 import {
+  ARENA_BOUNDARY_COLLIDER_HEIGHT,
+  ARENA_BOUNDARY_COLLIDER_THICKNESS,
   ARENA_HALF_SIZE,
   ATMOSPHERE_PARTICLE_COUNT,
   CRATE_PLACEMENT_ATTEMPTS,
@@ -19,6 +21,9 @@ import {
   FLOATING_COMBAT_TEXT_SIDE_JITTER,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN,
+  INTERIOR_ARENA_WALL_HEIGHT,
+  INTERIOR_ARENA_WALL_SEGMENTS,
+  INTERIOR_ARENA_WALL_THICKNESS,
   PAINKILLER_PICKUP_RADIUS,
   PAINKILLER_SPAWN_HEIGHT,
   PAINKILLER_SPAWN_PLACEMENT_ATTEMPTS,
@@ -210,6 +215,67 @@ export function isPointInsideTreeTrunk(
       point.y <= TREE_TRUNK_COLLIDER_ARGS[1] * 2 + 0.2
     )
   })
+}
+
+export function isPointInsideArenaWall(point: Vector3, padding = 0) {
+  if (
+    point.y < 0 ||
+    point.y >
+      Math.max(ARENA_BOUNDARY_COLLIDER_HEIGHT, INTERIOR_ARENA_WALL_HEIGHT)
+  ) {
+    return false
+  }
+
+  const boundaryPadding = ARENA_BOUNDARY_COLLIDER_THICKNESS / 2 + padding
+
+  if (
+    Math.abs(point.x) >= ARENA_HALF_SIZE - boundaryPadding ||
+    Math.abs(point.z) >= ARENA_HALF_SIZE - boundaryPadding
+  ) {
+    return true
+  }
+
+  return INTERIOR_ARENA_WALL_SEGMENTS.some((segment) => {
+    const halfLength = segment.length / 2 + padding
+    const halfThickness = INTERIOR_ARENA_WALL_THICKNESS / 2 + padding
+    const localX = Math.abs(point.x - segment.center[0])
+    const localZ = Math.abs(point.z - segment.center[1])
+
+    return segment.axis === 'x'
+      ? localX <= halfLength && localZ <= halfThickness
+      : localX <= halfThickness && localZ <= halfLength
+  })
+}
+
+interface IProjectileObstaclePathCheck {
+  nextPosition: Vector3
+  previousPosition: Vector3
+  treeLayouts: ITreeLayout[]
+}
+
+export function doesProjectilePathHitObstacle({
+  nextPosition,
+  previousPosition,
+  treeLayouts
+}: IProjectileObstaclePathCheck) {
+  const travelDistance = previousPosition.distanceTo(nextPosition)
+  const sampleCount = Math.max(1, Math.ceil(travelDistance / 0.24))
+  const samplePoint = new Vector3()
+
+  for (let sampleIndex = 0; sampleIndex <= sampleCount; sampleIndex += 1) {
+    const alpha = sampleIndex / sampleCount
+
+    samplePoint.lerpVectors(previousPosition, nextPosition, alpha)
+
+    if (
+      isPointInsideArenaWall(samplePoint) ||
+      isPointInsideTreeTrunk(samplePoint, treeLayouts)
+    ) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export function createRandomEnemyFlightPosition() {

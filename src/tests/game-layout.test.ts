@@ -6,6 +6,8 @@ import {
 } from 'pages/game-page/helpers'
 import {
   createEnemyState,
+  doesProjectilePathHitObstacle,
+  isPointInsideArenaWall,
   isPointInsideTreeTrunk
 } from 'pages/game-page/game-scene/helpers'
 import { Vector3 } from 'three'
@@ -71,5 +73,42 @@ describe('game layout helpers', () => {
     expect(isPointInsideTreeTrunk(new Vector3(4, 1.5, 4), treeLayouts)).toBe(
       false
     )
+  })
+
+  it('detects collisions with arena boundary and interior walls', () => {
+    expect(isPointInsideArenaWall(new Vector3(37.2, 1.4, 0))).toBe(true)
+    expect(isPointInsideArenaWall(new Vector3(-30.5, 1.2, -24))).toBe(true)
+    expect(isPointInsideArenaWall(new Vector3(0, 1.2, 0))).toBe(false)
+  })
+
+  it('detects swept projectile collisions through walls and trees', () => {
+    const treeLayouts: ITreeLayout[] = [
+      {
+        enemyPosition: [0, 2.5, 0],
+        treePosition: [0, 0, 0]
+      }
+    ]
+
+    expect(
+      doesProjectilePathHitObstacle({
+        nextPosition: new Vector3(-30.5, 1.2, -15),
+        previousPosition: new Vector3(-30.5, 1.2, -33),
+        treeLayouts: []
+      })
+    ).toBe(true)
+    expect(
+      doesProjectilePathHitObstacle({
+        nextPosition: new Vector3(0, 1.2, 2.2),
+        previousPosition: new Vector3(0, 1.2, -2.2),
+        treeLayouts
+      })
+    ).toBe(true)
+    expect(
+      doesProjectilePathHitObstacle({
+        nextPosition: new Vector3(4, 1.2, 6),
+        previousPosition: new Vector3(4, 1.2, 2),
+        treeLayouts: []
+      })
+    ).toBe(false)
   })
 })

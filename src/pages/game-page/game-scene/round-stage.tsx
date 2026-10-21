@@ -43,7 +43,7 @@ import {
   spawnEnemyExplosionParticles,
   updateFloatingCombatTextStates,
   syncControlsState,
-  isPointInsideTreeTrunk
+  doesProjectilePathHitObstacle
 } from './helpers'
 import {
   createInitialPlayerPosition,
@@ -113,8 +113,6 @@ import {
   FLOATING_COMBAT_TEXT_POOL_SIZE,
   type TGameControl
 } from '../settings'
-import { isPointInsideAnyCrate } from '../world-collision'
-
 const playerRigidBodyName = 'player-body'
 const cloudColors = ['orange', 'hotpink', 'skyblue', 'white', 'gold']
 
@@ -671,6 +669,8 @@ export default function RoundStage({
         continue
       }
 
+      const previousProjectilePosition = projectile.position.clone()
+
       projectile.position.addScaledVector(projectile.velocity, delta)
       projectile.ttl -= delta
 
@@ -680,11 +680,11 @@ export default function RoundStage({
       }
 
       if (
-        isPointInsideAnyCrate(
-          [projectile.position.x, projectile.position.y, projectile.position.z],
-          crateLayouts
-        ) ||
-        isPointInsideTreeTrunk(projectile.position, treeLayouts)
+        doesProjectilePathHitObstacle({
+          nextPosition: projectile.position,
+          previousPosition: previousProjectilePosition,
+          treeLayouts
+        })
       ) {
         projectile.active = false
         continue
