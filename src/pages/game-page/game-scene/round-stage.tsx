@@ -20,9 +20,11 @@ import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
 import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
 import { ExplosionParticles } from './actors/explosion-particles'
+import { FloatingCombatText } from './actors/floating-combat-text'
 import { PainkillerPickups } from './actors/painkiller-pickups'
 import { TntBoxes } from './actors/tnt-boxes'
 import {
+  createFloatingCombatTextState,
   createExplosionParticleState,
   createEnemyState,
   createEnemyExplosionParticleState,
@@ -31,12 +33,15 @@ import {
   createTntState,
   createRandomPainkillerPosition,
   resetControlsState,
+  resetFloatingCombatTextState,
   resetEnemyExplosionParticleState,
   resetExplosionParticleState,
   resetProjectileState,
+  spawnFloatingCombatText,
   spawnProjectileIntoPool,
   spawnExplosionParticles,
   spawnEnemyExplosionParticles,
+  updateFloatingCombatTextStates,
   syncControlsState,
   isPointInsideTreeTrunk
 } from './helpers'
@@ -104,6 +109,7 @@ import {
   TNT_EXPLOSION_PARTICLE_EMISSIVE,
   TNT_EXPLOSION_PARTICLE_POOL_SIZE,
   TNT_EXPLOSION_PARTICLES_PER_BURST,
+  FLOATING_COMBAT_TEXT_POOL_SIZE,
   type TGameControl
 } from '../settings'
 import { isPointInsideAnyCrate } from '../world-collision'
@@ -193,6 +199,11 @@ export default function RoundStage({
       createExplosionParticleState()
     )
   )
+  const floatingCombatTextStateRef = useRef(
+    Array.from({ length: FLOATING_COMBAT_TEXT_POOL_SIZE }, () =>
+      createFloatingCombatTextState()
+    )
+  )
   const painkillerStateRef = useRef(
     createPainkillerState(crateLayouts, treeLayouts)
   )
@@ -214,6 +225,16 @@ export default function RoundStage({
   const setHealth = (health: number) => {
     healthRef.current = health
     onHealthChangeRef.current(health)
+  }
+
+  const spawnHealthDeltaText = (
+    value: number,
+    source: 'enemy' | 'painkiller' | 'tnt'
+  ) => {
+    spawnFloatingCombatText(floatingCombatTextStateRef.current, {
+      source,
+      value
+    })
   }
 
   const triggerPlayerHitFlash = () => {
@@ -271,7 +292,12 @@ export default function RoundStage({
       tntBoxState.position.clone(),
       TNT_EXPLOSION_PARTICLES_PER_BURST
     )
-    setHealth(Math.max(0, healthRef.current - TNT_BOX_DAMAGE))
+
+    const nextHealth = Math.max(0, healthRef.current - TNT_BOX_DAMAGE)
+    const healthDelta = nextHealth - healthRef.current
+
+    setHealth(nextHealth)
+    spawnHealthDeltaText(healthDelta, 'tnt')
 
     if (playerBody) {
       const currentVelocity = playerBody.linvel()
@@ -435,6 +461,9 @@ export default function RoundStage({
     for (const particleState of tntExplosionParticleStateRef.current) {
       resetExplosionParticleState(particleState)
     }
+    for (const floatingCombatTextState of floatingCombatTextStateRef.current) {
+      resetFloatingCombatTextState(floatingCombatTextState)
+    }
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
       treeLayouts
@@ -469,6 +498,8 @@ export default function RoundStage({
   ])
 
   useFrame((_, delta) => {
+    updateFloatingCombatTextStates(floatingCombatTextStateRef.current, delta)
+
     const playerBody = playerBodyRef.current
 
     if (playerBody) {
@@ -671,9 +702,15 @@ export default function RoundStage({
             lastDamageAtRef.current = now
             projectile.active = false
             triggerPlayerHitFlash()
-            setHealth(
-              Math.max(0, healthRef.current - difficultyConfig.enemyDamage)
+
+            const nextHealth = Math.max(
+              0,
+              healthRef.current - difficultyConfig.enemyDamage
             )
+            const healthDelta = nextHealth - healthRef.current
+
+            setHealth(nextHealth)
+            spawnHealthDeltaText(healthDelta, 'enemy')
           }
           continue
       }
@@ -697,7 +734,15 @@ export default function RoundStage({
       ) {
         painkillerState.active = false
         painkillerState.respawnAt = now + PAINKILLER_RESPAWN_SECONDS
-        setHealth(Math.min(MAX_HEALTH, healthRef.current + PAINKILLER_HEAL))
+
+        const nextHealth = Math.min(
+          MAX_HEALTH,
+          healthRef.current + PAINKILLER_HEAL
+        )
+        const healthDelta = nextHealth - healthRef.current
+
+        setHealth(nextHealth)
+        spawnHealthDeltaText(healthDelta, 'painkiller')
       }
     }
   })
@@ -766,6 +811,10 @@ export default function RoundStage({
         tntBoxStateRef={tntBoxStateRef}
       />
       <AxeProjectiles projectilesRef={projectilesRef} />
+      <FloatingCombatText
+        floatingCombatTextStateRef={floatingCombatTextStateRef}
+        playerPositionRef={playerPositionRef}
+      />
       <Clouds material={MeshBasicMaterial}>
         {cloudConfigs.map((cloudConfig) => (
           <Cloud

@@ -79,6 +79,13 @@ export const TNT_EXPLOSION_PARTICLES_PER_BURST = 88
 export const TNT_EXPLOSION_PARTICLE_POOL_SIZE = 72
 export const TNT_EXPLOSION_PARTICLE_COLOR = '#ff5a4a'
 export const TNT_EXPLOSION_PARTICLE_EMISSIVE = '#ff2c1c'
+export const FLOATING_COMBAT_TEXT_POOL_SIZE = 20
+export const FLOATING_COMBAT_TEXT_LIFETIME_SECONDS = 0.85
+export const FLOATING_COMBAT_TEXT_BASE_RISE_SPEED = 1.7
+export const FLOATING_COMBAT_TEXT_SIDE_JITTER = 0.42
+export const FLOATING_COMBAT_TEXT_DAMAGE_COLOR = '#ff786a'
+export const FLOATING_COMBAT_TEXT_TNT_COLOR = '#ff9d4d'
+export const FLOATING_COMBAT_TEXT_HEAL_COLOR = '#77f2af'
 export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
   'viking-raider': {
     chooserModelOffset: [0.25, -0.08, -0.1065],
@@ -278,6 +285,7 @@ export const PLAYER_CAMERA_DISTANCE = 6.5
 export const PLAYER_CAMERA_HEIGHT = 2
 export const PLAYER_CAMERA_ORBIT_SPEED = 0.14
 export const PLAYER_HEALTH_METER_OFFSET = 0.4
+export const PLAYER_COMBAT_TEXT_HEAD_OFFSET = 2.15
 export const PLAYER_COLLIDER_HALF_HEIGHT = 1.08
 export const PLAYER_HITBOX_OFFSET = new Vector3(0, 1.2, 0)
 export const PLAYER_COLLISION_RADIUS = 0.58

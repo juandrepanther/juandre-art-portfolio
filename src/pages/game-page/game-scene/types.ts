@@ -3,6 +3,7 @@ import type { TWeapon } from '../settings'
 
 export type TProjectileOwner = 'enemy' | 'player'
 export type { TWeapon }
+export type TFloatingCombatTextSource = 'enemy' | 'painkiller' | 'tnt'
 
 export type TTreeVariant = 0 | 1 | 2
 
@@ -52,4 +53,14 @@ export interface IControlsState {
   forward: boolean
   left: boolean
   right: boolean
+}
+
+export interface IFloatingCombatTextState {
+  active: boolean
+  maxTtl: number
+  position: Vector3
+  source: TFloatingCombatTextSource
+  ttl: number
+  value: number
+  velocity: Vector3
 }

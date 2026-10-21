@@ -14,6 +14,9 @@ import {
   ENEMY_EXPLOSION_PARTICLE_SPEED_MAX,
   ENEMY_EXPLOSION_PARTICLE_SPEED_MIN,
   ENEMY_EXPLOSION_PARTICLES_PER_BURST,
+  FLOATING_COMBAT_TEXT_BASE_RISE_SPEED,
+  FLOATING_COMBAT_TEXT_LIFETIME_SECONDS,
+  FLOATING_COMBAT_TEXT_SIDE_JITTER,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX,
   HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN,
   PAINKILLER_PICKUP_RADIUS,
@@ -35,8 +38,10 @@ import type {
   IControlsState,
   IEnemyState,
   IEnemyExplosionParticleState,
+  IFloatingCombatTextState,
   ITntBoxState,
   IProjectileState,
+  TFloatingCombatTextSource,
   TProjectileOwner,
   TWeapon,
   TTreeVariant
@@ -66,6 +71,99 @@ export function createProjectileState(): IProjectileState {
     ttl: 0,
     velocity: new Vector3()
   }
+}
+
+export function createFloatingCombatTextState(): IFloatingCombatTextState {
+  return {
+    active: false,
+    maxTtl: 0,
+    position: new Vector3(),
+    source: 'enemy',
+    ttl: 0,
+    value: 0,
+    velocity: new Vector3()
+  }
+}
+
+export function resetFloatingCombatTextState(
+  floatingCombatTextState: IFloatingCombatTextState
+) {
+  floatingCombatTextState.active = false
+  floatingCombatTextState.maxTtl = 0
+  floatingCombatTextState.position.set(0, 0, 0)
+  floatingCombatTextState.source = 'enemy'
+  floatingCombatTextState.ttl = 0
+  floatingCombatTextState.value = 0
+  floatingCombatTextState.velocity.set(0, 0, 0)
+}
+
+interface ISpawnFloatingCombatText {
+  source: TFloatingCombatTextSource
+  value: number
+}
+
+export function spawnFloatingCombatText(
+  floatingCombatTextStates: IFloatingCombatTextState[],
+  { source, value }: ISpawnFloatingCombatText
+) {
+  if (value === 0) {
+    return
+  }
+
+  const floatingCombatTextState =
+    floatingCombatTextStates.find((candidate) => !candidate.active) ??
+    floatingCombatTextStates[0]
+
+  if (!floatingCombatTextState) {
+    return
+  }
+
+  floatingCombatTextState.active = true
+  floatingCombatTextState.maxTtl = FLOATING_COMBAT_TEXT_LIFETIME_SECONDS
+  floatingCombatTextState.ttl = FLOATING_COMBAT_TEXT_LIFETIME_SECONDS
+  floatingCombatTextState.position.set(0, 0, 0)
+  floatingCombatTextState.source = source
+  floatingCombatTextState.value = Math.round(value)
+  floatingCombatTextState.velocity.set(
+    (Math.random() - 0.5) * FLOATING_COMBAT_TEXT_SIDE_JITTER,
+    FLOATING_COMBAT_TEXT_BASE_RISE_SPEED + Math.random() * 0.75,
+    (Math.random() - 0.5) * FLOATING_COMBAT_TEXT_SIDE_JITTER
+  )
+}
+
+export function updateFloatingCombatTextStates(
+  floatingCombatTextStates: IFloatingCombatTextState[],
+  delta: number
+) {
+  for (const floatingCombatTextState of floatingCombatTextStates) {
+    if (!floatingCombatTextState.active) {
+      continue
+    }
+
+    floatingCombatTextState.ttl -= delta
+
+    if (floatingCombatTextState.ttl <= 0) {
+      resetFloatingCombatTextState(floatingCombatTextState)
+      continue
+    }
+
+    floatingCombatTextState.position.addScaledVector(
+      floatingCombatTextState.velocity,
+      delta
+    )
+    floatingCombatTextState.velocity.x *= 0.92
+    floatingCombatTextState.velocity.z *= 0.92
+  }
+}
+
+export function formatFloatingCombatTextValue(value: number) {
+  const roundedValue = Math.round(value)
+
+  if (roundedValue > 0) {
+    return `+${roundedValue}`
+  }
+
+  return String(roundedValue)
 }
 
 export function resetProjectileState(projectile: IProjectileState) {
