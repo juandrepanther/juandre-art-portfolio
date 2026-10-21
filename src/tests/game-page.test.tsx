@@ -30,7 +30,8 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
     health,
     isCameraOrbiting,
     onEnemyHit,
-    onHealthChange
+    onHealthChange,
+    onPlayerHitIndicator
   }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
@@ -44,6 +45,9 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
         </button>
         <button onClick={() => onHealthChange(0)} type="button">
           Trigger loss
+        </button>
+        <button onClick={() => onPlayerHitIndicator?.('right')} type="button">
+          Trigger right hit indicator
         </button>
         Mock Game Scene
       </div>
@@ -172,6 +176,13 @@ describe('GamePage', () => {
     expect(screen.getByText(/select a warrior/i)).toBeInTheDocument()
     expect(screen.getByText(/click the scene/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^noob$/i })).toBeInTheDocument()
+    if (import.meta.env.DEV) {
+      expect(screen.getByRole('button', { name: /^dev$/i })).toBeInTheDocument()
+    } else {
+      expect(
+        screen.queryByRole('button', { name: /^dev$/i })
+      ).not.toBeInTheDocument()
+    }
     expect(
       screen.getByRole('button', { name: /^hardcore$/i })
     ).toBeInTheDocument()
@@ -601,6 +612,25 @@ describe('GamePage', () => {
     expect(screen.getByText(/scene health: 65/i)).toBeInTheDocument()
   })
 
+  it('shows directional hit marker next to pointer when scene reports hit side', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /trigger right hit indicator/i })
+    )
+
+    expect(screen.getByTestId('game-pointer')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('pointer-hit-indicator-right')
+    ).toBeInTheDocument()
+  })
+
   it('shows a game over image popup with replay when health reaches zero', async () => {
     renderWithProviders(
       <MemoryRouter>
@@ -734,5 +764,39 @@ describe('GamePage', () => {
       screen.getByRole('button', { name: /^change$/i })
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /replay/i })).toBeInTheDocument()
+  })
+
+  it('keeps the round running in DEV mode without a timer win', async () => {
+    if (!import.meta.env.DEV) {
+      return
+    }
+
+    vi.useFakeTimers()
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^dev$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+
+    const countdownAndRoundSeconds =
+      START_RUN_COUNTDOWN_SECONDS + DIFFICULTY_CONFIGS.Noob.roundTime + 5
+
+    for (let second = 0; second < countdownAndRoundSeconds; second += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000)
+      })
+    }
+
+    expect(screen.getByText(/mode: dev/i)).toBeInTheDocument()
+    expect(screen.getByText(/^∞$/)).toBeInTheDocument()
+    expect(
+      screen.queryByRole('img', { name: /victory result/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
   })
 })

@@ -6,6 +6,7 @@ import type {
 } from './settings'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
+export type TPointerHitDirection = 'top' | 'right' | 'bottom' | 'left'
 
 export type {
   ICharacterConfig,
@@ -26,6 +27,7 @@ export {
   CRATE_SIZE_PRESETS,
   CRATE_STACK_HEIGHT_MAX,
   DESKTOP_BREAKPOINT,
+  DEVELOPMENT_MODE_CONFIG,
   DIFFICULTY_CONFIGS,
   GAME_BACKGROUND_COLOR,
   ENEMY_RESPAWN_SECONDS,
@@ -53,6 +55,7 @@ export interface IGameSceneProps {
   difficulty: TDifficultyLevel
   health: number
   isActive: boolean
+  isDevelopmentMode?: boolean
   isCameraOrbiting: boolean
   isLandscapeMobile: boolean
   isMobileViewport: boolean
@@ -66,6 +69,7 @@ export interface IGameSceneProps {
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
   playerName: string
+  onPlayerHitIndicator?: (direction: TPointerHitDirection) => void
   roundKey: number
   showHealthMeter: boolean
 }

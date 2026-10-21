@@ -17,6 +17,7 @@ function GameScene({
   difficulty,
   health,
   isActive,
+  isDevelopmentMode,
   isCameraOrbiting,
   isLandscapeMobile,
   isMobileViewport,
@@ -29,6 +30,7 @@ function GameScene({
   showMobileControls,
   onHealthChange,
   onEnemyHit,
+  onPlayerHitIndicator,
   playerName,
   roundKey,
   showHealthMeter
@@ -73,6 +75,7 @@ function GameScene({
               difficulty={difficulty}
               health={health}
               isActive={isActive}
+              isDevelopmentMode={isDevelopmentMode}
               isCameraOrbiting={isCameraOrbiting}
               isLandscapeMobile={isLandscapeMobile}
               isMobileViewport={isMobileViewport}
@@ -85,6 +88,7 @@ function GameScene({
               showMobileControls={showMobileControls}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
+              onPlayerHitIndicator={onPlayerHitIndicator}
               playerName={playerName}
               key={`${difficulty}-${characterConfig.id}-${roundKey}`}
               roundKey={roundKey}

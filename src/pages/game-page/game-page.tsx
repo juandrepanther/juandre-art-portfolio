@@ -30,6 +30,7 @@ import ScoreboardPanel from './scoreboard-panel'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   CHARACTER_CONFIGS,
+  DEVELOPMENT_MODE_CONFIG,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
   GAME_POINTER_COLOR,
@@ -39,6 +40,7 @@ import {
   formatTimeLabel,
   type TCharacterId,
   type TGameStatus,
+  type TPointerHitDirection,
   type TDifficultyLevel
 } from './helpers'
 
@@ -65,6 +67,16 @@ const fightButtonPulse = keyframes`
   }
 `
 
+const pointerHitMarkerFade = keyframes`
+  0% {
+    opacity: 0.95;
+  }
+
+  100% {
+    opacity: 0;
+  }
+`
+
 function GamePage() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const { height, width } = useWindowSize()
@@ -75,6 +87,7 @@ function GamePage() {
   const [playerName, setPlayerName] = useState('')
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
+  const [entryMode, setEntryMode] = useState<'normal' | 'dev'>('normal')
   const [health, setHealth] = useState(MAX_HEALTH)
   const [enemyHits, setEnemyHits] = useState(0)
   const [isSpotifyPlayerOpen, setIsSpotifyPlayerOpen] = useState(false)
@@ -104,6 +117,9 @@ function GamePage() {
     x: 0,
     y: 0
   })
+  const [pointerHitDirection, setPointerHitDirection] =
+    useState<TPointerHitDirection | null>(null)
+  const [pointerHitPulseKey, setPointerHitPulseKey] = useState(0)
   const [mobileJumpPressCount, setMobileJumpPressCount] = useState(0)
   const [mobileShootPressCount, setMobileShootPressCount] = useState(0)
 
@@ -150,7 +166,18 @@ function GamePage() {
   const isResultDialogOpen =
     hasChosenCharacter && (gameStatus === 'won' || gameStatus === 'lost')
   const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
+  const isDevelopmentMode = entryMode === 'dev'
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
+  const effectiveDifficulty: TDifficultyLevel = isDevelopmentMode
+    ? 'Hardcore'
+    : difficulty
+  const effectiveDifficultyConfig = isDevelopmentMode
+    ? {
+        ...DIFFICULTY_CONFIGS.Hardcore,
+        enemyCount: DEVELOPMENT_MODE_CONFIG.enemyCount,
+        enemyDamage: DEVELOPMENT_MODE_CONFIG.incomingDamage
+      }
+    : difficultyConfig
   const resultImageAlt =
     gameStatus === 'won' ? 'Victory result' : 'Game over result'
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
@@ -177,6 +204,11 @@ function GamePage() {
 
   const handleMobileShootPress = () => {
     setMobileShootPressCount((currentCount) => currentCount + 1)
+  }
+
+  const handlePlayerHitIndicator = (direction: TPointerHitDirection) => {
+    setPointerHitDirection(direction)
+    setPointerHitPulseKey((currentKey) => currentKey + 1)
   }
 
   const lockGamePointer = () => {
@@ -258,7 +290,7 @@ function GamePage() {
   }, [countdownSeconds, isCountingDown])
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || isDevelopmentMode) {
       return undefined
     }
 
@@ -277,7 +309,7 @@ function GamePage() {
     return () => {
       window.clearInterval(intervalId)
     }
-  }, [isPlaying])
+  }, [isDevelopmentMode, isPlaying])
 
   const handleHealthChange = (nextHealth: number) => {
     const clampedHealth = clampHealth(nextHealth)
@@ -297,7 +329,7 @@ function GamePage() {
       setHealth(MAX_HEALTH)
       setEnemyHits(0)
       setEnemiesDefeatedCount(0)
-      setRemainingTime(difficultyConfig.roundTime)
+      setRemainingTime(isDevelopmentMode ? 0 : difficultyConfig.roundTime)
       setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
       setRoundKey((currentRoundKey) => currentRoundKey + 1)
       setGameStatus('countdown')
@@ -317,7 +349,10 @@ function GamePage() {
 
   const handleDifficultyChange = (nextDifficulty: TDifficultyLevel) => {
     setDifficulty(nextDifficulty)
-    setRemainingTime(DIFFICULTY_CONFIGS[nextDifficulty].roundTime)
+
+    if (!isDevelopmentMode) {
+      setRemainingTime(DIFFICULTY_CONFIGS[nextDifficulty].roundTime)
+    }
   }
 
   const handleReturnToMenu = () => {
@@ -325,7 +360,7 @@ function GamePage() {
     setGameStatus('menu')
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
-    setRemainingTime(difficultyConfig.roundTime)
+    setRemainingTime(isDevelopmentMode ? 0 : difficultyConfig.roundTime)
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
   }
@@ -342,12 +377,31 @@ function GamePage() {
       difficulty,
       playerName: normalizedPlayerName
     })
+    setEntryMode('normal')
     setHasChosenCharacter(true)
     setRemainingTime(difficultyConfig.roundTime)
   }
 
+  const handleChooseDevelopmentCharacter = () => {
+    const normalizedPlayerName = playerName.trim()
+
+    if (normalizedPlayerName.length === 0) {
+      return
+    }
+
+    setPlayerName(normalizedPlayerName)
+    setPendingRun({
+      difficulty,
+      playerName: normalizedPlayerName
+    })
+    setEntryMode('dev')
+    setHasChosenCharacter(true)
+    setRemainingTime(0)
+  }
+
   const handleChooseDifferentCharacter = () => {
     handleReturnToMenu()
+    setEntryMode('normal')
     setHasChosenCharacter(false)
   }
 
@@ -457,10 +511,11 @@ function GamePage() {
             <GameScene
               cameraHorizontalSnapKey={cameraHorizontalSnapKey}
               characterConfig={selectedCharacterConfig}
-              difficultyConfig={difficultyConfig}
-              difficulty={difficulty}
+              difficultyConfig={effectiveDifficultyConfig}
+              difficulty={effectiveDifficulty}
               health={health}
               isActive={isPlaying}
+              isDevelopmentMode={isDevelopmentMode}
               isCameraOrbiting={isCameraOrbiting}
               isLandscapeMobile={isLandscapeMobile}
               isMobileViewport={isMobileViewport}
@@ -480,6 +535,7 @@ function GamePage() {
                 setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
               }}
               onHealthChange={handleHealthChange}
+              onPlayerHitIndicator={handlePlayerHitIndicator}
               playerName={playerName}
               roundKey={roundKey}
               showHealthMeter={hasChosenCharacter}
@@ -492,6 +548,7 @@ function GamePage() {
                 availableCharacterIds={characterOptions}
                 isMobileViewport={isMobileViewport}
                 onCharacterChange={setSelectedCharacter}
+                onDevChoose={handleChooseDevelopmentCharacter}
                 onDifficultyChange={handleDifficultyChange}
                 onPlayerNameChange={setPlayerName}
                 onChoose={handleChooseCharacter}
@@ -506,6 +563,7 @@ function GamePage() {
               <>
                 <Box
                   aria-hidden="true"
+                  data-testid="game-pointer"
                   sx={{
                     position: 'absolute',
                     left: '50%',
@@ -538,6 +596,43 @@ function GamePage() {
                   }}
                 />
 
+                {pointerHitDirection ? (
+                  <Box
+                    aria-hidden="true"
+                    data-testid={`pointer-hit-indicator-${pointerHitDirection}`}
+                    key={`${pointerHitDirection}-${pointerHitPulseKey}`}
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      zIndex: 3,
+                      pointerEvents: 'none',
+                      borderRadius: 999,
+                      bgcolor: '#ff5a4a',
+                      boxShadow: '0 0 14px rgba(255, 90, 74, 0.62)',
+                      transform:
+                        pointerHitDirection === 'right'
+                          ? 'translate(18px, -50%)'
+                          : pointerHitDirection === 'left'
+                            ? 'translate(-26px, -50%)'
+                            : pointerHitDirection === 'top'
+                              ? 'translate(-50%, -26px)'
+                              : 'translate(-50%, 18px)',
+                      width:
+                        pointerHitDirection === 'top' ||
+                        pointerHitDirection === 'bottom'
+                          ? 16
+                          : 8,
+                      height:
+                        pointerHitDirection === 'top' ||
+                        pointerHitDirection === 'bottom'
+                          ? 8
+                          : 16,
+                      animation: `${pointerHitMarkerFade} 420ms ease-out forwards`
+                    }}
+                  />
+                ) : null}
+
                 {isMobileViewport ? (
                   <Stack
                     direction="row"
@@ -561,7 +656,7 @@ function GamePage() {
                   >
                     <Chip
                       color="primary"
-                      label={`${remainingTime}s`}
+                      label={isDevelopmentMode ? '∞' : `${remainingTime}s`}
                       size="small"
                     />
                     <Chip
@@ -597,7 +692,7 @@ function GamePage() {
                     >
                       <Chip
                         color="warning"
-                        label={`Mode: ${difficultyConfig.label}`}
+                        label={`Mode: ${isDevelopmentMode ? 'DEV' : difficultyConfig.label}`}
                       />
                       <Chip
                         color="primary"
@@ -621,7 +716,9 @@ function GamePage() {
                           Time left
                         </Typography>
                         <Typography variant="h3">
-                          {formatTimeLabel(remainingTime)}
+                          {isDevelopmentMode
+                            ? '∞'
+                            : formatTimeLabel(remainingTime)}
                         </Typography>
                       </Box>
 

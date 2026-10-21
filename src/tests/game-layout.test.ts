@@ -73,6 +73,15 @@ describe('game layout helpers', () => {
     expect(isPointInsideTreeTrunk(new Vector3(4, 1.5, 4), treeLayouts)).toBe(
       false
     )
+
+    expect(
+      isPointInsideTreeTrunk(new Vector3(0.2, 3.6, 0.2), [
+        {
+          enemyPosition: [1, 2.5, 1],
+          treePosition: [0, 2, 0]
+        }
+      ])
+    ).toBe(true)
   })
 
   it('detects collisions with arena boundary and interior walls', () => {
@@ -110,5 +119,20 @@ describe('game layout helpers', () => {
         treeLayouts: []
       })
     ).toBe(false)
+
+    expect(
+      doesProjectilePathHitObstacle({
+        crateLayouts: [
+          {
+            position: [0, 1.2, 0],
+            rotationY: 0,
+            size: [2, 2, 2]
+          }
+        ],
+        nextPosition: new Vector3(0, 1.2, 3),
+        previousPosition: new Vector3(0, 1.2, -3),
+        treeLayouts: []
+      })
+    ).toBe(true)
   })
 })

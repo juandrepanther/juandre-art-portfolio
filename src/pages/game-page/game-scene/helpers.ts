@@ -204,15 +204,18 @@ export function isPointInsideTreeTrunk(
   point: Vector3,
   treeLayouts: ITreeLayout[]
 ) {
+  const trunkPadding = 0.08
+
   return treeLayouts.some(({ treePosition }) => {
+    const trunkCenterY = treePosition[1] + TREE_TRUNK_COLLIDER_ARGS[1]
     const deltaX = Math.abs(point.x - treePosition[0])
+    const deltaY = Math.abs(point.y - trunkCenterY)
     const deltaZ = Math.abs(point.z - treePosition[2])
 
     return (
-      deltaX <= TREE_TRUNK_COLLIDER_ARGS[0] + 0.08 &&
-      deltaZ <= TREE_TRUNK_COLLIDER_ARGS[2] + 0.08 &&
-      point.y >= 0 &&
-      point.y <= TREE_TRUNK_COLLIDER_ARGS[1] * 2 + 0.2
+      deltaX <= TREE_TRUNK_COLLIDER_ARGS[0] + trunkPadding &&
+      deltaY <= TREE_TRUNK_COLLIDER_ARGS[1] + trunkPadding &&
+      deltaZ <= TREE_TRUNK_COLLIDER_ARGS[2] + trunkPadding
     )
   })
 }
@@ -248,12 +251,14 @@ export function isPointInsideArenaWall(point: Vector3, padding = 0) {
 }
 
 interface IProjectileObstaclePathCheck {
+  crateLayouts?: ICrateLayout[]
   nextPosition: Vector3
   previousPosition: Vector3
   treeLayouts: ITreeLayout[]
 }
 
 export function doesProjectilePathHitObstacle({
+  crateLayouts = [],
   nextPosition,
   previousPosition,
   treeLayouts
@@ -269,6 +274,10 @@ export function doesProjectilePathHitObstacle({
 
     if (
       isPointInsideArenaWall(samplePoint) ||
+      isPointInsideAnyCrate(
+        [samplePoint.x, samplePoint.y, samplePoint.z],
+        crateLayouts
+      ) ||
       isPointInsideTreeTrunk(samplePoint, treeLayouts)
     ) {
       return true

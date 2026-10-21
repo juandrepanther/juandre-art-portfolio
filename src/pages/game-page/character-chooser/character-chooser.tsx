@@ -24,6 +24,7 @@ interface ICharacterChooser {
   availableCharacterIds: TCharacterId[]
   isMobileViewport: boolean
   onCharacterChange: (characterId: TCharacterId) => void
+  onDevChoose: () => void
   onDifficultyChange: (difficulty: TDifficultyLevel) => void
   onPlayerNameChange: (playerName: string) => void
   onChoose: () => void
@@ -51,6 +52,7 @@ function CharacterChooser({
   availableCharacterIds,
   isMobileViewport,
   onCharacterChange,
+  onDevChoose,
   onDifficultyChange,
   onPlayerNameChange,
   onChoose,
@@ -66,6 +68,7 @@ function CharacterChooser({
   const totalCharacters = availableCharacterIds.length
   const difficultyOptions: TDifficultyLevel[] = ['Noob', 'Balls', 'Hardcore']
   const isChooseDisabled = playerName.trim().length === 0
+  const isDevelopmentEnvironment = import.meta.env.DEV
   const shouldShowPlayerNameError =
     playerNameOptions.length === 0 && playerName.trim().length === 0
 
@@ -478,6 +481,24 @@ function CharacterChooser({
               spacing={1}
               sx={{ justifyContent: 'center', alignItems: 'center' }}
             >
+              {isDevelopmentEnvironment ? (
+                <Tooltip
+                  disableHoverListener={!isChooseDisabled}
+                  title="Type a player name or choose one from the list"
+                >
+                  <span>
+                    <Button
+                      color="warning"
+                      disabled={isChooseDisabled}
+                      onClick={onDevChoose}
+                      size={isMobileViewport ? 'medium' : 'large'}
+                      variant="outlined"
+                    >
+                      DEV
+                    </Button>
+                  </span>
+                </Tooltip>
+              ) : null}
               <Tooltip
                 disableHoverListener={!isChooseDisabled}
                 title="Type a player name or choose one from the list"

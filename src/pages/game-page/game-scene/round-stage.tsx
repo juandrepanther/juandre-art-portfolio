@@ -173,6 +173,7 @@ export default function RoundStage({
   difficulty,
   health,
   isActive,
+  isDevelopmentMode = false,
   isCameraOrbiting,
   isLandscapeMobile,
   isMobileViewport,
@@ -185,6 +186,7 @@ export default function RoundStage({
   showMobileControls,
   onHealthChange,
   onEnemyHit,
+  onPlayerHitIndicator,
   playerName,
   roundKey,
   showHealthMeter
@@ -253,6 +255,36 @@ export default function RoundStage({
   const consumedShootCountRef = useRef(0)
   const cameraYawRef = useRef(0)
   const cameraPitchRef = useRef(0)
+  const cameraUpRef = useRef(new Vector3(0, 1, 0))
+
+  const getPlayerHitDirection = (projectileVelocity: Vector3) => {
+    const normalizedVelocity = projectileVelocity.clone()
+
+    if (normalizedVelocity.lengthSq() <= 0.0001) {
+      return null
+    }
+
+    normalizedVelocity.normalize()
+    cameraUpRef.current
+      .crossVectors(cameraRightRef.current, cameraLookDirectionRef.current)
+      .normalize()
+
+    const horizontalMagnitude = normalizedVelocity.dot(cameraRightRef.current)
+    const verticalMagnitude = normalizedVelocity.dot(cameraUpRef.current)
+
+    if (
+      Math.abs(horizontalMagnitude) <= 0.05 &&
+      Math.abs(verticalMagnitude) <= 0.05
+    ) {
+      return null
+    }
+
+    if (Math.abs(horizontalMagnitude) >= Math.abs(verticalMagnitude)) {
+      return horizontalMagnitude >= 0 ? 'left' : 'right'
+    }
+
+    return verticalMagnitude >= 0 ? 'top' : 'bottom'
+  }
 
   const setHealth = (health: number) => {
     healthRef.current = health
@@ -327,7 +359,8 @@ export default function RoundStage({
       )
     }
 
-    const nextHealth = Math.max(0, healthRef.current - TNT_BOX_DAMAGE)
+    const tntDamage = isDevelopmentMode ? 0 : TNT_BOX_DAMAGE
+    const nextHealth = Math.max(0, healthRef.current - tntDamage)
     const healthDelta = nextHealth - healthRef.current
 
     setHealth(nextHealth)
@@ -822,6 +855,7 @@ export default function RoundStage({
 
       if (
         doesProjectilePathHitObstacle({
+          crateLayouts,
           nextPosition: projectile.position,
           previousPosition: previousProjectilePosition,
           treeLayouts
@@ -878,12 +912,18 @@ export default function RoundStage({
 
             const nextHealth = Math.max(
               0,
-              healthRef.current - difficultyConfig.enemyDamage
+              healthRef.current -
+                (isDevelopmentMode ? 0 : difficultyConfig.enemyDamage)
             )
             const healthDelta = nextHealth - healthRef.current
+            const hitDirection = getPlayerHitDirection(projectile.velocity)
 
             setHealth(nextHealth)
             spawnHealthDeltaText(healthDelta, 'enemy')
+
+            if (hitDirection) {
+              onPlayerHitIndicator?.(hitDirection)
+            }
           }
           continue
       }

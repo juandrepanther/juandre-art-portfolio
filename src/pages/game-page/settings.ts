@@ -51,6 +51,11 @@ export interface IDifficultyConfig {
   roundTime: number
 }
 
+export interface IDevelopmentModeConfig {
+  enemyCount: number
+  incomingDamage: number
+}
+
 export type TInteriorWallAxis = 'x' | 'z'
 
 export interface IInteriorArenaWallSegment {
@@ -158,8 +163,8 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     label: 'Khur',
     description: 'He is a very serious warrior.',
     modelUrl: khurModelUrl,
-    modelScale: 1,
-    modelOffset: [0, -0.08, -0.1065],
+    modelScale: 1.45,
+    modelOffset: [0, 0.4, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'spear'
   },
@@ -205,6 +210,10 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyThrowInterval: 1.3,
     roundTime: 80
   }
+}
+export const DEVELOPMENT_MODE_CONFIG: IDevelopmentModeConfig = {
+  enemyCount: 3,
+  incomingDamage: 0
 }
 export const ARENA_BOUNDARY_COLLIDER_HEIGHT = 8
 export const ARENA_BOUNDARY_COLLIDER_THICKNESS = 2
