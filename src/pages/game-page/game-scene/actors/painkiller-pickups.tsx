@@ -21,8 +21,8 @@ interface IPainkillerPickup {
 }
 
 const painkillerModelScale = 0.5
-const painkillerModelPosition: [number, number, number] = [0, -0.2, 0]
-const painkillerModelRotation: [number, number, number] = [0, 0, 0]
+const painkillerModelPosition: [number, number, number] = [0, 0, 0]
+const painkillerModelRotation: [number, number, number] = [-Math.PI / 2, 0, 0]
 
 useGLTF.preload(painkillerModelUrl)
 
