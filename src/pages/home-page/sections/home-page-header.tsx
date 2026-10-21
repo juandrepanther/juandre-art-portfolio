@@ -6,13 +6,16 @@ import {
   Stack,
   Switch,
   Toolbar,
-  Typography
+  Typography,
+  useMediaQuery
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { Link as RouterLink } from 'react-router'
 
 interface IHomePageHeader {
   actionHref: string
   actionLabel: string
+  mobileActionLabel?: string
   isDarkMode: boolean
   onToggleDarkMode: () => void
 }
@@ -20,9 +23,16 @@ interface IHomePageHeader {
 function HomePageHeader({
   actionHref,
   actionLabel,
+  mobileActionLabel,
   isDarkMode,
   onToggleDarkMode
 }: IHomePageHeader) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const visibleActionLabel =
+    isMobile && mobileActionLabel ? mobileActionLabel : actionLabel
+  const modeLabel = isDarkMode ? 'Dark mode' : 'Light mode'
+
   return (
     <AppBar
       color="transparent"
@@ -92,7 +102,7 @@ function HomePageHeader({
               }
             }}
           >
-            {actionLabel}
+            {visibleActionLabel}
           </Button>
           <FormControlLabel
             control={
@@ -102,11 +112,11 @@ function HomePageHeader({
                 onChange={onToggleDarkMode}
               />
             }
-            label={isDarkMode ? 'Dark mode' : 'Light mode'}
+            label={isMobile ? '' : modeLabel}
             labelPlacement="start"
             sx={{
               m: 0,
-              gap: 1,
+              gap: isMobile ? 0 : 1,
               '.MuiFormControlLabel-label': {
                 color: 'text.secondary',
                 fontSize: { xs: '0.75rem', sm: '0.875rem' },

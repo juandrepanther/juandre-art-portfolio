@@ -70,6 +70,7 @@ function HomePage() {
       <HomePageHeader
         actionHref="/game"
         actionLabel="Play Varang Kill (Alpha)"
+        mobileActionLabel="Play"
         isDarkMode={isDarkMode}
         onToggleDarkMode={toggleDarkMode}
       />
