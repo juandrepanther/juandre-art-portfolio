@@ -239,6 +239,25 @@ function GamePage() {
   }
 
   useEffect(() => {
+    if (!(isMobileViewport && isLandscapeMobile)) {
+      return undefined
+    }
+
+    const documentElement = document.documentElement
+    const bodyElement = document.body
+    const previousHtmlOverflow = documentElement.style.overflow
+    const previousBodyOverflow = bodyElement.style.overflow
+
+    documentElement.style.overflow = 'hidden'
+    bodyElement.style.overflow = 'hidden'
+
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow
+      bodyElement.style.overflow = previousBodyOverflow
+    }
+  }, [isLandscapeMobile, isMobileViewport])
+
+  useEffect(() => {
     if (gameStatus === 'countdown' || gameStatus === 'playing') {
       return
     }
