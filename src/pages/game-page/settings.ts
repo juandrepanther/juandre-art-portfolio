@@ -2,6 +2,7 @@ import type { KeyboardControlsEntry } from '@react-three/drei'
 import juanModelUrl from 'assets/models/juan.glb?url'
 import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
+import monkModelUrl from 'assets/models/monk.glb?url'
 import percModelUrl from 'assets/models/perc.glb?url'
 import valModelUrl from 'assets/models/val.glb?url'
 import khurModelUrl from 'assets/models/khur.glb?url'
@@ -15,12 +16,14 @@ export type TCharacterId =
   | 'perc'
   | 'val'
   | 'khur'
+  | 'albert'
 export type TWeapon =
   | 'axe'
   | 'sword'
   | 'accordion'
   | 'mic'
   | 'drum_stick'
+  | 'drums'
   | 'wild_boar'
   | 'spear'
 export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
@@ -180,6 +183,19 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     modelOffset: [0, 0.7, -0.1065],
     modelRotation: [-Math.PI / 2, 0, 0],
     weapon: 'mic'
+  },
+  albert: {
+    chooserModelOffset: [0.25, -0.08, -0.1065],
+    chooserModelRotation: [-Math.PI / 2, 0, 0],
+    chooserModelScale: 1.1,
+    id: 'albert',
+    label: 'Albert',
+    description: 'Silent killer using a storm of drumsets.',
+    modelUrl: monkModelUrl,
+    modelScale: 1.35,
+    modelOffset: [0, 0.18, -0.1065],
+    modelRotation: [-Math.PI / 2, 0, 0],
+    weapon: 'drums'
   }
 }
 export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {

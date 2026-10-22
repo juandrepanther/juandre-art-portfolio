@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import accordionModelUrl from 'assets/models/accordion.glb?url'
 import axeModelUrl from 'assets/models/axe.glb?url'
 import drumStickModelUrl from 'assets/models/drum_stick.glb?url'
+import drumsModelUrl from 'assets/models/drums.glb?url'
 import micModelUrl from 'assets/models/mic.glb?url'
 import spearModelUrl from 'assets/models/spear.glb?url'
 import swordModelUrl from 'assets/models/sword.glb?url'
@@ -59,6 +60,11 @@ const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
     rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
     scale: 4.62
   },
+  drums: {
+    position: [0.2725, 0.06, 0],
+    rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
+    scale: 0.62
+  },
   wild_boar: {
     position: [0.2725, 0.06, 0],
     rotation: [Math.PI / 4, Math.PI / 4, Math.PI / 2],
@@ -75,6 +81,7 @@ const projectileModelUrls: Record<TWeapon, string> = {
   axe: axeModelUrl,
   accordion: accordionModelUrl,
   drum_stick: drumStickModelUrl,
+  drums: drumsModelUrl,
   mic: micModelUrl,
   spear: spearModelUrl,
   sword: swordModelUrl,
