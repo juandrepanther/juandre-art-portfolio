@@ -52,6 +52,7 @@ describe('CharacterPreview', () => {
     renderWithProviders(
       <CharacterPreview
         characterConfig={CHARACTER_CONFIGS['viking-raider']}
+        isLandscapeMobile={false}
         isMobileViewport={false}
       />
     )
@@ -69,6 +70,7 @@ describe('CharacterPreview', () => {
     renderWithProviders(
       <CharacterPreview
         characterConfig={CHARACTER_CONFIGS['viking-raider']}
+        isLandscapeMobile={false}
         isMobileViewport={false}
       />
     )

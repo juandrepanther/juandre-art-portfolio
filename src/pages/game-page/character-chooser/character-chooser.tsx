@@ -64,6 +64,7 @@ function CharacterChooser({
   selectedDifficulty
 }: ICharacterChooser) {
   const theme = useTheme()
+  const isMobileLandscape = isMobileViewport && isLandscapeMobile
   const selectedIndex = availableCharacterIds.indexOf(
     selectedCharacterConfig.id
   )
@@ -91,11 +92,12 @@ function CharacterChooser({
         position: 'absolute',
         inset: 0,
         zIndex: 7,
-        display: 'grid',
-        placeItems: 'center',
-        px: isMobileViewport ? 0 : { xs: 2, md: 4 },
-        py: isMobileViewport ? 0 : { xs: 3, md: 4 },
-        overflowY: isMobileViewport && isLandscapeMobile ? 'hidden' : 'auto',
+        display: isMobileLandscape ? 'flex' : 'grid',
+        placeItems: isMobileLandscape ? undefined : 'center',
+        alignItems: isMobileLandscape ? 'stretch' : undefined,
+        px: isMobileLandscape ? 0 : isMobileViewport ? 0 : { xs: 2, md: 4 },
+        py: isMobileLandscape ? 0 : isMobileViewport ? 0 : { xs: 3, md: 4 },
+        overflowY: isMobileLandscape ? 'hidden' : 'auto',
         background: `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0.72)} 0%, ${alpha(theme.palette.background.paper, 0.84)} 100%)`,
         backdropFilter: 'blur(20px)'
       }}
@@ -104,8 +106,10 @@ function CharacterChooser({
         spacing={3}
         sx={{
           width: 'min(1120px, 100%)',
+          height: isMobileLandscape ? '100%' : 'auto',
           maxHeight: '100%',
-          overflowY: isMobileViewport && isLandscapeMobile ? 'hidden' : 'auto',
+          overflowY: isMobileLandscape ? 'hidden' : 'auto',
+          justifyContent: isMobileLandscape ? 'space-between' : 'flex-start',
           p: isMobileViewport ? 0.5 : { xs: 3, md: 4 },
           borderRadius: isMobileViewport ? 0.5 : 3,
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
@@ -126,7 +130,10 @@ function CharacterChooser({
         <Stack
           direction={isMobileViewport ? 'row' : { xs: 'column', lg: 'row' }}
           spacing={isMobileViewport ? 1.5 : 3}
-          sx={{ alignItems: 'stretch' }}
+          sx={{
+            alignItems: 'stretch',
+            minHeight: isMobileLandscape ? 0 : undefined
+          }}
         >
           <Stack
             spacing={isMobileViewport ? 1.2 : 2.5}
@@ -146,6 +153,7 @@ function CharacterChooser({
             >
               <CharacterPreview
                 characterConfig={selectedCharacterConfig}
+                isLandscapeMobile={isLandscapeMobile}
                 isMobileViewport={isMobileViewport}
               />
             </Box>

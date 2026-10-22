@@ -8,6 +8,7 @@ import CharacterModel from './character-model'
 
 interface ICharacterPreview {
   characterConfig: ICharacterConfig
+  isLandscapeMobile: boolean
   isMobileViewport: boolean
 }
 
@@ -43,6 +44,7 @@ function CharacterPreviewLoader() {
 
 function CharacterPreview({
   characterConfig,
+  isLandscapeMobile,
   isMobileViewport
 }: ICharacterPreview) {
   const theme = useTheme()
@@ -52,7 +54,11 @@ function CharacterPreview({
       sx={{
         position: 'relative',
         overflow: 'hidden',
-        minHeight: isMobileViewport ? 178 : 420,
+        minHeight: isMobileViewport
+          ? isLandscapeMobile
+            ? 'clamp(120px, 34vh, 178px)'
+            : 178
+          : 420,
         borderRadius: 3,
         border: `1px solid ${alpha(theme.palette.common.white, 0.12)}`,
         background:
