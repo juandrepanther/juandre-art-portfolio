@@ -10,7 +10,7 @@ import {
   Typography
 } from '@mui/material'
 import { keyframes } from '@mui/material/styles'
-import { EmojiEvents, MusicNote } from '@mui/icons-material'
+import { ChevronLeft, EmojiEvents, MusicNote } from '@mui/icons-material'
 import gameOverImage from 'assets/images/over.png'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import winImage from 'assets/images/win.png'
@@ -441,6 +441,8 @@ function GamePage() {
       <HomePageHeader
         actionHref="/"
         actionLabel="Back to Portfolio"
+        mobileLandscapeActionIcon={<ChevronLeft fontSize="small" />}
+        mobileLandscapeActionAriaLabel="Back to Portfolio"
         isDarkMode={isDarkMode}
         onToggleDarkMode={toggleDarkMode}
       />

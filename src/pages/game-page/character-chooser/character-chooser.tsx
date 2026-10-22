@@ -104,7 +104,7 @@ function CharacterChooser({
           width: 'min(1120px, 100%)',
           maxHeight: '100%',
           overflowY: 'auto',
-          p: isMobileViewport ? 0 : { xs: 3, md: 4 },
+          p: isMobileViewport ? 0.5 : { xs: 3, md: 4 },
           borderRadius: isMobileViewport ? 0.5 : 3,
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.88)} 0%, ${alpha(theme.palette.background.default, 0.78)} 100%)`,

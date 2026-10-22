@@ -10,12 +10,15 @@ import {
   useMediaQuery
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import type { ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router'
 
 interface IHomePageHeader {
   actionHref: string
   actionLabel: string
   mobileActionLabel?: string
+  mobileLandscapeActionIcon?: ReactNode
+  mobileLandscapeActionAriaLabel?: string
   isDarkMode: boolean
   onToggleDarkMode: () => void
 }
@@ -24,14 +27,24 @@ function HomePageHeader({
   actionHref,
   actionLabel,
   mobileActionLabel,
+  mobileLandscapeActionIcon,
+  mobileLandscapeActionAriaLabel,
   isDarkMode,
   onToggleDarkMode
 }: IHomePageHeader) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobileViewport = useMediaQuery('(max-width: 1023.95px)')
+  const isLandscape = useMediaQuery('(orientation: landscape)')
+  const isMobileLandscape = isMobileViewport && isLandscape
   const visibleActionLabel =
     isMobile && mobileActionLabel ? mobileActionLabel : actionLabel
   const modeLabel = isDarkMode ? 'Dark mode' : 'Light mode'
+  const shouldRenderMobileLandscapeActionIcon =
+    isMobileLandscape && mobileLandscapeActionIcon !== undefined
+  const actionAriaLabel = shouldRenderMobileLandscapeActionIcon
+    ? (mobileLandscapeActionAriaLabel ?? actionLabel)
+    : undefined
 
   return (
     <AppBar
@@ -41,6 +54,8 @@ function HomePageHeader({
       position="sticky"
       sx={{
         top: 0,
+        py: 0,
+        px: isMobileLandscape ? 1.5 : 0,
         zIndex: 10,
         backdropFilter: 'blur(18px)',
         backgroundColor: isDarkMode
@@ -55,17 +70,28 @@ function HomePageHeader({
         disableGutters
         sx={{
           width: {
-            xs: 'calc(100% - 24px)',
+            xs: isMobileLandscape ? '100%' : 'calc(100% - 24px)',
             sm: 'min(1200px, calc(100% - 40px))'
           },
-          mx: 'auto',
-          py: { xs: 1.25, sm: 1.5, md: 2 },
-          minHeight: 'unset',
+          mx: isMobileLandscape ? 0 : 'auto',
+          py: {
+            xs: isMobileLandscape ? 0 : 1.25,
+            sm: isMobileLandscape ? 0 : 1.5,
+            md: isMobileLandscape ? 0 : 2
+          },
+          minHeight: isMobileLandscape ? '0 !important' : undefined,
           alignItems: 'center',
           justifyContent: 'space-between'
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: isMobileLandscape ? 'row' : 'column',
+            alignItems: isMobileLandscape ? 'center' : 'flex-start',
+            gap: isMobileLandscape ? 1 : 0
+          }}
+        >
           <Typography
             variant="body2"
             sx={{ color: 'secondary.main', letterSpacing: '0.08em' }}
@@ -73,8 +99,15 @@ function HomePageHeader({
             JANIS DREGERIS
           </Typography>
           <Typography
-            variant="h1"
-            sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, lineHeight: 1.1 }}
+            variant={isMobileLandscape ? 'body2' : 'h1'}
+            sx={{
+              fontSize: isMobileLandscape
+                ? '0.78rem'
+                : { xs: '0.9rem', sm: '1rem' },
+              lineHeight: 1.1,
+              letterSpacing: isMobileLandscape ? '0.04em' : undefined,
+              whiteSpace: 'nowrap'
+            }}
           >
             FULL STACK ENGINEER
           </Typography>
@@ -85,6 +118,7 @@ function HomePageHeader({
             component={RouterLink}
             to={actionHref}
             variant="outlined"
+            aria-label={actionAriaLabel}
             sx={{
               borderColor: isDarkMode
                 ? 'rgba(84, 199, 184, 0.42)'
@@ -102,7 +136,9 @@ function HomePageHeader({
               }
             }}
           >
-            {visibleActionLabel}
+            {shouldRenderMobileLandscapeActionIcon
+              ? mobileLandscapeActionIcon
+              : visibleActionLabel}
           </Button>
           <FormControlLabel
             control={
