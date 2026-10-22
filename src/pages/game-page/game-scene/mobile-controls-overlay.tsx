@@ -176,7 +176,7 @@ function MobileControlsOverlay({
           right: 'max(10px, env(safe-area-inset-right))',
           bottom: 'max(10px, env(safe-area-inset-bottom))',
           display: 'grid',
-          gap: 8,
+          gap: 12,
           pointerEvents: 'auto',
           zIndex: 4
         }}
@@ -185,14 +185,14 @@ function MobileControlsOverlay({
           aria-label="Jump"
           onPointerDown={onJumpPress}
           style={{
-            width: 72,
-            height: 36,
+            width: 108,
+            height: 52,
             borderRadius: 999,
             border: '1px solid rgba(255,255,255,0.7)',
             color: '#f8fbff',
             background: 'rgba(0,0,0,0.36)',
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 14,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             backdropFilter: 'blur(4px)'
@@ -205,14 +205,14 @@ function MobileControlsOverlay({
           aria-label="Shoot"
           onPointerDown={onShootPress}
           style={{
-            width: 72,
-            height: 36,
+            width: 108,
+            height: 52,
             borderRadius: 999,
             border: '1px solid rgba(255,255,255,0.7)',
             color: '#f8fbff',
             background: 'rgba(255,80,52,0.72)',
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 14,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             backdropFilter: 'blur(4px)'
