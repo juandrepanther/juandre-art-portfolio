@@ -439,16 +439,12 @@ function GamePage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        backgroundColor: 'background.default',
-        ...(isMobileViewport && isLandscapeMobile
-          ? {
-              height: '100dvh',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column'
-            }
-          : null)
+        height: '100dvh',
+        minHeight: '100dvh',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: 'background.default'
       }}
     >
       <HomePageHeader
@@ -463,14 +459,9 @@ function GamePage() {
       <Box
         component="main"
         sx={{
-          minHeight:
-            isMobileViewport && isLandscapeMobile ? 0 : 'calc(100vh - 88px)',
-          ...(isMobileViewport && isLandscapeMobile
-            ? {
-                flex: 1,
-                overflow: 'hidden'
-              }
-            : null),
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
           px: isMobileViewport ? 0 : { xs: 2, md: 3 },
           py: isMobileViewport ? 0 : { xs: 2, md: 3 }
         }}
@@ -507,16 +498,8 @@ function GamePage() {
           <Box
             sx={{
               position: 'relative',
-              height: isMobileViewport
-                ? isLandscapeMobile
-                  ? '100%'
-                  : 'calc(100vh - 88px)'
-                : 'calc(100vh - 112px)',
-              minHeight: isMobileViewport
-                ? isLandscapeMobile
-                  ? '100%'
-                  : 'calc(100vh - 88px)'
-                : 'calc(100vh - 112px)',
+              height: '100%',
+              minHeight: 0,
               overflow: 'hidden',
               borderRadius: isMobileViewport ? 0.5 : 3,
               border: isMobileViewport

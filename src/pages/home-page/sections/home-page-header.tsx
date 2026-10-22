@@ -51,7 +51,7 @@ function HomePageHeader({
       color="transparent"
       component="header"
       elevation={0}
-      position="absolute"
+      position="sticky"
       sx={{
         top: 0,
         py: 0,
