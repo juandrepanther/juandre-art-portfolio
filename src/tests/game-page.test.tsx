@@ -1,4 +1,4 @@
-import { act, fireEvent, waitFor } from '@testing-library/react'
+import { act, fireEvent, waitFor, within } from '@testing-library/react'
 import { screen } from 'shadow-dom-testing-library'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -640,6 +640,9 @@ describe('GamePage', () => {
 
     setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /trigger enemy defeat/i })
+    )
     fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
 
     expect(
@@ -647,6 +650,12 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('LOST')).toBeInTheDocument()
+    const resultDialog = screen.getByRole('dialog')
+
+    expect(
+      within(resultDialog).getByText(/enemies defeated/i)
+    ).toBeInTheDocument()
+    expect(within(resultDialog).getByText('1')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /portfolio/i })).toHaveAttribute(
       'href',
       '/'
@@ -745,6 +754,9 @@ describe('GamePage', () => {
     setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
     fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+    fireEvent.click(
+      screen.getByRole('button', { name: /trigger enemy defeat/i })
+    )
 
     const roundCompletionSeconds =
       START_RUN_COUNTDOWN_SECONDS + DIFFICULTY_CONFIGS.Noob.roundTime + 1
@@ -760,6 +772,12 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByText('WIN')).toBeInTheDocument()
+    const resultDialog = screen.getByRole('dialog')
+
+    expect(
+      within(resultDialog).getByText(/enemies defeated/i)
+    ).toBeInTheDocument()
+    expect(within(resultDialog).getByText('1')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^change$/i })
     ).toBeInTheDocument()

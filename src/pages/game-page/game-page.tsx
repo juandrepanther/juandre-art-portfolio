@@ -1129,6 +1129,22 @@ function GamePage() {
                     {resultStatusLabel}
                   </Typography>
                 </Box>
+
+                <Stack
+                  direction="row"
+                  sx={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    mt: 1.5,
+                    px: 0.25
+                  }}
+                >
+                  <Typography sx={{ color: 'text.secondary' }} variant="body2">
+                    Enemies defeated
+                  </Typography>
+                  <Chip color="warning" label={enemyHits} variant="outlined" />
+                </Stack>
               </Box>
               <DialogActions
                 sx={{

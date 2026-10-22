@@ -137,7 +137,7 @@ export const CHARACTER_CONFIGS: Record<TCharacterId, ICharacterConfig> = {
     chooserModelRotation: [-Math.PI / 2, 0, 0],
     chooserModelScale: 1,
     id: 'perc',
-    label: 'Bear',
+    label: 'Nikita Bear',
     description: 'His sticks will go through your eyes',
     modelUrl: percModelUrl,
     modelScale: 1,
