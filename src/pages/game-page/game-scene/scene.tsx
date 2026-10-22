@@ -3,6 +3,7 @@ import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
 import { Suspense, useRef } from 'react'
+import mobileSkyImage from 'assets/images/forest.jpg'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
 import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
@@ -49,11 +50,15 @@ function GameScene({
       >
         <Suspense fallback={null}>
           {import.meta.env.DEV ? <Perf position="top-right" /> : null}
-          <Environment
-            preset="forest"
-            background={shouldRenderVisualEffects}
-            backgroundBlurriness={shouldRenderVisualEffects ? 0.4 : 0}
-          />
+          {shouldRenderVisualEffects ? (
+            <Environment
+              preset="forest"
+              background={true}
+              backgroundBlurriness={0.4}
+            />
+          ) : (
+            <Environment files={mobileSkyImage} background={true} />
+          )}
           <Physics
             colliders={false}
             debug={import.meta.env.DEV}

@@ -513,6 +513,35 @@ describe('GamePage', () => {
     ).toBeInTheDocument()
   })
 
+  it('shows an always-enabled mobile STOP button and larger joystick in landscape', () => {
+    mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^fight$/i }))
+
+    const stopButton = screen.getByRole('button', { name: /^stop$/i })
+    const joystick = screen.getByTestId('mobile-joystick')
+
+    expect(stopButton).toBeEnabled()
+    expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /jump/i })).toBeInTheDocument()
+    expect(joystick).toHaveStyle({ width: '99px', height: '99px' })
+
+    fireEvent.click(stopButton)
+
+    expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /jump/i })
+    ).not.toBeInTheDocument()
+  })
+
   it('starts with the configured preparation countdown', async () => {
     vi.useFakeTimers()
 

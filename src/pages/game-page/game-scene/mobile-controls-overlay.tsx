@@ -12,7 +12,10 @@ interface IMobileControlsOverlay {
   onShootPress: () => void
 }
 
-const joystickMaxDistance = 44
+const joystickScale = 1.15
+const joystickMaxDistance = Math.round(44 * joystickScale)
+const joystickSize = Math.round(86 * joystickScale)
+const joystickKnobSize = Math.round(36 * joystickScale)
 
 function clampVectorToRadius(x: number, y: number, maxDistance: number) {
   const distance = Math.hypot(x, y)
@@ -135,6 +138,7 @@ function MobileControlsOverlay({
       />
 
       <div
+        data-testid="mobile-joystick"
         onPointerCancel={resetJoystick}
         onPointerDown={handleJoystickPointerDown}
         onPointerMove={handleJoystickPointerMove}
@@ -143,8 +147,8 @@ function MobileControlsOverlay({
           position: 'absolute',
           left: 'max(10px, env(safe-area-inset-left))',
           bottom: 'max(10px, env(safe-area-inset-bottom))',
-          width: 86,
-          height: 86,
+          width: joystickSize,
+          height: joystickSize,
           borderRadius: '50%',
           border: '1px solid rgba(255,255,255,0.62)',
           background: 'rgba(0,0,0,0.26)',
@@ -159,8 +163,8 @@ function MobileControlsOverlay({
             position: 'absolute',
             left: '50%',
             top: '50%',
-            width: 36,
-            height: 36,
+            width: joystickKnobSize,
+            height: joystickKnobSize,
             borderRadius: '50%',
             border: '1px solid rgba(255,255,255,0.72)',
             background: 'rgba(255,255,255,0.42)',

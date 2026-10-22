@@ -648,6 +648,37 @@ function GamePage() {
 
             {hasChosenCharacter ? (
               <>
+                {isMobileViewport && isLandscapeMobile ? (
+                  <Button
+                    color="primary"
+                    onClick={handleReturnToMenu}
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      left: 'max(10px, env(safe-area-inset-left))',
+                      top: 'max(10px, env(safe-area-inset-top))',
+                      zIndex: 12,
+                      minWidth: 74,
+                      fontWeight: 700,
+                      backdropFilter: 'blur(10px)',
+                      backgroundColor: isDarkMode
+                        ? 'rgba(12, 17, 23, 0.58)'
+                        : 'rgba(255, 255, 255, 0.72)',
+                      border: isDarkMode
+                        ? '1px solid rgba(220, 229, 236, 0.24)'
+                        : '1px solid rgba(20, 32, 44, 0.2)',
+                      '&:hover': {
+                        backgroundColor: isDarkMode
+                          ? 'rgba(12, 17, 23, 0.72)'
+                          : 'rgba(255, 255, 255, 0.9)'
+                      }
+                    }}
+                    variant="outlined"
+                  >
+                    STOP
+                  </Button>
+                ) : null}
+
                 <Box
                   aria-hidden="true"
                   data-testid="game-pointer"
