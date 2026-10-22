@@ -1,7 +1,7 @@
 import { Environment, KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
-import { Perf } from 'r3f-perf'
+// import { Perf } from 'r3f-perf'
 import { Suspense, useRef } from 'react'
 import mobileSkyImage from 'assets/images/forest.jpg'
 import type { IGameSceneProps } from '../helpers'
@@ -49,7 +49,7 @@ function GameScene({
         shadows={shouldRenderVisualEffects}
       >
         <Suspense fallback={null}>
-          {import.meta.env.DEV ? <Perf position="top-right" /> : null}
+          {/* {import.meta.env.DEV ? <Perf position="top-right" /> : null} */}
           {shouldRenderVisualEffects ? (
             <Environment
               preset="forest"
