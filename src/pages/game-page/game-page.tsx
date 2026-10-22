@@ -187,6 +187,8 @@ function GamePage() {
   const trimmedPlayerName = playerName.trim()
   const shouldShowMobileControlsOverlay =
     isMobileViewport && isLandscapeMobile && isRoundActive
+  const shouldDisableTouchSelection =
+    isMobileViewport && isLandscapeMobile && isRoundActive
 
   const handleMobileMoveChange = (vector: IJoystickVector) => {
     setMobileMoveVector(vector)
@@ -256,6 +258,56 @@ function GamePage() {
       bodyElement.style.overflow = previousBodyOverflow
     }
   }, [isLandscapeMobile, isMobileViewport])
+
+  useEffect(() => {
+    if (!shouldDisableTouchSelection) {
+      return undefined
+    }
+
+    const documentElement = document.documentElement
+    const bodyElement = document.body
+    const previousHtmlUserSelect = documentElement.style.userSelect
+    const previousBodyUserSelect = bodyElement.style.userSelect
+    const previousHtmlWebkitUserSelect = documentElement.style.getPropertyValue(
+      '-webkit-user-select'
+    )
+    const previousBodyWebkitUserSelect = bodyElement.style.getPropertyValue(
+      '-webkit-user-select'
+    )
+    const previousHtmlWebkitTouchCallout =
+      documentElement.style.getPropertyValue('-webkit-touch-callout')
+    const previousBodyWebkitTouchCallout = bodyElement.style.getPropertyValue(
+      '-webkit-touch-callout'
+    )
+
+    documentElement.style.userSelect = 'none'
+    bodyElement.style.userSelect = 'none'
+    documentElement.style.setProperty('-webkit-user-select', 'none')
+    bodyElement.style.setProperty('-webkit-user-select', 'none')
+    documentElement.style.setProperty('-webkit-touch-callout', 'none')
+    bodyElement.style.setProperty('-webkit-touch-callout', 'none')
+
+    return () => {
+      documentElement.style.userSelect = previousHtmlUserSelect
+      bodyElement.style.userSelect = previousBodyUserSelect
+      documentElement.style.setProperty(
+        '-webkit-user-select',
+        previousHtmlWebkitUserSelect
+      )
+      bodyElement.style.setProperty(
+        '-webkit-user-select',
+        previousBodyWebkitUserSelect
+      )
+      documentElement.style.setProperty(
+        '-webkit-touch-callout',
+        previousHtmlWebkitTouchCallout
+      )
+      bodyElement.style.setProperty(
+        '-webkit-touch-callout',
+        previousBodyWebkitTouchCallout
+      )
+    }
+  }, [shouldDisableTouchSelection])
 
   useEffect(() => {
     if (gameStatus === 'countdown' || gameStatus === 'playing') {
@@ -522,6 +574,10 @@ function GamePage() {
               height: '100%',
               minHeight: 0,
               overflow: 'hidden',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              touchAction: 'none',
               borderRadius: isMobileViewport ? 0.5 : 3,
               border: isMobileViewport
                 ? 'none'
