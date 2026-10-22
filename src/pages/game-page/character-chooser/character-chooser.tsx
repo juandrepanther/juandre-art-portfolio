@@ -22,6 +22,7 @@ import CharacterPreview from './character-preview'
 
 interface ICharacterChooser {
   availableCharacterIds: TCharacterId[]
+  isLandscapeMobile: boolean
   isMobileViewport: boolean
   onCharacterChange: (characterId: TCharacterId) => void
   onDevChoose: () => void
@@ -50,6 +51,7 @@ const difficultyLabelPulse = keyframes`
 
 function CharacterChooser({
   availableCharacterIds,
+  isLandscapeMobile,
   isMobileViewport,
   onCharacterChange,
   onDevChoose,
@@ -93,7 +95,7 @@ function CharacterChooser({
         placeItems: 'center',
         px: isMobileViewport ? 0 : { xs: 2, md: 4 },
         py: isMobileViewport ? 0 : { xs: 3, md: 4 },
-        overflowY: 'auto',
+        overflowY: isMobileViewport && isLandscapeMobile ? 'hidden' : 'auto',
         background: `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0.72)} 0%, ${alpha(theme.palette.background.paper, 0.84)} 100%)`,
         backdropFilter: 'blur(20px)'
       }}
@@ -103,7 +105,7 @@ function CharacterChooser({
         sx={{
           width: 'min(1120px, 100%)',
           maxHeight: '100%',
-          overflowY: 'auto',
+          overflowY: isMobileViewport && isLandscapeMobile ? 'hidden' : 'auto',
           p: isMobileViewport ? 0.5 : { xs: 3, md: 4 },
           borderRadius: isMobileViewport ? 0.5 : 3,
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
@@ -402,6 +404,16 @@ function CharacterChooser({
                           ? 'contained'
                           : 'outlined'
                       }
+                      sx={
+                        isMobileViewport
+                          ? {
+                              px: 0.85,
+                              py: 0.25,
+                              minWidth: 56,
+                              fontSize: '0.68rem'
+                            }
+                          : undefined
+                      }
                     >
                       {difficultyOption}
                     </Button>
@@ -491,8 +503,18 @@ function CharacterChooser({
                       color="warning"
                       disabled={isChooseDisabled}
                       onClick={onDevChoose}
-                      size={isMobileViewport ? 'medium' : 'large'}
+                      size={isMobileViewport ? 'small' : 'large'}
                       variant="outlined"
+                      sx={
+                        isMobileViewport
+                          ? {
+                              px: 1,
+                              py: 0.35,
+                              minWidth: 48,
+                              fontSize: '0.72rem'
+                            }
+                          : undefined
+                      }
                     >
                       DEV
                     </Button>
@@ -508,8 +530,18 @@ function CharacterChooser({
                     color="error"
                     disabled={isChooseDisabled}
                     onClick={onChoose}
-                    size={isMobileViewport ? 'medium' : 'large'}
+                    size={isMobileViewport ? 'small' : 'large'}
                     variant="contained"
+                    sx={
+                      isMobileViewport
+                        ? {
+                            px: 1.25,
+                            py: 0.35,
+                            minWidth: 70,
+                            fontSize: '0.72rem'
+                          }
+                        : undefined
+                    }
                   >
                     Choose
                   </Button>

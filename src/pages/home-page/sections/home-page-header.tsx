@@ -40,9 +40,9 @@ function HomePageHeader({
   const visibleActionLabel =
     isMobile && mobileActionLabel ? mobileActionLabel : actionLabel
   const modeLabel = isDarkMode ? 'Dark mode' : 'Light mode'
-  const shouldRenderMobileLandscapeActionIcon =
-    isMobileLandscape && mobileLandscapeActionIcon !== undefined
-  const actionAriaLabel = shouldRenderMobileLandscapeActionIcon
+  const shouldRenderMobileActionIcon =
+    isMobileViewport && mobileLandscapeActionIcon !== undefined
+  const actionAriaLabel = shouldRenderMobileActionIcon
     ? (mobileLandscapeActionAriaLabel ?? actionLabel)
     : undefined
 
@@ -136,7 +136,7 @@ function HomePageHeader({
               }
             }}
           >
-            {shouldRenderMobileLandscapeActionIcon
+            {shouldRenderMobileActionIcon
               ? mobileLandscapeActionIcon
               : visibleActionLabel}
           </Button>

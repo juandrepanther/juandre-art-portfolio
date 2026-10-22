@@ -437,7 +437,20 @@ function GamePage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: 'background.default',
+        ...(isMobileViewport && isLandscapeMobile
+          ? {
+              height: '100dvh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }
+          : null)
+      }}
+    >
       <HomePageHeader
         actionHref="/"
         actionLabel="Back to Portfolio"
@@ -450,7 +463,14 @@ function GamePage() {
       <Box
         component="main"
         sx={{
-          minHeight: 'calc(100vh - 88px)',
+          minHeight:
+            isMobileViewport && isLandscapeMobile ? 0 : 'calc(100vh - 88px)',
+          ...(isMobileViewport && isLandscapeMobile
+            ? {
+                flex: 1,
+                overflow: 'hidden'
+              }
+            : null),
           px: isMobileViewport ? 0 : { xs: 2, md: 3 },
           py: isMobileViewport ? 0 : { xs: 2, md: 3 }
         }}
@@ -488,10 +508,14 @@ function GamePage() {
             sx={{
               position: 'relative',
               height: isMobileViewport
-                ? 'calc(100vh - 88px)'
+                ? isLandscapeMobile
+                  ? '100%'
+                  : 'calc(100vh - 88px)'
                 : 'calc(100vh - 112px)',
               minHeight: isMobileViewport
-                ? 'calc(100vh - 88px)'
+                ? isLandscapeMobile
+                  ? '100%'
+                  : 'calc(100vh - 88px)'
                 : 'calc(100vh - 112px)',
               overflow: 'hidden',
               borderRadius: isMobileViewport ? 0.5 : 3,
@@ -548,6 +572,7 @@ function GamePage() {
             {!hasChosenCharacter ? (
               <CharacterChooser
                 availableCharacterIds={characterOptions}
+                isLandscapeMobile={isLandscapeMobile}
                 isMobileViewport={isMobileViewport}
                 onCharacterChange={setSelectedCharacter}
                 onDevChoose={handleChooseDevelopmentCharacter}
