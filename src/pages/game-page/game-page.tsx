@@ -156,6 +156,7 @@ function GamePage() {
     height === undefined ||
     width > height
   const isMobilePortrait = isMobileViewport && !isLandscapeMobile
+  const viewportHeight = isMobileViewport ? '100svh' : '100dvh'
   const isCountingDown = gameStatus === 'countdown'
   const isPlaying = gameStatus === 'playing'
   const isRoundActive = isCountingDown || isPlaying
@@ -439,8 +440,9 @@ function GamePage() {
   return (
     <Box
       sx={{
-        height: '100dvh',
-        minHeight: '100dvh',
+        height: viewportHeight,
+        minHeight: viewportHeight,
+        maxHeight: viewportHeight,
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
