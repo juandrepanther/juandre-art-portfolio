@@ -11,6 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import { alpha, keyframes, useTheme } from '@mui/material/styles'
+import chooserBackgroundImage from 'assets/images/bg.jpg'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
 import type {
@@ -112,8 +113,11 @@ function CharacterChooser({
           justifyContent: isMobileLandscape ? 'space-between' : 'flex-start',
           p: isMobileViewport ? 0.5 : { xs: 3, md: 4 },
           borderRadius: isMobileViewport ? 0.5 : 3,
-          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-          background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.88)} 0%, ${alpha(theme.palette.background.default, 0.78)} 100%)`,
+          border: 'none',
+          backgroundImage: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)} 0%, ${alpha(theme.palette.background.default, 0.7)} 100%), url(${chooserBackgroundImage})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
           boxShadow: `0 28px 90px ${alpha(theme.palette.common.black, 0.34)}`
         }}
       >
