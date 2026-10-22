@@ -5,6 +5,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createAppTheme } from 'lib/mui/app-theme'
 import { useThemeStore } from 'lib/zustand/theme-store'
+import WebglNotSupportedPage from 'pages/webgl-not-supported-page/webgl-not-supported-page'
+import { isWebGLSupported } from 'utils/webgl-support'
 import { AppRoutes } from './routes'
 import './index.css'
 
@@ -19,14 +21,19 @@ const root = createRoot(rootNode)
 function AppRoot() {
   const { isDarkMode } = useThemeStore()
   const theme = createAppTheme(isDarkMode ? 'dark' : 'light')
+  const hasWebGLSupport = isWebGLSupported()
 
   return (
     <StrictMode>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        {hasWebGLSupport ? (
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        ) : (
+          <WebglNotSupportedPage />
+        )}
       </ThemeProvider>
     </StrictMode>
   )
