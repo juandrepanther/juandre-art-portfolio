@@ -118,11 +118,6 @@ import {
 } from '../settings'
 const playerRigidBodyName = 'player-body'
 const cloudColors = ['orange', 'hotpink', 'skyblue', 'white', 'gold']
-const playerMobileBulbPosition: [number, number, number] = [0, 0.95, 0]
-const playerMobileBulbRadius = 0.09
-const playerMobileBulbGlowRadius = 0.21
-const playerMobileBulbLightDistance = 3.4
-const playerMobileBulbLightIntensity = 6.2
 
 interface ICloudConfig {
   bounds: [number, number, number]
@@ -198,6 +193,9 @@ export default function RoundStage({
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
   const shouldRenderVisualEffects = !isMobileViewport
+  const mapDirectionalLightIntensity = isMobileViewport
+    ? DIRECTIONAL_LIGHT_BASE_INTENSITY * 2
+    : DIRECTIONAL_LIGHT_BASE_INTENSITY
   const [subscribeToKeyboard, getKeyboardState] =
     useKeyboardControls<TGameControl>()
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
@@ -987,7 +985,7 @@ export default function RoundStage({
       <directionalLight
         castShadow={shouldRenderVisualEffects}
         color={DIRECTIONAL_LIGHT_BASE_COLOR}
-        intensity={DIRECTIONAL_LIGHT_BASE_INTENSITY}
+        intensity={mapDirectionalLightIntensity}
         position={DIRECTIONAL_LIGHT_POSITION}
         ref={directionalLightRef}
         shadow-bias={DIRECTIONAL_LIGHT_SHADOW_BIAS}
@@ -1013,7 +1011,6 @@ export default function RoundStage({
       <Enemy
         enemyCount={difficultyConfig.enemyCount}
         enemyStateRef={enemyStateRef}
-        isMobileViewport={isMobileViewport}
       />
       {shouldRenderVisualEffects ? (
         <EnemyExplosionParticles
@@ -1086,29 +1083,6 @@ export default function RoundStage({
             groupRef={playerRef}
             isHitFlashing={isPlayerHitFlashing}
           >
-            {isMobileViewport ? (
-              <group position={playerMobileBulbPosition}>
-                <pointLight
-                  color="#ffe199"
-                  decay={1.2}
-                  distance={playerMobileBulbLightDistance}
-                  intensity={playerMobileBulbLightIntensity}
-                />
-                <mesh>
-                  <sphereGeometry args={[playerMobileBulbRadius, 14, 14]} />
-                  <meshBasicMaterial color="#fff8de" toneMapped={false} />
-                </mesh>
-                <mesh>
-                  <sphereGeometry args={[playerMobileBulbGlowRadius, 14, 14]} />
-                  <meshBasicMaterial
-                    color="#ffd47a"
-                    opacity={0.4}
-                    toneMapped={false}
-                    transparent
-                  />
-                </mesh>
-              </group>
-            ) : null}
             {showHealthMeter ? (
               <PlayerHealthMeter
                 health={health}

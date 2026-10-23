@@ -162,6 +162,10 @@ function GamePage() {
   const isRoundActive = isCountingDown || isPlaying
   const shouldShowCenterFightButton =
     hasChosenCharacter && gameStatus === 'menu'
+  const shouldShowMobileChooseButton =
+    isMobileViewport && isLandscapeMobile && shouldShowCenterFightButton
+  const shouldShowMobileStopButton =
+    isMobileViewport && isLandscapeMobile && isRoundActive
   const isCameraOrbiting =
     gameStatus === 'menu' || gameStatus === 'won' || gameStatus === 'lost'
   const isResultDialogOpen =
@@ -648,10 +652,14 @@ function GamePage() {
 
             {hasChosenCharacter ? (
               <>
-                {isMobileViewport && isLandscapeMobile ? (
+                {shouldShowMobileChooseButton || shouldShowMobileStopButton ? (
                   <Button
                     color="primary"
-                    onClick={handleReturnToMenu}
+                    onClick={
+                      shouldShowMobileChooseButton
+                        ? handleChooseDifferentCharacter
+                        : handleReturnToMenu
+                    }
                     size="small"
                     sx={{
                       position: 'absolute',
@@ -675,7 +683,7 @@ function GamePage() {
                     }}
                     variant="outlined"
                   >
-                    STOP
+                    {shouldShowMobileChooseButton ? 'CHOOSE' : 'STOP'}
                   </Button>
                 ) : null}
 
