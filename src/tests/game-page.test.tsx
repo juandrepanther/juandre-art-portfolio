@@ -542,6 +542,43 @@ describe('GamePage', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('blurs player name input on mobile option selection', async () => {
+    mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
+    useGameScoreboardStore.getState().saveWonRun({
+      difficulty: 'Noob',
+      enemiesDefeated: 3,
+      playerName: 'Player1'
+    })
+
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      callback(0)
+      return 0
+    })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    const playerNameInput = screen.getByRole('combobox', {
+      name: /player name/i
+    })
+
+    playerNameInput.focus()
+    fireEvent.change(playerNameInput, { target: { value: 'Pla' } })
+
+    const playerOption = await screen.findByRole('option', {
+      name: 'Player1'
+    })
+
+    fireEvent.click(playerOption)
+
+    await waitFor(() => {
+      expect(playerNameInput).not.toHaveFocus()
+    })
+  })
+
   it('starts with the configured preparation countdown', async () => {
     vi.useFakeTimers()
 

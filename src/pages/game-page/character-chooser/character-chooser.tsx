@@ -11,6 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import { alpha, keyframes, useTheme } from '@mui/material/styles'
+import { useRef, type SyntheticEvent } from 'react'
 import chooserBackgroundImage from 'assets/images/bg.jpg'
 import logoVnImage from 'assets/images/logo_vn.jpg'
 import { createInteractiveSurfaceSx } from 'utils/interactive-surface'
@@ -75,6 +76,21 @@ function CharacterChooser({
   const isDevelopmentEnvironment = import.meta.env.DEV
   const shouldShowPlayerNameError =
     playerNameOptions.length === 0 && playerName.trim().length === 0
+  const playerNameInputRef = useRef<HTMLInputElement | null>(null)
+
+  const handlePlayerNameSelection = (
+    _: SyntheticEvent,
+    nextPlayerName: string | null,
+    reason: string
+  ) => {
+    onPlayerNameChange(nextPlayerName ?? '')
+
+    if (isMobileViewport && reason === 'selectOption') {
+      requestAnimationFrame(() => {
+        playerNameInputRef.current?.blur()
+      })
+    }
+  }
 
   const moveSelection = (direction: -1 | 1) => {
     if (totalCharacters <= 1) {
@@ -207,9 +223,7 @@ function CharacterChooser({
                 freeSolo
                 fullWidth
                 inputValue={playerName}
-                onChange={(_, nextPlayerName) => {
-                  onPlayerNameChange(nextPlayerName ?? '')
-                }}
+                onChange={handlePlayerNameSelection}
                 onInputChange={(_, nextPlayerNameInput) => {
                   onPlayerNameChange(nextPlayerNameInput)
                 }}
@@ -224,6 +238,7 @@ function CharacterChooser({
                         ? 'Type any player name to start'
                         : undefined
                     }
+                    inputRef={playerNameInputRef}
                     label="Player name"
                     size="small"
                   />
@@ -288,9 +303,7 @@ function CharacterChooser({
                   <Autocomplete
                     freeSolo
                     inputValue={playerName}
-                    onChange={(_, nextPlayerName) => {
-                      onPlayerNameChange(nextPlayerName ?? '')
-                    }}
+                    onChange={handlePlayerNameSelection}
                     onInputChange={(_, nextPlayerNameInput) => {
                       onPlayerNameChange(nextPlayerNameInput)
                     }}
@@ -305,6 +318,7 @@ function CharacterChooser({
                             ? 'Type any player name to start'
                             : undefined
                         }
+                        inputRef={playerNameInputRef}
                         label="Player name"
                         size="small"
                       />
