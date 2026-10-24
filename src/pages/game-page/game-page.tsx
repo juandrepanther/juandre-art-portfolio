@@ -182,6 +182,7 @@ function GamePage() {
   const resultImageAlt =
     gameStatus === 'won' ? 'Victory result' : 'Game over result'
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
+  const shouldShowResultImage = !(isMobileViewport && isLandscapeMobile)
   const resultStatusLabel = gameStatus === 'won' ? 'WIN' : 'LOST'
   const resultStatusColor = gameStatus === 'won' ? '#6ec060' : '#ff5a4a'
   const trimmedPlayerName = playerName.trim()
@@ -1122,59 +1123,82 @@ function GamePage() {
               }}
             >
               <Box sx={{ px: 2.5, pt: 2.5 }}>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: isMobileViewport ? 0.5 : 1.5
-                  }}
-                >
+                {shouldShowResultImage ? (
                   <Box
-                    alt={resultImageAlt}
-                    component="img"
-                    src={resultImageSource}
                     sx={{
-                      display: 'block',
-                      width:
-                        isMobileViewport && gameStatus === 'won'
-                          ? '82%'
-                          : '100%',
-                      maxHeight:
-                        isMobileViewport && gameStatus === 'won'
-                          ? 140
-                          : undefined,
-                      mx:
-                        isMobileViewport && gameStatus === 'won'
-                          ? 'auto'
-                          : undefined,
-                      objectFit:
-                        isMobileViewport && gameStatus === 'won'
-                          ? 'contain'
-                          : undefined,
-                      height: 'auto'
-                    }}
-                  />
-                  <Typography
-                    variant={isMobileViewport ? 'h4' : 'h2'}
-                    sx={{
-                      position: 'absolute',
-                      left: '50%',
-                      top: '80%',
-                      transform: 'translate(-50%, -50%)',
-                      color: resultStatusColor,
-                      fontWeight: 800,
-                      letterSpacing: isMobileViewport ? '0.12em' : '0.18em',
-                      textShadow: '0 10px 24px rgba(0, 0, 0, 0.55)',
-                      textAlign: 'center',
-                      backgroundColor: 'white',
-                      borderRadius: isMobileViewport ? 0.5 : 1,
-                      p: isMobileViewport ? 0.6 : 1,
-                      fontSize: isMobileViewport ? 22 : undefined
+                      position: 'relative',
+                      overflow: 'hidden',
+                      borderRadius: isMobileViewport ? 0.5 : 1.5
                     }}
                   >
-                    {resultStatusLabel}
-                  </Typography>
-                </Box>
+                    <Box
+                      alt={resultImageAlt}
+                      component="img"
+                      src={resultImageSource}
+                      sx={{
+                        display: 'block',
+                        width:
+                          isMobileViewport && gameStatus === 'won'
+                            ? '82%'
+                            : '100%',
+                        maxHeight:
+                          isMobileViewport && gameStatus === 'won'
+                            ? 140
+                            : undefined,
+                        mx:
+                          isMobileViewport && gameStatus === 'won'
+                            ? 'auto'
+                            : undefined,
+                        objectFit:
+                          isMobileViewport && gameStatus === 'won'
+                            ? 'contain'
+                            : undefined,
+                        height: 'auto'
+                      }}
+                    />
+                    <Typography
+                      variant={isMobileViewport ? 'h4' : 'h2'}
+                      sx={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '80%',
+                        transform: 'translate(-50%, -50%)',
+                        color: resultStatusColor,
+                        fontWeight: 800,
+                        letterSpacing: isMobileViewport ? '0.12em' : '0.18em',
+                        textShadow: '0 10px 24px rgba(0, 0, 0, 0.55)',
+                        textAlign: 'center',
+                        backgroundColor: 'white',
+                        borderRadius: isMobileViewport ? 0.5 : 1,
+                        p: isMobileViewport ? 0.6 : 1,
+                        fontSize: isMobileViewport ? 22 : undefined
+                      }}
+                    >
+                      {resultStatusLabel}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', py: 1 }}
+                  >
+                    <Typography
+                      variant={isMobileViewport ? 'h4' : 'h2'}
+                      sx={{
+                        color: resultStatusColor,
+                        fontWeight: 800,
+                        letterSpacing: isMobileViewport ? '0.12em' : '0.18em',
+                        textShadow: '0 10px 24px rgba(0, 0, 0, 0.55)',
+                        textAlign: 'center',
+                        backgroundColor: 'white',
+                        borderRadius: isMobileViewport ? 0.5 : 1,
+                        p: isMobileViewport ? 0.6 : 1,
+                        fontSize: isMobileViewport ? 22 : undefined
+                      }}
+                    >
+                      {resultStatusLabel}
+                    </Typography>
+                  </Box>
+                )}
 
                 <Stack
                   direction="row"

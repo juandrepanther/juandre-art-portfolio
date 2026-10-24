@@ -547,6 +547,25 @@ describe('GamePage', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('hides result image in mobile landscape result dialog', () => {
+    mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /trigger loss/i }))
+
+    expect(
+      screen.queryByRole('img', { name: /game over result/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('LOST')).toBeInTheDocument()
+  })
+
   it('blurs player name input on mobile option selection', async () => {
     mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
     useGameScoreboardStore.getState().saveWonRun({
@@ -908,10 +927,14 @@ describe('GamePage', () => {
     expect(screen.getByText(/^∞$/)).toBeInTheDocument()
     expect(screen.getByText(/scene difficulty: balls/i)).toBeInTheDocument()
     expect(
-      screen.getByText(`Scene enemy damage: ${DIFFICULTY_CONFIGS.Balls.enemyDamage}`)
+      screen.getByText(
+        `Scene enemy damage: ${DIFFICULTY_CONFIGS.Balls.enemyDamage}`
+      )
     ).toBeInTheDocument()
     expect(
-      screen.getByText(`Scene enemy count: ${DIFFICULTY_CONFIGS.Balls.enemyCount}`)
+      screen.getByText(
+        `Scene enemy count: ${DIFFICULTY_CONFIGS.Balls.enemyCount}`
+      )
     ).toBeInTheDocument()
   })
 })
