@@ -53,6 +53,7 @@ import {
   updateCameraOrbitPosition
 } from './camera'
 import { AtmosphereParticles, StormLightning } from './lighting'
+import { canUseAirJumpNearApex } from './jump-helpers'
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds } from './world-objects/arena-bounds'
 import { CrateField } from './world-objects/crate-field'
@@ -92,6 +93,10 @@ import {
   PLAYER_HIT_FLASH_DURATION_MS,
   PLAYER_HIT_RADIUS,
   PLAYER_HITBOX_OFFSET,
+  PLAYER_GROUNDED_VERTICAL_SPEED_EPSILON,
+  PLAYER_JUMP_GRAVITY,
+  PLAYER_MAX_JUMPS,
+  PLAYER_SECOND_JUMP_APEX_ZONE_RATIO,
   PLAYER_JUMP_VELOCITY,
   POINTER_LOCK_MAX_POLAR_ANGLE,
   POINTER_LOCK_MIN_POLAR_ANGLE,
@@ -256,6 +261,8 @@ export default function RoundStage({
   const consumedLookAccumulatorRef = useRef({ x: 0, y: 0 })
   const consumedJumpCountRef = useRef(0)
   const consumedShootCountRef = useRef(0)
+  const airborneJumpCountRef = useRef(0)
+  const jumpStartYRef = useRef(PLAYER_BODY_GROUND_OFFSET)
   const cameraYawRef = useRef(0)
   const cameraPitchRef = useRef(0)
   const cameraUpRef = useRef(new Vector3(0, 1, 0))
@@ -325,10 +332,45 @@ export default function RoundStage({
     }
 
     const currentVelocity = playerBody.linvel()
+    const currentY = playerBody.translation().y
+    const isGroundedByVerticalVelocity =
+      Math.abs(currentVelocity.y) <= PLAYER_GROUNDED_VERTICAL_SPEED_EPSILON
+    const canUseGroundJump =
+      airborneJumpCountRef.current === 0 && isGroundedByVerticalVelocity
 
-    if (Math.abs(currentVelocity.y) > 0.1) {
+    if (canUseGroundJump) {
+      jumpStartYRef.current = currentY
+      airborneJumpCountRef.current = 1
+
+      playerBody.setLinvel(
+        {
+          x: currentVelocity.x,
+          y: PLAYER_JUMP_VELOCITY,
+          z: currentVelocity.z
+        },
+        true
+      )
+
       return
     }
+
+    if (airborneJumpCountRef.current >= PLAYER_MAX_JUMPS) {
+      return
+    }
+
+    const canUseSecondJump = canUseAirJumpNearApex({
+      apexZoneRatio: PLAYER_SECOND_JUMP_APEX_ZONE_RATIO,
+      currentY,
+      gravity: PLAYER_JUMP_GRAVITY,
+      jumpStartY: jumpStartYRef.current,
+      jumpVelocity: PLAYER_JUMP_VELOCITY
+    })
+
+    if (!canUseSecondJump) {
+      return
+    }
+
+    airborneJumpCountRef.current = PLAYER_MAX_JUMPS
 
     playerBody.setLinvel(
       {
@@ -512,6 +554,8 @@ export default function RoundStage({
     playerVelocityRef.current.set(0, 0, 0)
     playerDirectionRef.current.set(0, 0, -1)
     desiredFacingRef.current.set(0, 0, -1)
+    airborneJumpCountRef.current = 0
+    jumpStartYRef.current = PLAYER_BODY_GROUND_OFFSET
     isPointerLockedRef.current = document.pointerLockElement === gl.domElement
     pendingPointerShotRef.current = false
     resetCameraState({
@@ -783,6 +827,16 @@ export default function RoundStage({
         nextPlayerTranslation.y,
         nextPlayerTranslation.z
       )
+
+      const hasLandedSinceJump =
+        airborneJumpCountRef.current > 0 &&
+        Math.abs(currentVelocity.y) <= PLAYER_GROUNDED_VERTICAL_SPEED_EPSILON &&
+        nextPlayerTranslation.y <= jumpStartYRef.current + 0.08
+
+      if (hasLandedSinceJump) {
+        airborneJumpCountRef.current = 0
+        jumpStartYRef.current = nextPlayerTranslation.y
+      }
     }
 
     playerRef.current.rotation.y = Math.atan2(
