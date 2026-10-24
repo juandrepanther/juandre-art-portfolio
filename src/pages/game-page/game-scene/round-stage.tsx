@@ -15,7 +15,12 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import groundTextureUrl from 'assets/images/bg_ground.jpg?url'
 import type { DirectionalLight, Group, SpotLight } from 'three'
-import { MeshBasicMaterial, RepeatWrapping, SRGBColorSpace, Vector3 } from 'three'
+import {
+  MeshBasicMaterial,
+  RepeatWrapping,
+  SRGBColorSpace,
+  Vector3
+} from 'three'
 import CharacterModel from '../character-chooser/character-model'
 import PlayerHealthMeter from './player-health-meter'
 import { AxeProjectiles } from './actors/axe-projectiles'
@@ -60,6 +65,7 @@ import { GameSceneInstructions } from './overlay'
 import { ArenaBounds } from './world-objects/arena-bounds'
 import { CrateField } from './world-objects/crate-field'
 import { TreeCluster } from './world-objects/tree-cluster'
+import { findHighestCrateTopUnderCircle } from '../world-collision'
 import {
   GAME_GROUND_SIZE,
   MAX_HEALTH,
@@ -838,11 +844,20 @@ export default function RoundStage({
         nextPlayerTranslation.y,
         nextPlayerTranslation.z
       )
+      const playerFeetY = nextPlayerTranslation.y - PLAYER_BODY_GROUND_OFFSET
+      const highestCrateTop = findHighestCrateTopUnderCircle(
+        { x: nextPlayerTranslation.x, z: nextPlayerTranslation.z },
+        PLAYER_COLLISION_RADIUS,
+        crateLayouts,
+        0.02
+      )
+      const supportSurfaceY =
+        highestCrateTop === null ? 0 : Math.max(0, highestCrateTop)
 
       const hasLandedSinceJump =
         airborneJumpCountRef.current > 0 &&
         Math.abs(currentVelocity.y) <= PLAYER_GROUNDED_VERTICAL_SPEED_EPSILON &&
-        nextPlayerTranslation.y <= jumpStartYRef.current + 0.08
+        playerFeetY <= supportSurfaceY + 0.08
 
       if (hasLandedSinceJump) {
         airborneJumpCountRef.current = 0
