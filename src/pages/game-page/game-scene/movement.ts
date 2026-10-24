@@ -59,6 +59,7 @@ export function applyEnemyTravelByDifficulty(
   delta: number
 ) {
   switch (difficulty) {
+    case 'Balls':
     case 'Hardcore': {
       const travelToTarget = enemyState.targetPosition
         .clone()
@@ -95,6 +96,7 @@ export function resetEnemyForDifficulty(
   enemyState.active = true
 
   switch (difficulty) {
+    case 'Balls':
     case 'Hardcore':
       enemyState.position.copy(createRandomEnemyFlightPosition())
       enemyState.targetPosition.copy(createRandomEnemyFlightPosition())
