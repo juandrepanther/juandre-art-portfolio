@@ -88,7 +88,7 @@ export function CrateObstacle({
         args={[width / 2, height / 2, depth / 2]}
         ref={colliderRef}
       />
-      <mesh castShadow ref={crateMeshRef} receiveShadow>
+      <mesh ref={crateMeshRef}>
         <boxGeometry args={crateLayout.size} />
         <meshStandardMaterial map={boxTexture} roughness={0.9} />
       </mesh>

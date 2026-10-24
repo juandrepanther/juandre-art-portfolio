@@ -1,5 +1,4 @@
 import { Environment, KeyboardControls } from '@react-three/drei'
-import * as THREE from 'three'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
 // import { Perf } from 'r3f-perf'
@@ -7,7 +6,11 @@ import { Suspense, useRef } from 'react'
 import mobileSkyImage from 'assets/images/forest.jpg'
 import type { IGameSceneProps } from '../helpers'
 import RoundStage from './round-stage'
-import { GAME_CONTROL_MAP, PLAYER_JUMP_GRAVITY } from '../settings'
+import {
+  ENABLE_ALL_SHADER_EFFECTS,
+  GAME_CONTROL_MAP,
+  PLAYER_JUMP_GRAVITY
+} from '../settings'
 import { Bloom, EffectComposer, GodRays } from '@react-three/postprocessing'
 import type { Mesh } from 'three'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
@@ -38,7 +41,8 @@ function GameScene({
   showHealthMeter
 }: IGameSceneProps) {
   const sunRef = useRef<Mesh | null>(null)
-  const shouldRenderVisualEffects = !isMobileViewport
+  const shouldRenderVisualEffects =
+    ENABLE_ALL_SHADER_EFFECTS && !isMobileViewport
 
   return (
     <KeyboardControls map={GAME_CONTROL_MAP}>
@@ -48,10 +52,6 @@ function GameScene({
         fallback={<div>WebGL is unavailable.</div>}
         id="game-scene-canvas"
         shadows={shouldRenderVisualEffects}
-        gl={{
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2
-        }}
       >
         <Suspense fallback={null}>
           {/* {import.meta.env.DEV ? <Perf position="top-right" /> : null} */}
@@ -100,7 +100,7 @@ function GameScene({
               onEnemyHit={onEnemyHit}
               onPlayerHitIndicator={onPlayerHitIndicator}
               playerName={playerName}
-              key={`${difficulty}-${characterConfig.id}-${roundKey}`}
+              key={`${difficulty}-${roundKey}`}
               roundKey={roundKey}
               showHealthMeter={showHealthMeter}
             />
@@ -121,13 +121,12 @@ function GameScene({
                 sun={sunRef}
                 weight={2.4}
               />
-
               <Bloom
-                intensity={1}
-                kernelSize={KernelSize.LARGE}
-                luminanceThreshold={0.36}
-                luminanceSmoothing={0.03}
-                mipmapBlur={true}
+                intensity={0.4}
+                kernelSize={KernelSize.SMALL}
+                luminanceThreshold={0}
+                luminanceSmoothing={0.2}
+                mipmapBlur={false}
                 resolutionX={Resolution.AUTO_SIZE}
                 resolutionY={Resolution.AUTO_SIZE}
               />

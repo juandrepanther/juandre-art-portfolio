@@ -62,8 +62,6 @@ function VikingAvatar({
   useEffect(() => {
     modelScene.traverse((object) => {
       if (object instanceof Mesh) {
-        object.castShadow = true
-        object.receiveShadow = false
         object.frustumCulled = false
 
         const materials = Array.isArray(object.material)

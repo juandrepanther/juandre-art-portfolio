@@ -14,7 +14,7 @@ import {
 import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 import groundTextureUrl from 'assets/images/bg_ground.jpg?url'
-import type { DirectionalLight, Group, SpotLight } from 'three'
+import type { DirectionalLight, Group } from 'three'
 import {
   MeshBasicMaterial,
   RepeatWrapping,
@@ -59,7 +59,7 @@ import {
   updateCameraFollowPosition,
   updateCameraOrbitPosition
 } from './camera'
-import { AtmosphereParticles, StormLightning } from './lighting'
+import { AtmosphereParticles } from './lighting'
 import { canUseAirJumpNearApex } from './jump-helpers'
 import { GameSceneInstructions } from './overlay'
 import { ArenaBounds } from './world-objects/arena-bounds'
@@ -93,6 +93,7 @@ import {
   updatePlayerMovement
 } from './movement'
 import {
+  ENABLE_ALL_SHADER_EFFECTS,
   ENEMY_AIM_PRECISION,
   ENEMY_HIT_RADIUS,
   ENEMY_HITBOX_OFFSET,
@@ -215,7 +216,8 @@ export default function RoundStage({
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
   const groundTexture = useTexture(groundTextureUrl)
-  const shouldRenderVisualEffects = !isMobileViewport
+  const shouldRenderVisualEffects =
+    ENABLE_ALL_SHADER_EFFECTS && !isMobileViewport
   const mapDirectionalLightIntensity = isMobileViewport
     ? DIRECTIONAL_LIGHT_BASE_INTENSITY * 2
     : DIRECTIONAL_LIGHT_BASE_INTENSITY
@@ -278,7 +280,6 @@ export default function RoundStage({
   const cameraRightRef = useRef(new Vector3(1, 0, 0))
   const hitFlashTimeoutRef = useRef<number | null>(null)
   const directionalLightRef = useRef<DirectionalLight | null>(null)
-  const spotlightRef = useRef<SpotLight | null>(null)
   const mobileLookDeltaRef = useRef<ILookDelta>({ x: 0, y: 0 })
   const consumedLookAccumulatorRef = useRef({ x: 0, y: 0 })
   const consumedJumpCountRef = useRef(0)
@@ -1094,22 +1095,11 @@ export default function RoundStage({
       <ArenaBounds />
       {shouldRenderVisualEffects ? <AtmosphereParticles /> : null}
 
-      <mesh
-        position={[0, -0.02, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow={shouldRenderVisualEffects}
-      >
+      <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
         <meshStandardMaterial map={groundTexture} color="#ffffff" />
       </mesh>
-      {shouldRenderVisualEffects ? (
-        <StormLightning
-          directionalLightRef={directionalLightRef}
-          spotlightRef={spotlightRef}
-        />
-      ) : null}
       <directionalLight
-        castShadow={shouldRenderVisualEffects}
         color={DIRECTIONAL_LIGHT_BASE_COLOR}
         intensity={mapDirectionalLightIntensity}
         position={DIRECTIONAL_LIGHT_POSITION}

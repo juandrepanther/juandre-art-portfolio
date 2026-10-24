@@ -119,7 +119,7 @@ export function ArenaBounds() {
               position={wallPosition}
               friction={0}
             />
-            <mesh castShadow position={wallPosition} receiveShadow>
+            <mesh position={wallPosition}>
               <boxGeometry args={[width, INTERIOR_ARENA_WALL_HEIGHT, depth]} />
               <meshStandardMaterial
                 attach="material-0"

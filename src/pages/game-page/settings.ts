@@ -70,6 +70,7 @@ export interface IInteriorArenaWallSegment {
 
 export const GAME_ARENA_HALF_SIZE = 38
 export const GAME_GROUND_SIZE = 80
+export const ENABLE_ALL_SHADER_EFFECTS = true
 export const GAME_BACKGROUND_COLOR = '#7f8b92'
 export const GAME_FOG_COLOR = '#98a2a8'
 export const DESKTOP_BREAKPOINT = 1024

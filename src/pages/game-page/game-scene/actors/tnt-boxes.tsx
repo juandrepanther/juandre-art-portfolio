@@ -202,9 +202,7 @@ export function TntBoxes({
             sensor
           />
           <mesh
-            castShadow
             material={materials}
-            receiveShadow
             ref={(mesh) => {
               meshRefs.current[index] = mesh
             }}

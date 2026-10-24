@@ -51,8 +51,6 @@ function PainkillerPickup({ painkillerStateRef, index }: IPainkillerPickup) {
   useEffect(() => {
     modelScene.traverse((object) => {
       if (object instanceof Mesh) {
-        object.castShadow = true
-        object.receiveShadow = false
         object.frustumCulled = false
       }
     })

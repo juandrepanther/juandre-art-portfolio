@@ -155,8 +155,6 @@ function ProjectileModel({ weapon, onTintMaterialsReady }: IProjectileModel) {
         return
       }
 
-      object.castShadow = true
-      object.receiveShadow = false
       object.frustumCulled = false
 
       const materials = Array.isArray(object.material)

@@ -82,9 +82,13 @@ function GamePage() {
   const [selectedCharacter, setSelectedCharacter] = useState<TCharacterId>(
     characterOptions[0]
   )
+  const [gameCharacter, setGameCharacter] = useState<TCharacterId>(
+    characterOptions[0]
+  )
   const [hasChosenCharacter, setHasChosenCharacter] = useState(false)
   const [playerName, setPlayerName] = useState('')
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
+  const [gameDifficulty, setGameDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [entryMode, setEntryMode] = useState<'normal' | 'dev'>('normal')
   const [health, setHealth] = useState(MAX_HEALTH)
@@ -170,10 +174,11 @@ function GamePage() {
   const isResultDialogOpen =
     hasChosenCharacter && (gameStatus === 'won' || gameStatus === 'lost')
   const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
+  const gameCharacterConfig = CHARACTER_CONFIGS[gameCharacter]
   const isDevelopmentMode = entryMode === 'dev'
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
-  const effectiveDifficulty: TDifficultyLevel = difficulty
-  const effectiveDifficultyConfig = difficultyConfig
+  const effectiveDifficulty: TDifficultyLevel = gameDifficulty
+  const effectiveDifficultyConfig = DIFFICULTY_CONFIGS[gameDifficulty]
   const resultImageAlt =
     gameStatus === 'won' ? 'Victory result' : 'Game over result'
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
@@ -390,13 +395,18 @@ function GamePage() {
   const startRound = () => {
     flushSync(() => {
       if (trimmedPlayerName.length > 0) {
-        setPendingRun({ difficulty, playerName: trimmedPlayerName })
+        setPendingRun({
+          difficulty: effectiveDifficulty,
+          playerName: trimmedPlayerName
+        })
       }
 
       setHealth(MAX_HEALTH)
       setEnemyHits(0)
       setEnemiesDefeatedCount(0)
-      setRemainingTime(isDevelopmentMode ? 0 : difficultyConfig.roundTime)
+      setRemainingTime(
+        isDevelopmentMode ? 0 : effectiveDifficultyConfig.roundTime
+      )
       setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
       setRoundKey((currentRoundKey) => currentRoundKey + 1)
       setGameStatus('countdown')
@@ -427,7 +437,9 @@ function GamePage() {
     setGameStatus('menu')
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
-    setRemainingTime(isDevelopmentMode ? 0 : difficultyConfig.roundTime)
+    setRemainingTime(
+      isDevelopmentMode ? 0 : effectiveDifficultyConfig.roundTime
+    )
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
   }
@@ -444,6 +456,8 @@ function GamePage() {
       difficulty,
       playerName: normalizedPlayerName
     })
+    setGameCharacter(selectedCharacter)
+    setGameDifficulty(difficulty)
     setEntryMode('normal')
     setHasChosenCharacter(true)
     setRemainingTime(difficultyConfig.roundTime)
@@ -461,6 +475,8 @@ function GamePage() {
       difficulty,
       playerName: normalizedPlayerName
     })
+    setGameCharacter(selectedCharacter)
+    setGameDifficulty(difficulty)
     setEntryMode('dev')
     setHasChosenCharacter(true)
     setRemainingTime(0)
@@ -591,7 +607,7 @@ function GamePage() {
           >
             <GameScene
               cameraHorizontalSnapKey={cameraHorizontalSnapKey}
-              characterConfig={selectedCharacterConfig}
+              characterConfig={gameCharacterConfig}
               difficultyConfig={effectiveDifficultyConfig}
               difficulty={effectiveDifficulty}
               health={health}
@@ -809,7 +825,7 @@ function GamePage() {
                     >
                       <Chip
                         color="warning"
-                        label={`Mode: ${isDevelopmentMode ? 'DEV' : difficultyConfig.label}`}
+                        label={`Mode: ${isDevelopmentMode ? 'DEV' : effectiveDifficultyConfig.label}`}
                       />
                       <Chip
                         color="primary"

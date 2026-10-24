@@ -81,7 +81,7 @@ function CharacterPreview({
         style={{ position: 'absolute', inset: 0 }}
       >
         <ambientLight intensity={1.6} />
-        <directionalLight castShadow intensity={2.2} position={[5, 8, 6]} />
+        <directionalLight intensity={2.2} position={[5, 8, 6]} />
         <spotLight
           angle={0.36}
           intensity={22}

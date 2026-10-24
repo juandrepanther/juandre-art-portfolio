@@ -48,8 +48,6 @@ function EnemyUnit({ enemyStateRef, index }: IEnemyUnit) {
   useEffect(() => {
     modelScene.traverse((object) => {
       if (object instanceof Mesh) {
-        object.castShadow = true
-        object.receiveShadow = false
         object.frustumCulled = false
       }
     })

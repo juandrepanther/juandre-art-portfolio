@@ -68,8 +68,6 @@ function CharacterModel({
         return
       }
 
-      object.castShadow = true
-      object.receiveShadow = false
       object.frustumCulled = false
 
       const materials = Array.isArray(object.material)
