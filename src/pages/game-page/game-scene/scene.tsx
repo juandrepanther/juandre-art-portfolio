@@ -123,7 +123,7 @@ function GameScene({
               />
               <Bloom
                 intensity={0.4}
-                kernelSize={KernelSize.SMALL}
+                kernelSize={KernelSize.LARGE}
                 luminanceThreshold={0}
                 luminanceSmoothing={0.2}
                 mipmapBlur={false}
