@@ -7,6 +7,7 @@ import {
   isPointInsideAnyCrate,
   isPointInsideCrate
 } from 'pages/game-page/world-collision'
+import { createRuntimeCrateLayout } from 'pages/game-page/crate-height-animation'
 import type { ICrateLayout } from 'pages/game-page/world-layout'
 
 const crateLayouts: ICrateLayout[] = [
@@ -93,5 +94,28 @@ describe('world collision helpers', () => {
     expect(
       findHighestCrateTopUnderCircle({ x: 35, z: -34 }, 0.6, crateLayouts, 0.08)
     ).toBeNull()
+  })
+
+  it('uses animated crate heights when runtime crate layouts are provided', () => {
+    const crate = crateLayouts[0]
+    const maxPulseElapsedTime = Math.PI / (2 * 2.4)
+    const animatedCrate = createRuntimeCrateLayout(
+      crate,
+      maxPulseElapsedTime,
+      true,
+      0
+    )
+
+    expect(getCrateTopHeight(animatedCrate)).toBeGreaterThan(
+      getCrateTopHeight(crate)
+    )
+    expect(
+      findHighestCrateTopUnderCircle(
+        { x: crate.position[0], z: crate.position[2] },
+        0.6,
+        [animatedCrate],
+        0.08
+      )
+    ).toBe(getCrateTopHeight(animatedCrate))
   })
 })

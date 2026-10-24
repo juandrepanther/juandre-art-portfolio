@@ -67,6 +67,13 @@ import { CrateField } from './world-objects/crate-field'
 import { TreeCluster } from './world-objects/tree-cluster'
 import { findHighestCrateTopUnderCircle } from '../world-collision'
 import {
+  createAnimatedCrateFlags,
+  createCrateAnimationOffsets,
+  createInactiveAnimatedCrateFlags,
+  createRuntimeCrateLayouts,
+  shouldAnimateCrateHeight
+} from '../crate-height-animation'
+import {
   GAME_GROUND_SIZE,
   MAX_HEALTH,
   PAINKILLER_HEAL,
@@ -76,6 +83,7 @@ import {
   PROJECTILE_LIFETIME_SECONDS,
   createRandomBoxLayouts,
   createRandomTreeLayouts,
+  type ICrateLayout,
   type IGameSceneProps
 } from '../helpers'
 import {
@@ -127,6 +135,7 @@ import {
   TNT_EXPLOSION_PARTICLE_POOL_SIZE,
   TNT_EXPLOSION_PARTICLES_PER_BURST,
   FLOATING_COMBAT_TEXT_POOL_SIZE,
+  CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS,
   type TGameControl
 } from '../settings'
 const playerRigidBodyName = 'player-body'
@@ -215,6 +224,10 @@ export default function RoundStage({
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
   const [treeLayouts] = useState(() => createRandomTreeLayouts())
   const [crateLayouts] = useState(() => createRandomBoxLayouts(treeLayouts))
+  const [crateAnimationOffsets] = useState(() =>
+    createCrateAnimationOffsets(crateLayouts.length)
+  )
+  const isCrateHeightAnimationEnabled = shouldAnimateCrateHeight(difficulty)
   const [cloudConfigs] = useState(() => createRandomCloudConfigs())
   const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
@@ -272,6 +285,14 @@ export default function RoundStage({
   const consumedShootCountRef = useRef(0)
   const airborneJumpCountRef = useRef(0)
   const jumpStartYRef = useRef(PLAYER_BODY_GROUND_OFFSET)
+  const nextCrateAnimationRerandomizeAtRef = useRef(
+    CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS
+  )
+  const animatedCrateFlagsRef = useRef<boolean[]>(
+    isCrateHeightAnimationEnabled
+      ? createAnimatedCrateFlags(crateLayouts.length)
+      : createInactiveAnimatedCrateFlags(crateLayouts.length)
+  )
   const cameraYawRef = useRef(0)
   const cameraPitchRef = useRef(0)
   const cameraUpRef = useRef(new Vector3(0, 1, 0))
@@ -589,6 +610,11 @@ export default function RoundStage({
     mobileLookDeltaRef.current = { x: 0, y: 0 }
     consumedLookAccumulatorRef.current = { x: 0, y: 0 }
     resetControlsState(controlsRef.current)
+    animatedCrateFlagsRef.current = isCrateHeightAnimationEnabled
+      ? createAnimatedCrateFlags(crateLayouts.length)
+      : createInactiveAnimatedCrateFlags(crateLayouts.length)
+    nextCrateAnimationRerandomizeAtRef.current =
+      clock.elapsedTime + CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS
     enemyStateRef.current = createEnemyState(
       difficultyConfig.enemyCount,
       crateLayouts,
@@ -628,10 +654,12 @@ export default function RoundStage({
     onHealthChangeRef.current(MAX_HEALTH)
   }, [
     camera,
+    clock,
     crateLayouts,
     difficultyConfig.enemyCount,
     difficulty,
     gl,
+    isCrateHeightAnimationEnabled,
     roundKey,
     treeLayouts
   ])
@@ -779,6 +807,25 @@ export default function RoundStage({
       return
     }
 
+    const now = clock.elapsedTime
+
+    if (isCrateHeightAnimationEnabled) {
+      while (now >= nextCrateAnimationRerandomizeAtRef.current) {
+        animatedCrateFlagsRef.current = createAnimatedCrateFlags(
+          crateLayouts.length
+        )
+        nextCrateAnimationRerandomizeAtRef.current +=
+          CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS
+      }
+    }
+
+    const runtimeCrateLayouts: ICrateLayout[] = createRuntimeCrateLayouts({
+      crateAnimationOffsets,
+      crateLayouts,
+      difficulty,
+      elapsedTime: now,
+      isAnimatedCrateFlags: animatedCrateFlagsRef.current
+    })
     const mobileForward = mobileMoveVectorY < -0.28
     const mobileBackward = mobileMoveVectorY > 0.28
     const mobileLeft = mobileMoveVectorX < -0.28
@@ -848,7 +895,7 @@ export default function RoundStage({
       const highestCrateTop = findHighestCrateTopUnderCircle(
         { x: nextPlayerTranslation.x, z: nextPlayerTranslation.z },
         PLAYER_COLLISION_RADIUS,
-        crateLayouts,
+        runtimeCrateLayouts,
         0.02
       )
       const supportSurfaceY =
@@ -870,7 +917,6 @@ export default function RoundStage({
       playerDirectionRef.current.z
     )
 
-    const now = clock.elapsedTime
     const playerHitboxCenter = playerPositionRef.current
       .clone()
       .add(PLAYER_HITBOX_OFFSET)
@@ -938,7 +984,7 @@ export default function RoundStage({
 
       if (
         doesProjectilePathHitObstacle({
-          crateLayouts,
+          crateLayouts: runtimeCrateLayouts,
           nextPosition: projectile.position,
           previousPosition: previousProjectilePosition,
           treeLayouts
@@ -1017,7 +1063,7 @@ export default function RoundStage({
         if (now >= painkillerState.respawnAt) {
           painkillerState.active = true
           painkillerState.position.copy(
-            createRandomPainkillerPosition(crateLayouts, treeLayouts)
+            createRandomPainkillerPosition(runtimeCrateLayouts, treeLayouts)
           )
         }
 
@@ -1085,7 +1131,10 @@ export default function RoundStage({
 
       <TreeCluster treeLayouts={treeLayouts} />
       <CrateField
+        animatedCrateFlagsRef={animatedCrateFlagsRef}
+        crateAnimationOffsets={crateAnimationOffsets}
         crateLayouts={crateLayouts}
+        difficulty={difficulty}
         shouldRenderVisualEffects={shouldRenderVisualEffects}
       />
       <Enemy

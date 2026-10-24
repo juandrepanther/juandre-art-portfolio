@@ -118,10 +118,10 @@ function GameScene({
               />
 
               <Bloom
-                intensity={10}
+                intensity={0.6}
                 kernelSize={KernelSize.LARGE}
-                luminanceThreshold={0.8}
-                luminanceSmoothing={0.025}
+                luminanceThreshold={0.36}
+                luminanceSmoothing={0.03}
                 mipmapBlur={false}
                 resolutionX={Resolution.AUTO_SIZE}
                 resolutionY={Resolution.AUTO_SIZE}
