@@ -5,11 +5,12 @@ import {
   RigidBody
 } from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
-import { useRef, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import type { ICrateLayout } from '../../helpers'
 import type { TDifficultyLevel } from '../../settings'
-import { RoundedBox, Sparkles } from '@react-three/drei'
-import type { Mesh } from 'three'
+import { Sparkles, useTexture } from '@react-three/drei'
+import boxTextureUrl from 'assets/images/walls/box.png?url'
+import { SRGBColorSpace, type Mesh } from 'three'
 import {
   createRuntimeCrateLayout,
   shouldAnimateCrateHeight
@@ -36,6 +37,12 @@ export function CrateObstacle({
   const crateMeshRef = useRef<Mesh | null>(null)
   const rigidBodyRef = useRef<RapierRigidBody | null>(null)
   const colliderRef = useRef<RapierCollider | null>(null)
+  const boxTexture = useTexture(boxTextureUrl)
+
+  useEffect(() => {
+    boxTexture.colorSpace = SRGBColorSpace
+    boxTexture.needsUpdate = true
+  }, [boxTexture])
 
   useFrame(({ clock }) => {
     const isCrateHeightAnimated =
@@ -81,18 +88,10 @@ export function CrateObstacle({
         args={[width / 2, height / 2, depth / 2]}
         ref={colliderRef}
       />
-      <RoundedBox
-        args={crateLayout.size}
-        castShadow
-        ref={crateMeshRef}
-        receiveShadow
-        radius={0.48}
-      >
-        <meshStandardMaterial
-          color={index % 2 === 0 ? '#8f6845' : '#7b583a'}
-          roughness={0.9}
-        />
-      </RoundedBox>
+      <mesh castShadow ref={crateMeshRef} receiveShadow>
+        <boxGeometry args={crateLayout.size} />
+        <meshStandardMaterial map={boxTexture} roughness={0.9} />
+      </mesh>
       {shouldRenderVisualEffects ? (
         <Sparkles count={50} scale={5} size={8} speed={2.4} />
       ) : null}

@@ -1,4 +1,5 @@
 import { Environment, KeyboardControls } from '@react-three/drei'
+import * as THREE from 'three'
 import { Physics } from '@react-three/rapier'
 import { Canvas } from '@react-three/fiber'
 // import { Perf } from 'r3f-perf'
@@ -47,6 +48,10 @@ function GameScene({
         fallback={<div>WebGL is unavailable.</div>}
         id="game-scene-canvas"
         shadows={shouldRenderVisualEffects}
+        gl={{
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.2
+        }}
       >
         <Suspense fallback={null}>
           {/* {import.meta.env.DEV ? <Perf position="top-right" /> : null} */}
@@ -107,7 +112,7 @@ function GameScene({
                 blendFunction={BlendFunction.SCREEN}
                 clampMax={11}
                 decay={0.9}
-                density={0.96}
+                density={1.26}
                 exposure={0.6}
                 kernelSize={KernelSize.SMALL}
                 resolutionX={Resolution.AUTO_SIZE}
@@ -118,11 +123,11 @@ function GameScene({
               />
 
               <Bloom
-                intensity={0.6}
+                intensity={1}
                 kernelSize={KernelSize.LARGE}
                 luminanceThreshold={0.36}
                 luminanceSmoothing={0.03}
-                mipmapBlur={false}
+                mipmapBlur={true}
                 resolutionX={Resolution.AUTO_SIZE}
                 resolutionY={Resolution.AUTO_SIZE}
               />
