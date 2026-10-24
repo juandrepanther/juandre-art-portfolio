@@ -13,6 +13,7 @@ export function TreeCluster({ treeLayouts }: ITreeCluster) {
       {treeLayouts.map(({ treePosition }, index) => (
         <RigidBody
           colliders={false}
+          friction={0}
           key={`tree-${index}`}
           position={treePosition}
           rotation={[0, (index % 2 === 0 ? 1 : -1) * 0.18 * (index + 1), 0]}
@@ -20,6 +21,7 @@ export function TreeCluster({ treeLayouts }: ITreeCluster) {
         >
           <CuboidCollider
             args={TREE_TRUNK_COLLIDER_ARGS}
+            friction={0}
             position={[0, 1.95, 0]}
           />
           <EvergreenTree variant={getTreeVariant(index)} />

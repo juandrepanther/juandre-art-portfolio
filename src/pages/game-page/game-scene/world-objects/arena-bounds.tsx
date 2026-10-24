@@ -73,7 +73,7 @@ export function ArenaBounds() {
 
         return (
           <group key={`outer-boundary-collider-${index}`}>
-            <CuboidCollider args={args} position={position} />
+            <CuboidCollider args={args} friction={0} position={position} />
             <mesh position={position}>
               <boxGeometry args={[width, height, depth]} />
               <meshBasicMaterial
@@ -114,7 +114,11 @@ export function ArenaBounds() {
 
         return (
           <group key={segment.id}>
-            <CuboidCollider args={colliderArgs} position={wallPosition} />
+            <CuboidCollider
+              args={colliderArgs}
+              position={wallPosition}
+              friction={0}
+            />
             <mesh castShadow position={wallPosition} receiveShadow>
               <boxGeometry args={[width, INTERIOR_ARENA_WALL_HEIGHT, depth]} />
               <meshStandardMaterial

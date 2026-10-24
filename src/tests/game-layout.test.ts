@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  GAME_ARENA_HALF_SIZE,
   TREE_LAYOUT_COUNT,
   type ITreeLayout,
   createRandomTreeLayouts
@@ -85,7 +86,10 @@ describe('game layout helpers', () => {
   })
 
   it('detects collisions with arena boundary and interior walls', () => {
-    expect(isPointInsideArenaWall(new Vector3(37.2, 1.4, 0))).toBe(true)
+    expect(isPointInsideArenaWall(new Vector3(37.2, 1.4, 0))).toBe(false)
+    expect(
+      isPointInsideArenaWall(new Vector3(GAME_ARENA_HALF_SIZE + 0.1, 1.4, 0))
+    ).toBe(true)
     expect(isPointInsideArenaWall(new Vector3(-30.5, 1.2, -24))).toBe(true)
     expect(isPointInsideArenaWall(new Vector3(0, 1.2, 0))).toBe(false)
   })

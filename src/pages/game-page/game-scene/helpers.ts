@@ -7,7 +7,6 @@ import {
 } from '../helpers'
 import {
   ARENA_BOUNDARY_COLLIDER_HEIGHT,
-  ARENA_BOUNDARY_COLLIDER_THICKNESS,
   ARENA_HALF_SIZE,
   ATMOSPHERE_PARTICLE_COUNT,
   CRATE_PLACEMENT_ATTEMPTS,
@@ -229,11 +228,13 @@ export function isPointInsideArenaWall(point: Vector3, padding = 0) {
     return false
   }
 
-  const boundaryPadding = ARENA_BOUNDARY_COLLIDER_THICKNESS / 2 + padding
+  // Boundary colliders are centered outside the playable area, so the inner face
+  // starts at ARENA_HALF_SIZE. Treat points beyond that face as blocked.
+  const innerBoundary = ARENA_HALF_SIZE - padding
 
   if (
-    Math.abs(point.x) >= ARENA_HALF_SIZE - boundaryPadding ||
-    Math.abs(point.z) >= ARENA_HALF_SIZE - boundaryPadding
+    Math.abs(point.x) >= innerBoundary ||
+    Math.abs(point.z) >= innerBoundary
   ) {
     return true
   }
