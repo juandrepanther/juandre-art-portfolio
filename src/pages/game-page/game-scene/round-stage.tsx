@@ -2,6 +2,7 @@ import {
   Cloud,
   Clouds,
   PointerLockControls,
+  useTexture,
   useKeyboardControls
 } from '@react-three/drei'
 import {
@@ -12,8 +13,9 @@ import {
 } from '@react-three/rapier'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
+import groundTextureUrl from 'assets/images/bg_ground.jpg?url'
 import type { DirectionalLight, Group, SpotLight } from 'three'
-import { MeshBasicMaterial, Vector3 } from 'three'
+import { MeshBasicMaterial, RepeatWrapping, SRGBColorSpace, Vector3 } from 'three'
 import CharacterModel from '../character-chooser/character-model'
 import PlayerHealthMeter from './player-health-meter'
 import { AxeProjectiles } from './actors/axe-projectiles'
@@ -197,6 +199,7 @@ export default function RoundStage({
   showHealthMeter
 }: IGameSceneProps) {
   const { camera, clock, gl } = useThree()
+  const groundTexture = useTexture(groundTextureUrl)
   const shouldRenderVisualEffects = !isMobileViewport
   const mapDirectionalLightIntensity = isMobileViewport
     ? DIRECTIONAL_LIGHT_BASE_INTENSITY * 2
@@ -266,6 +269,14 @@ export default function RoundStage({
   const cameraYawRef = useRef(0)
   const cameraPitchRef = useRef(0)
   const cameraUpRef = useRef(new Vector3(0, 1, 0))
+
+  useEffect(() => {
+    groundTexture.colorSpace = SRGBColorSpace
+    groundTexture.wrapS = RepeatWrapping
+    groundTexture.wrapT = RepeatWrapping
+    groundTexture.repeat.set(8, 8)
+    groundTexture.needsUpdate = true
+  }, [groundTexture])
 
   const getPlayerHitDirection = (projectileVelocity: Vector3) => {
     const normalizedVelocity = projectileVelocity.clone()
@@ -1028,7 +1039,7 @@ export default function RoundStage({
         receiveShadow={shouldRenderVisualEffects}
       >
         <planeGeometry args={[GAME_GROUND_SIZE, GAME_GROUND_SIZE]} />
-        <meshStandardMaterial color="green" />
+        <meshStandardMaterial map={groundTexture} color="#ffffff" />
       </mesh>
       {shouldRenderVisualEffects ? (
         <StormLightning
