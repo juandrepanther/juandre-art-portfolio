@@ -27,6 +27,8 @@ vi.mock('@react-three/drei', () => ({
 
 vi.mock('pages/game-page/game-scene/scene', () => ({
   default: function MockGameScene({
+    difficulty,
+    difficultyConfig,
     health,
     isCameraOrbiting,
     onEnemyHit,
@@ -35,6 +37,9 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
   }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
+        <div>Scene difficulty: {difficulty}</div>
+        <div>Scene enemy damage: {difficultyConfig.enemyDamage}</div>
+        <div>Scene enemy count: {difficultyConfig.enemyCount}</div>
         <div>Scene health: {health}</div>
         <div>Scene orbit: {String(isCameraOrbiting)}</div>
         <button onClick={() => onEnemyHit()} type="button">
@@ -882,5 +887,31 @@ describe('GamePage', () => {
       screen.queryByRole('img', { name: /victory result/i })
     ).not.toBeInTheDocument()
     expect(screen.getByText('Scene orbit: false')).toBeInTheDocument()
+  })
+
+  it('applies DEV no-damage/no-time behavior on the selected difficulty', () => {
+    if (!import.meta.env.DEV) {
+      return
+    }
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    setPlayerName('Player1')
+    fireEvent.click(screen.getByRole('button', { name: /^balls$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^dev$/i }))
+
+    expect(screen.getByText(/mode: dev/i)).toBeInTheDocument()
+    expect(screen.getByText(/^∞$/)).toBeInTheDocument()
+    expect(screen.getByText(/scene difficulty: balls/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(`Scene enemy damage: ${DIFFICULTY_CONFIGS.Balls.enemyDamage}`)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(`Scene enemy count: ${DIFFICULTY_CONFIGS.Balls.enemyCount}`)
+    ).toBeInTheDocument()
   })
 })

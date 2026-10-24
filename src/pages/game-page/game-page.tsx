@@ -30,7 +30,6 @@ import ScoreboardPanel from './scoreboard-panel'
 import SpotifyArtistPlayer from './spotify-artist-player'
 import {
   CHARACTER_CONFIGS,
-  DEVELOPMENT_MODE_CONFIG,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
   GAME_POINTER_COLOR,
@@ -173,16 +172,8 @@ function GamePage() {
   const selectedCharacterConfig = CHARACTER_CONFIGS[selectedCharacter]
   const isDevelopmentMode = entryMode === 'dev'
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
-  const effectiveDifficulty: TDifficultyLevel = isDevelopmentMode
-    ? 'Hardcore'
-    : difficulty
-  const effectiveDifficultyConfig = isDevelopmentMode
-    ? {
-        ...DIFFICULTY_CONFIGS.Hardcore,
-        enemyCount: DEVELOPMENT_MODE_CONFIG.enemyCount,
-        enemyDamage: DEVELOPMENT_MODE_CONFIG.incomingDamage
-      }
-    : difficultyConfig
+  const effectiveDifficulty: TDifficultyLevel = difficulty
+  const effectiveDifficultyConfig = difficultyConfig
   const resultImageAlt =
     gameStatus === 'won' ? 'Victory result' : 'Game over result'
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
