@@ -2,16 +2,23 @@ import { MAX_HEALTH } from './settings'
 import type {
   ICharacterConfig,
   IDifficultyConfig,
+  ILevelConfig,
   TDifficultyLevel
 } from './settings'
 
 export type TGameStatus = 'menu' | 'countdown' | 'playing' | 'won' | 'lost'
 export type TPointerHitDirection = 'top' | 'right' | 'bottom' | 'left'
+export type TRoundCombatConfig = IDifficultyConfig | ILevelConfig
 
 export type {
+  IBossConfig,
   ICharacterConfig,
   IDifficultyConfig,
+  ILevelConfig,
   TCharacterId,
+  TDevLevelOption,
+  TGameMode,
+  TLevelId,
   TDifficultyLevel
 } from './settings'
 export type { ICrateLayout, ITreeLayout, TWorldPosition } from './world-layout'
@@ -29,12 +36,15 @@ export {
   DESKTOP_BREAKPOINT,
   DEVELOPMENT_MODE_CONFIG,
   DIFFICULTY_CONFIGS,
+  FINAL_BOSS_CONFIG,
   GAME_BACKGROUND_COLOR,
   ENEMY_RESPAWN_SECONDS,
   GAME_POINTER_COLOR,
   GAME_ARENA_HALF_SIZE,
   GAME_FOG_COLOR,
   GAME_GROUND_SIZE,
+  LEVEL_CONFIGS,
+  LEVEL_ORDER,
   MAX_HEALTH,
   PAINKILLER_HEAL,
   PAINKILLER_RESPAWN_SECONDS,
@@ -49,12 +59,15 @@ export {
 export { createRandomBoxLayouts, createRandomTreeLayouts } from './world-layout'
 
 export interface IGameSceneProps {
+  bossHealthPercent: number
   cameraHorizontalSnapKey?: number
   characterConfig: ICharacterConfig
-  difficultyConfig: IDifficultyConfig
+  combatConfig: TRoundCombatConfig
   difficulty: TDifficultyLevel
+  gameMode: 'Survive' | 'Levels'
   health: number
   isActive: boolean
+  isBossPhase: boolean
   isDevelopmentMode?: boolean
   isCameraOrbiting: boolean
   isLandscapeMobile: boolean
@@ -66,6 +79,8 @@ export interface IGameSceneProps {
   mobileMoveVectorY: number
   mobileShootPressCount: number
   showMobileControls: boolean
+  onBossDefeated: () => void
+  onBossHealthChange: (healthPercent: number) => void
   onHealthChange: (health: number) => void
   onEnemyHit: () => void
   playerName: string

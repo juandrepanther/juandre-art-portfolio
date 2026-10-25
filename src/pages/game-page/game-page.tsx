@@ -32,14 +32,21 @@ import {
   CHARACTER_CONFIGS,
   DESKTOP_BREAKPOINT,
   DIFFICULTY_CONFIGS,
+  FINAL_BOSS_CONFIG,
   GAME_POINTER_COLOR,
+  LEVEL_CONFIGS,
+  LEVEL_ORDER,
   MAX_HEALTH,
   START_RUN_COUNTDOWN_SECONDS,
   clampHealth,
   formatTimeLabel,
   type TCharacterId,
+  type TDevLevelOption,
+  type TGameMode,
   type TGameStatus,
+  type TLevelId,
   type TPointerHitDirection,
+  type TRoundCombatConfig,
   type TDifficultyLevel
 } from './helpers'
 
@@ -89,7 +96,22 @@ function GamePage() {
   const [playerName, setPlayerName] = useState('')
   const [difficulty, setDifficulty] = useState<TDifficultyLevel>('Noob')
   const [gameDifficulty, setGameDifficulty] = useState<TDifficultyLevel>('Noob')
+  const [selectedGameMode, setSelectedGameMode] = useState<TGameMode>('Survive')
+  const [selectedDevLevel, setSelectedDevLevel] = useState<TDevLevelOption>(1)
+  const [gameStartLevel, setGameStartLevel] = useState<TDevLevelOption>(1)
+  const [gameMode, setGameMode] = useState<TGameMode>('Survive')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
+  const [currentLevelId, setCurrentLevelId] = useState<TLevelId>(1)
+  const [levelEnemiesDefeated, setLevelEnemiesDefeated] = useState(0)
+  const [isBossPhase, setIsBossPhase] = useState(false)
+  const [isBossCountdownPending, setIsBossCountdownPending] = useState(false)
+  const [bossHealthPercent, setBossHealthPercent] = useState(
+    FINAL_BOSS_CONFIG.maxHealthPercent
+  )
+  const [countdownLabel, setCountdownLabel] = useState('PREPARE')
+  const [countdownHint, setCountdownHint] = useState(
+    'The run begins in two seconds. Get ready to move, aim, and throw.'
+  )
   const [entryMode, setEntryMode] = useState<'normal' | 'dev'>('normal')
   const [health, setHealth] = useState(MAX_HEALTH)
   const [enemyHits, setEnemyHits] = useState(0)
@@ -177,8 +199,22 @@ function GamePage() {
   const gameCharacterConfig = CHARACTER_CONFIGS[gameCharacter]
   const isDevelopmentMode = entryMode === 'dev'
   const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
-  const effectiveDifficulty: TDifficultyLevel = gameDifficulty
-  const effectiveDifficultyConfig = DIFFICULTY_CONFIGS[gameDifficulty]
+  const effectiveDifficulty: TDifficultyLevel =
+    gameMode === 'Levels' ? 'Balls' : gameDifficulty
+  const effectiveCombatConfig: TRoundCombatConfig =
+    gameMode === 'Levels'
+      ? LEVEL_CONFIGS[currentLevelId]
+      : DIFFICULTY_CONFIGS[gameDifficulty]
+  const isLevelsMode = gameMode === 'Levels'
+  const isDevBossStart =
+    isLevelsMode && isDevelopmentMode && gameStartLevel === 'Boss'
+  const resolvedStartLevel: TLevelId =
+    gameStartLevel === 'Boss'
+      ? LEVEL_ORDER[LEVEL_ORDER.length - 1]
+      : gameStartLevel
+  const initialRoundLevelId: TLevelId =
+    isLevelsMode && isDevelopmentMode ? resolvedStartLevel : 1
+  const shouldRunTimer = !isDevelopmentMode && gameMode === 'Survive'
   const resultImageAlt =
     gameStatus === 'won' ? 'Victory result' : 'Game over result'
   const resultImageSource = gameStatus === 'won' ? winImage : gameOverImage
@@ -349,6 +385,10 @@ function GamePage() {
     const timeoutId = window.setTimeout(() => {
       setCountdownSeconds((currentCountdownSeconds) => {
         if (currentCountdownSeconds <= 1) {
+          if (isBossCountdownPending) {
+            setIsBossPhase(true)
+            setIsBossCountdownPending(false)
+          }
           setGameStatus('playing')
           return 0
         }
@@ -360,10 +400,10 @@ function GamePage() {
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [countdownSeconds, isCountingDown])
+  }, [countdownSeconds, isBossCountdownPending, isCountingDown])
 
   useEffect(() => {
-    if (!isPlaying || isDevelopmentMode) {
+    if (!isPlaying || !shouldRunTimer) {
       return undefined
     }
 
@@ -382,7 +422,7 @@ function GamePage() {
     return () => {
       window.clearInterval(intervalId)
     }
-  }, [isDevelopmentMode, isPlaying])
+  }, [isPlaying, shouldRunTimer])
 
   const handleHealthChange = (nextHealth: number) => {
     const clampedHealth = clampHealth(nextHealth)
@@ -395,7 +435,7 @@ function GamePage() {
 
   const startRound = () => {
     flushSync(() => {
-      if (trimmedPlayerName.length > 0) {
+      if (trimmedPlayerName.length > 0 && gameMode === 'Survive') {
         setPendingRun({
           difficulty: effectiveDifficulty,
           playerName: trimmedPlayerName
@@ -404,9 +444,18 @@ function GamePage() {
 
       setHealth(MAX_HEALTH)
       setEnemyHits(0)
+      setLevelEnemiesDefeated(0)
+      setIsBossPhase(isDevBossStart)
+      setIsBossCountdownPending(false)
+      setBossHealthPercent(FINAL_BOSS_CONFIG.maxHealthPercent)
       setEnemiesDefeatedCount(0)
+      setCurrentLevelId(initialRoundLevelId)
       setRemainingTime(
-        isDevelopmentMode ? 0 : effectiveDifficultyConfig.roundTime
+        shouldRunTimer ? DIFFICULTY_CONFIGS[gameDifficulty].roundTime : 0
+      )
+      setCountdownLabel('PREPARE')
+      setCountdownHint(
+        'The run begins in two seconds. Get ready to move, aim, and throw.'
       )
       setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
       setRoundKey((currentRoundKey) => currentRoundKey + 1)
@@ -429,7 +478,9 @@ function GamePage() {
     setDifficulty(nextDifficulty)
 
     if (!isDevelopmentMode) {
-      setRemainingTime(DIFFICULTY_CONFIGS[nextDifficulty].roundTime)
+      if (selectedGameMode === 'Survive') {
+        setRemainingTime(DIFFICULTY_CONFIGS[nextDifficulty].roundTime)
+      }
     }
   }
 
@@ -438,8 +489,17 @@ function GamePage() {
     setGameStatus('menu')
     setHealth(MAX_HEALTH)
     setEnemyHits(0)
+    setCurrentLevelId(initialRoundLevelId)
+    setLevelEnemiesDefeated(0)
+    setIsBossPhase(false)
+    setIsBossCountdownPending(false)
+    setBossHealthPercent(FINAL_BOSS_CONFIG.maxHealthPercent)
     setRemainingTime(
-      isDevelopmentMode ? 0 : effectiveDifficultyConfig.roundTime
+      shouldRunTimer ? DIFFICULTY_CONFIGS[gameDifficulty].roundTime : 0
+    )
+    setCountdownLabel('PREPARE')
+    setCountdownHint(
+      'The run begins in two seconds. Get ready to move, aim, and throw.'
     )
     setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
     setRoundKey((currentRoundKey) => currentRoundKey + 1)
@@ -453,15 +513,26 @@ function GamePage() {
     }
 
     setPlayerName(normalizedPlayerName)
-    setPendingRun({
-      difficulty,
-      playerName: normalizedPlayerName
-    })
+    if (selectedGameMode === 'Survive') {
+      setPendingRun({
+        difficulty,
+        playerName: normalizedPlayerName
+      })
+    }
     setGameCharacter(selectedCharacter)
     setGameDifficulty(difficulty)
+    setGameStartLevel(1)
+    setGameMode(selectedGameMode)
     setEntryMode('normal')
     setHasChosenCharacter(true)
-    setRemainingTime(difficultyConfig.roundTime)
+    setCurrentLevelId(1)
+    setLevelEnemiesDefeated(0)
+    setIsBossPhase(false)
+    setIsBossCountdownPending(false)
+    setBossHealthPercent(FINAL_BOSS_CONFIG.maxHealthPercent)
+    setRemainingTime(
+      selectedGameMode === 'Survive' ? difficultyConfig.roundTime : 0
+    )
   }
 
   const handleChooseDevelopmentCharacter = () => {
@@ -472,14 +543,27 @@ function GamePage() {
     }
 
     setPlayerName(normalizedPlayerName)
-    setPendingRun({
-      difficulty,
-      playerName: normalizedPlayerName
-    })
+    if (selectedGameMode === 'Survive') {
+      setPendingRun({
+        difficulty,
+        playerName: normalizedPlayerName
+      })
+    }
     setGameCharacter(selectedCharacter)
     setGameDifficulty(difficulty)
+    setGameStartLevel(selectedDevLevel)
+    setGameMode(selectedGameMode)
     setEntryMode('dev')
     setHasChosenCharacter(true)
+    setCurrentLevelId(
+      selectedDevLevel === 'Boss'
+        ? LEVEL_ORDER[LEVEL_ORDER.length - 1]
+        : selectedDevLevel
+    )
+    setLevelEnemiesDefeated(0)
+    setIsBossPhase(false)
+    setIsBossCountdownPending(false)
+    setBossHealthPercent(FINAL_BOSS_CONFIG.maxHealthPercent)
     setRemainingTime(0)
   }
 
@@ -487,6 +571,51 @@ function GamePage() {
     handleReturnToMenu()
     setEntryMode('normal')
     setHasChosenCharacter(false)
+  }
+
+  const handleEnemyHit = () => {
+    incrementEnemiesDefeated()
+    setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
+
+    if (!isLevelsMode || !isPlaying || isBossPhase) {
+      return
+    }
+
+    const currentLevelConfig = LEVEL_CONFIGS[currentLevelId]
+    const nextLevelEnemiesDefeated = levelEnemiesDefeated + 1
+
+    if (nextLevelEnemiesDefeated < currentLevelConfig.enemyCount) {
+      setLevelEnemiesDefeated(nextLevelEnemiesDefeated)
+      return
+    }
+
+    if (currentLevelId === LEVEL_ORDER[LEVEL_ORDER.length - 1]) {
+      setLevelEnemiesDefeated(nextLevelEnemiesDefeated)
+      setIsBossPhase(false)
+      setIsBossCountdownPending(true)
+      setCountdownLabel('FINAL BOSS')
+      setCountdownHint(
+        'Final boss enters the arena. Prepare for the last fight.'
+      )
+      setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
+      setRoundKey((currentRoundKey) => currentRoundKey + 1)
+      setGameStatus('countdown')
+      return
+    }
+
+    const nextLevelId = LEVEL_ORDER[currentLevelId]
+
+    if (!nextLevelId) {
+      return
+    }
+
+    setCurrentLevelId(nextLevelId)
+    setLevelEnemiesDefeated(0)
+    setCountdownLabel(`LEVEL ${nextLevelId}`)
+    setCountdownHint(`Level ${nextLevelId} starts in a moment. Stay sharp.`)
+    setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
+    setRoundKey((currentRoundKey) => currentRoundKey + 1)
+    setGameStatus('countdown')
   }
 
   const handleOpenScoreboard = () => {
@@ -607,12 +736,15 @@ function GamePage() {
             }}
           >
             <GameScene
+              bossHealthPercent={bossHealthPercent}
               cameraHorizontalSnapKey={cameraHorizontalSnapKey}
               characterConfig={gameCharacterConfig}
-              difficultyConfig={effectiveDifficultyConfig}
+              combatConfig={effectiveCombatConfig}
               difficulty={effectiveDifficulty}
+              gameMode={gameMode}
               health={health}
               isActive={isPlaying}
+              isBossPhase={isBossPhase}
               isDevelopmentMode={isDevelopmentMode}
               isCameraOrbiting={isCameraOrbiting}
               isLandscapeMobile={isLandscapeMobile}
@@ -628,10 +760,11 @@ function GamePage() {
               }
               mobileShootPressCount={mobileShootPressCount}
               showMobileControls={isRoundActive}
-              onEnemyHit={() => {
-                incrementEnemiesDefeated()
-                setEnemyHits((currentEnemyHits) => currentEnemyHits + 1)
+              onBossDefeated={() => {
+                setGameStatus('won')
               }}
+              onBossHealthChange={setBossHealthPercent}
+              onEnemyHit={handleEnemyHit}
               onHealthChange={handleHealthChange}
               onPlayerHitIndicator={handlePlayerHitIndicator}
               playerName={playerName}
@@ -648,11 +781,15 @@ function GamePage() {
                 isMobileViewport={isMobileViewport}
                 onCharacterChange={setSelectedCharacter}
                 onDevChoose={handleChooseDevelopmentCharacter}
+                onDevLevelChange={setSelectedDevLevel}
                 onDifficultyChange={handleDifficultyChange}
+                onGameModeChange={setSelectedGameMode}
                 onPlayerNameChange={setPlayerName}
                 onChoose={handleChooseCharacter}
                 playerName={playerName}
                 playerNameOptions={playerNameOptions}
+                selectedDevLevel={selectedDevLevel}
+                selectedGameMode={selectedGameMode}
                 selectedCharacterConfig={selectedCharacterConfig}
                 selectedDifficulty={difficulty}
               />
@@ -790,7 +927,13 @@ function GamePage() {
                   >
                     <Chip
                       color="primary"
-                      label={isDevelopmentMode ? '∞' : `${remainingTime}s`}
+                      label={
+                        isLevelsMode
+                          ? `Level ${currentLevelId}${isBossPhase ? ' + Boss' : ''}`
+                          : isDevelopmentMode
+                            ? '∞'
+                            : `${remainingTime}s`
+                      }
                       size="small"
                     />
                     <Chip
@@ -826,7 +969,15 @@ function GamePage() {
                     >
                       <Chip
                         color="warning"
-                        label={`Mode: ${isDevelopmentMode ? 'DEV' : effectiveDifficultyConfig.label}`}
+                        label={`Mode: ${isDevelopmentMode ? 'DEV' : gameMode}`}
+                      />
+                      <Chip
+                        color="secondary"
+                        label={
+                          gameMode === 'Survive'
+                            ? `Difficulty: ${DIFFICULTY_CONFIGS[gameDifficulty].label}`
+                            : `Level ${currentLevelId}`
+                        }
                       />
                       <Chip
                         color="primary"
@@ -850,9 +1001,13 @@ function GamePage() {
                           Time left
                         </Typography>
                         <Typography variant="h3">
-                          {isDevelopmentMode
-                            ? '∞'
-                            : formatTimeLabel(remainingTime)}
+                          {isLevelsMode
+                            ? isBossPhase
+                              ? `Boss ${bossHealthPercent}%`
+                              : `L${currentLevelId}/7`
+                            : isDevelopmentMode
+                              ? '∞'
+                              : formatTimeLabel(remainingTime)}
                         </Typography>
                       </Box>
 
@@ -1077,7 +1232,7 @@ function GamePage() {
                   sx={{ color: 'secondary.main', letterSpacing: '0.16em' }}
                   variant={isMobileViewport ? 'caption' : 'body1'}
                 >
-                  PREPARE
+                  {countdownLabel}
                 </Typography>
                 <Typography variant={isMobileViewport ? 'h3' : 'h1'}>
                   {countdownSeconds}
@@ -1089,8 +1244,7 @@ function GamePage() {
                     fontSize: isMobileViewport ? 12 : undefined
                   }}
                 >
-                  The run begins in two seconds. Get ready to move, aim, and
-                  throw.
+                  {countdownHint}
                 </Typography>
               </Stack>
             ) : null}

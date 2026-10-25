@@ -30,8 +30,33 @@ interface IProjectileTransform {
 }
 
 interface IProjectileModel {
+  owner: IProjectileState['owner']
   weapon: TWeapon
   onTintMaterialsReady: (materials: MeshStandardMaterial[]) => void
+}
+
+interface IProjectileTint {
+  color: string
+  emissive: string
+  emissiveIntensity: number
+}
+
+const projectileTints: Record<IProjectileState['owner'], IProjectileTint> = {
+  player: {
+    color: '#f5f5f5',
+    emissive: '#121212',
+    emissiveIntensity: 0.1
+  },
+  enemy: {
+    color: '#ffdcb8',
+    emissive: '#5a2f1a',
+    emissiveIntensity: 0.4
+  },
+  boss: {
+    color: '#ffe48a',
+    emissive: '#ffd632',
+    emissiveIntensity: 1.7
+  }
 }
 
 const projectileTransforms: Record<TWeapon, IProjectileTransform> = {
@@ -108,8 +133,9 @@ export function AxeProjectiles({ projectilesRef }: IAxeProjectiles) {
 
 function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
   const projectileRef = useRef<Group | null>(null)
-  const tintMaterialsRef = useRef<MeshStandardMaterial[]>([])
   const [currentWeapon, setCurrentWeapon] = useState<TWeapon>('axe')
+  const [currentOwner, setCurrentOwner] =
+    useState<IProjectileState['owner']>('player')
 
   useFrame(() => {
     const projectileState = projectilesRef.current[index]
@@ -124,6 +150,9 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
     if (currentWeapon !== projectileState.weapon) {
       setCurrentWeapon(projectileState.weapon)
     }
+    if (currentOwner !== projectileState.owner) {
+      setCurrentOwner(projectileState.owner)
+    }
 
     if (projectileState.velocity.lengthSq() > 0) {
       projectileRef.current.rotation.z -= 0.18
@@ -132,18 +161,34 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
 
   return (
     <group ref={projectileRef}>
-      <ProjectileModel
-        key={currentWeapon}
-        onTintMaterialsReady={(materials) => {
-          tintMaterialsRef.current = materials
-        }}
-        weapon={currentWeapon}
-      />
+      {currentOwner === 'boss' ? (
+        <mesh>
+          <sphereGeometry args={[0.58, 20, 20]} />
+          <meshStandardMaterial
+            color="#ffe783"
+            emissive="#ffd632"
+            emissiveIntensity={2.2}
+            metalness={0.15}
+            roughness={0.25}
+          />
+        </mesh>
+      ) : (
+        <ProjectileModel
+          owner={currentOwner}
+          key={currentWeapon}
+          onTintMaterialsReady={() => {}}
+          weapon={currentWeapon}
+        />
+      )}
     </group>
   )
 }
 
-function ProjectileModel({ weapon, onTintMaterialsReady }: IProjectileModel) {
+function ProjectileModel({
+  owner,
+  weapon,
+  onTintMaterialsReady
+}: IProjectileModel) {
   const { scene } = useGLTF(projectileModelUrls[weapon])
   const [modelScene] = useState(() => scene.clone(true))
 
@@ -169,8 +214,16 @@ function ProjectileModel({ weapon, onTintMaterialsReady }: IProjectileModel) {
       }
     })
 
+    const tint = projectileTints[owner]
+
+    for (const material of tintMaterials) {
+      material.color.set(tint.color)
+      material.emissive.set(tint.emissive)
+      material.emissiveIntensity = tint.emissiveIntensity
+    }
+
     onTintMaterialsReady([...tintMaterials])
-  }, [modelScene, onTintMaterialsReady])
+  }, [modelScene, onTintMaterialsReady, owner])
 
   const projectileTransform = projectileTransforms[weapon]
 

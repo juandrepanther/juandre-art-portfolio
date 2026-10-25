@@ -1,7 +1,7 @@
 import { Vector3 } from 'three'
 import type { TWeapon } from '../settings'
 
-export type TProjectileOwner = 'enemy' | 'player'
+export type TProjectileOwner = 'boss' | 'enemy' | 'player'
 export type { TWeapon }
 export type TFloatingCombatTextSource = 'enemy' | 'painkiller' | 'tnt'
 

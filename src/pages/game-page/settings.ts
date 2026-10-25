@@ -3,6 +3,7 @@ import juanModelUrl from 'assets/models/juan.glb?url'
 import lenaModelUrl from 'assets/models/lena.glb?url'
 import lowPolyVikingModelUrl from 'assets/models/low_poly_viking.glb?url'
 import monkModelUrl from 'assets/models/monk.glb?url'
+import phoenixBirdModelUrl from 'assets/models/phoenix_bird.glb?url'
 import percModelUrl from 'assets/models/perc.glb?url'
 import valModelUrl from 'assets/models/val.glb?url'
 import khurModelUrl from 'assets/models/khur.glb?url'
@@ -28,6 +29,9 @@ export type TWeapon =
   | 'spear'
 export type TCharacterWeapon = Exclude<TWeapon, 'axe'>
 export type TDifficultyLevel = 'Noob' | 'Balls' | 'Hardcore'
+export type TGameMode = 'Survive' | 'Levels'
+export type TLevelId = 1 | 2 | 3 | 4 | 5 | 6 | 7
+export type TDevLevelOption = TLevelId | 'Boss'
 export type TGameControl = 'forward' | 'backward' | 'left' | 'right' | 'jump'
 
 export interface ICharacterConfig {
@@ -52,6 +56,27 @@ export interface IDifficultyConfig {
   enemyThrowInterval: number
   label: TDifficultyLevel
   roundTime: number
+}
+
+export interface ILevelConfig {
+  enemyCount: number
+  enemyDamage: number
+  enemyMovementSpeed: number
+  enemyProjectileSpeed: number
+  enemyThrowInterval: number
+  id: TLevelId
+  label: string
+}
+
+export interface IBossConfig {
+  healthStepPercent: number
+  maxHealthPercent: number
+  modelUrl: string
+  modelScale: number
+  movementSpeed: number
+  projectileDamage: number
+  projectileSpeed: number
+  throwInterval: number
 }
 
 export interface IDevelopmentModeConfig {
@@ -228,6 +253,82 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     roundTime: 80
   }
 }
+export const LEVEL_ORDER: TLevelId[] = [1, 2, 3, 4, 5, 6, 7]
+export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
+  1: {
+    id: 1,
+    label: 'Level 1',
+    enemyCount: 5,
+    enemyDamage: 8,
+    enemyMovementSpeed: 1.8,
+    enemyProjectileSpeed: 6,
+    enemyThrowInterval: 3.2
+  },
+  2: {
+    id: 2,
+    label: 'Level 2',
+    enemyCount: 7,
+    enemyDamage: 10,
+    enemyMovementSpeed: 2.2,
+    enemyProjectileSpeed: 8,
+    enemyThrowInterval: 2.8
+  },
+  3: {
+    id: 3,
+    label: 'Level 3',
+    enemyCount: 9,
+    enemyDamage: 13,
+    enemyMovementSpeed: 2.8,
+    enemyProjectileSpeed: 9.5,
+    enemyThrowInterval: 2.4
+  },
+  4: {
+    id: 4,
+    label: 'Level 4',
+    enemyCount: 12,
+    enemyDamage: 16,
+    enemyMovementSpeed: 3.5,
+    enemyProjectileSpeed: 11,
+    enemyThrowInterval: 2.1
+  },
+  5: {
+    id: 5,
+    label: 'Level 5',
+    enemyCount: 14,
+    enemyDamage: 20,
+    enemyMovementSpeed: 4.2,
+    enemyProjectileSpeed: 13,
+    enemyThrowInterval: 1.95
+  },
+  6: {
+    id: 6,
+    label: 'Level 6',
+    enemyCount: 16,
+    enemyDamage: 22,
+    enemyMovementSpeed: 5.8,
+    enemyProjectileSpeed: 15.5,
+    enemyThrowInterval: 1.6
+  },
+  7: {
+    id: 7,
+    label: 'Level 7',
+    enemyCount: 18,
+    enemyDamage: 25,
+    enemyMovementSpeed: 7.4,
+    enemyProjectileSpeed: 18,
+    enemyThrowInterval: 1.3
+  }
+}
+export const FINAL_BOSS_CONFIG: IBossConfig = {
+  maxHealthPercent: 100,
+  healthStepPercent: 5,
+  modelScale: 0.03,
+  movementSpeed: 10.8,
+  projectileSpeed: 14,
+  throwInterval: 0.62,
+  projectileDamage: 30,
+  modelUrl: phoenixBirdModelUrl
+}
 export const DEVELOPMENT_MODE_CONFIG: IDevelopmentModeConfig = {
   enemyCount: 3,
   incomingDamage: 0
@@ -337,6 +438,8 @@ export const DIRECTIONAL_LIGHT_SHADOW_NORMAL_BIAS = 0.03
 export const PROJECTILE_POOL_SIZE = 40
 export const ENEMY_HIT_RADIUS = 1.45
 export const ENEMY_HITBOX_OFFSET = new Vector3(0, 0.95, 0)
+export const FINAL_BOSS_HIT_RADIUS = 2.6
+export const FINAL_BOSS_HITBOX_OFFSET = new Vector3(0, 0.95, 0)
 export const HARDCORE_ENEMY_FLIGHT_HEIGHT_MAX = 2.5
 export const HARDCORE_ENEMY_FLIGHT_HEIGHT_MIN = 0
 export const HARDCORE_ENEMY_FLIGHT_PROXIMITY = 0.7

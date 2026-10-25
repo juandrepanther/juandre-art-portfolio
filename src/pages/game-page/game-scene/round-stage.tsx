@@ -27,6 +27,7 @@ import { AxeProjectiles } from './actors/axe-projectiles'
 import { Enemy } from './actors/enemy'
 import { EnemyExplosionParticles } from './actors/enemy-explosion-particles'
 import { ExplosionParticles } from './actors/explosion-particles'
+import { FinalBoss } from './actors/final-boss'
 import { FloatingCombatText } from './actors/floating-combat-text'
 import { PainkillerPickups } from './actors/painkiller-pickups'
 import { TntBoxes } from './actors/tnt-boxes'
@@ -50,7 +51,8 @@ import {
   spawnEnemyExplosionParticles,
   updateFloatingCombatTextStates,
   syncControlsState,
-  doesProjectilePathHitObstacle
+  doesProjectilePathHitObstacle,
+  createRandomEnemyFlightPosition
 } from './helpers'
 import {
   createInitialPlayerPosition,
@@ -97,6 +99,8 @@ import {
   ENEMY_AIM_PRECISION,
   ENEMY_HIT_RADIUS,
   ENEMY_HITBOX_OFFSET,
+  FINAL_BOSS_HIT_RADIUS,
+  FINAL_BOSS_HITBOX_OFFSET,
   ENEMY_EXPLOSION_PARTICLE_POOL_SIZE,
   PAINKILLER_PICKUP_RADIUS,
   PLAYER_BODY_GROUND_OFFSET,
@@ -137,6 +141,7 @@ import {
   TNT_EXPLOSION_PARTICLES_PER_BURST,
   FLOATING_COMBAT_TEXT_POOL_SIZE,
   CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS,
+  FINAL_BOSS_CONFIG,
   type TGameControl
 } from '../settings'
 const playerRigidBodyName = 'player-body'
@@ -190,12 +195,15 @@ const createRandomCloudConfigs = (): ICloudConfig[] => {
 }
 
 export default function RoundStage({
+  bossHealthPercent,
   cameraHorizontalSnapKey = 0,
   characterConfig,
-  difficultyConfig,
+  combatConfig,
   difficulty,
+  gameMode,
   health,
   isActive,
+  isBossPhase,
   isDevelopmentMode = false,
   isCameraOrbiting,
   isLandscapeMobile,
@@ -207,6 +215,8 @@ export default function RoundStage({
   mobileMoveVectorY,
   mobileShootPressCount,
   showMobileControls,
+  onBossDefeated,
+  onBossHealthChange,
   onHealthChange,
   onEnemyHit,
   onPlayerHitIndicator,
@@ -247,7 +257,7 @@ export default function RoundStage({
     Array.from({ length: PROJECTILE_POOL_SIZE }, createProjectileState)
   )
   const enemyStateRef = useRef(
-    createEnemyState(difficultyConfig.enemyCount, crateLayouts, treeLayouts)
+    createEnemyState(combatConfig.enemyCount, crateLayouts, treeLayouts)
   )
   const enemyExplosionParticleStateRef = useRef(
     Array.from({ length: ENEMY_EXPLOSION_PARTICLE_POOL_SIZE }, () =>
@@ -268,9 +278,16 @@ export default function RoundStage({
     createPainkillerState(crateLayouts, treeLayouts)
   )
   const tntBoxStateRef = useRef(createTntState(crateLayouts, treeLayouts))
+  const bossPositionRef = useRef(createRandomEnemyFlightPosition())
+  const bossTargetPositionRef = useRef(createRandomEnemyFlightPosition())
+  const bossNextThrowAtRef = useRef(0)
+  const bossHealthPercentRef = useRef(bossHealthPercent)
+  const bossDefeatedRef = useRef(false)
   const healthRef = useRef(MAX_HEALTH)
   const lastDamageAtRef = useRef(-10)
   const onHealthChangeRef = useRef(onHealthChange)
+  const onBossHealthChangeRef = useRef(onBossHealthChange)
+  const onBossDefeatedRef = useRef(onBossDefeated)
   const onEnemyHitRef = useRef(onEnemyHit)
   const pendingPointerShotRef = useRef(false)
   const shootPlayerProjectileRef = useRef<() => void>(() => {})
@@ -474,6 +491,35 @@ export default function RoundStage({
   }, [onEnemyHit])
 
   useEffect(() => {
+    onBossHealthChangeRef.current = onBossHealthChange
+  }, [onBossHealthChange])
+
+  useEffect(() => {
+    onBossDefeatedRef.current = onBossDefeated
+  }, [onBossDefeated])
+
+  useEffect(() => {
+    if (!isBossPhase) {
+      return
+    }
+
+    for (const enemyState of enemyStateRef.current) {
+      enemyState.active = false
+      enemyState.respawnAt = Number.POSITIVE_INFINITY
+    }
+
+    for (const projectile of projectilesRef.current) {
+      if (projectile.owner === 'enemy') {
+        projectile.active = false
+      }
+    }
+  }, [isBossPhase])
+
+  useEffect(() => {
+    bossHealthPercentRef.current = bossHealthPercent
+  }, [bossHealthPercent])
+
+  useEffect(() => {
     return () => {
       if (hitFlashTimeoutRef.current !== null) {
         window.clearTimeout(hitFlashTimeoutRef.current)
@@ -617,10 +663,14 @@ export default function RoundStage({
     nextCrateAnimationRerandomizeAtRef.current =
       clock.elapsedTime + CRATE_HEIGHT_ANIMATION_RERANDOMIZE_SECONDS
     enemyStateRef.current = createEnemyState(
-      difficultyConfig.enemyCount,
+      combatConfig.enemyCount,
       crateLayouts,
       treeLayouts
     )
+    bossPositionRef.current.copy(createRandomEnemyFlightPosition())
+    bossTargetPositionRef.current.copy(createRandomEnemyFlightPosition())
+    bossNextThrowAtRef.current = clock.elapsedTime + 0.9
+    bossDefeatedRef.current = false
     for (const particleState of enemyExplosionParticleStateRef.current) {
       resetEnemyExplosionParticleState(particleState)
     }
@@ -657,7 +707,7 @@ export default function RoundStage({
     camera,
     clock,
     crateLayouts,
-    difficultyConfig.enemyCount,
+    combatConfig.enemyCount,
     difficulty,
     gl,
     isCrateHeightAnimationEnabled,
@@ -921,50 +971,108 @@ export default function RoundStage({
     const playerHitboxCenter = playerPositionRef.current
       .clone()
       .add(PLAYER_HITBOX_OFFSET)
+    const bossHitboxCenter = bossPositionRef.current
+      .clone()
+      .add(FINAL_BOSS_HITBOX_OFFSET)
 
-    for (const enemyState of enemyStateRef.current) {
-      if (!enemyState.active) {
-        if (difficulty !== 'Noob' && now >= enemyState.respawnAt) {
-          resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
-        }
+    if (isBossPhase && !bossDefeatedRef.current) {
+      const toTarget = bossTargetPositionRef.current
+        .clone()
+        .sub(bossPositionRef.current)
+      const distanceToTarget = toTarget.length()
 
-        continue
+      if (distanceToTarget <= 0.9 || Math.random() < delta * 0.7) {
+        bossTargetPositionRef.current.copy(createRandomEnemyFlightPosition())
+      } else {
+        toTarget.normalize()
+        bossPositionRef.current.addScaledVector(
+          toTarget,
+          delta * FINAL_BOSS_CONFIG.movementSpeed
+        )
       }
 
-      applyEnemyTravelByDifficulty(
-        enemyState,
-        difficulty,
-        difficultyConfig.enemyMovementSpeed,
-        delta
-      )
-      enemyState.rotationY = Math.atan2(
-        playerPositionRef.current.x - enemyState.position.x,
-        playerPositionRef.current.z - enemyState.position.z
-      )
+      bossPositionRef.current.y += Math.sin(now * 2.8) * 0.01
 
-      if (now >= enemyState.nextThrowAt) {
-        const origin = enemyState.position.clone().add(new Vector3(0, 0.15, 0))
+      if (now >= bossNextThrowAtRef.current) {
+        const origin = bossPositionRef.current
+          .clone()
+          .add(new Vector3(0, 0.15, 0))
         const target = playerHitboxCenter.clone()
         const distanceToPlayer =
-          enemyState.position.distanceTo(playerHitboxCenter)
+          bossPositionRef.current.distanceTo(playerHitboxCenter)
         const precisionOffset = distanceToPlayer * ENEMY_AIM_PRECISION
 
         target.x += (Math.random() - 0.5) * precisionOffset * 2
         target.z += (Math.random() - 0.5) * precisionOffset * 2
 
+        const shotVelocity = target
+          .sub(origin)
+          .normalize()
+          .multiplyScalar(FINAL_BOSS_CONFIG.projectileSpeed)
+
         spawnProjectileIntoPool(
           projectilesRef.current,
           origin,
-          target
-            .sub(origin)
-            .normalize()
-            .multiplyScalar(difficultyConfig.enemyProjectileSpeed),
-          'enemy',
+          shotVelocity,
+          'boss',
           PROJECTILE_LIFETIME_SECONDS,
           'axe'
         )
+        bossNextThrowAtRef.current = now + FINAL_BOSS_CONFIG.throwInterval
+      }
+    }
 
-        enemyState.nextThrowAt = now + difficultyConfig.enemyThrowInterval
+    if (!isBossPhase) {
+      for (const enemyState of enemyStateRef.current) {
+        if (!enemyState.active) {
+          if (
+            gameMode === 'Survive' &&
+            difficulty !== 'Noob' &&
+            now >= enemyState.respawnAt
+          ) {
+            resetEnemyForDifficulty(enemyState, difficulty, now + 1.1)
+          }
+
+          continue
+        }
+
+        applyEnemyTravelByDifficulty(
+          enemyState,
+          difficulty,
+          combatConfig.enemyMovementSpeed,
+          delta
+        )
+        enemyState.rotationY = Math.atan2(
+          playerPositionRef.current.x - enemyState.position.x,
+          playerPositionRef.current.z - enemyState.position.z
+        )
+
+        if (now >= enemyState.nextThrowAt) {
+          const origin = enemyState.position
+            .clone()
+            .add(new Vector3(0, 0.15, 0))
+          const target = playerHitboxCenter.clone()
+          const distanceToPlayer =
+            enemyState.position.distanceTo(playerHitboxCenter)
+          const precisionOffset = distanceToPlayer * ENEMY_AIM_PRECISION
+
+          target.x += (Math.random() - 0.5) * precisionOffset * 2
+          target.z += (Math.random() - 0.5) * precisionOffset * 2
+
+          spawnProjectileIntoPool(
+            projectilesRef.current,
+            origin,
+            target
+              .sub(origin)
+              .normalize()
+              .multiplyScalar(combatConfig.enemyProjectileSpeed),
+            'enemy',
+            PROJECTILE_LIFETIME_SECONDS,
+            'axe'
+          )
+
+          enemyState.nextThrowAt = now + combatConfig.enemyThrowInterval
+        }
       }
     }
 
@@ -997,6 +1105,32 @@ export default function RoundStage({
 
       switch (projectile.owner) {
         case 'player': {
+          if (isBossPhase) {
+            const isBossHit =
+              bossHitboxCenter.distanceTo(projectile.position) <=
+              FINAL_BOSS_HIT_RADIUS
+
+            if (isBossHit) {
+              projectile.active = false
+
+              const nextBossHealthPercent = Math.max(
+                0,
+                bossHealthPercentRef.current -
+                  FINAL_BOSS_CONFIG.healthStepPercent
+              )
+
+              bossHealthPercentRef.current = nextBossHealthPercent
+              onBossHealthChangeRef.current(nextBossHealthPercent)
+
+              if (nextBossHealthPercent === 0 && !bossDefeatedRef.current) {
+                bossDefeatedRef.current = true
+                onBossDefeatedRef.current()
+              }
+            }
+
+            continue
+          }
+
           const hitEnemy = enemyStateRef.current.find((enemyState) => {
             if (!enemyState.active) {
               return false
@@ -1021,7 +1155,7 @@ export default function RoundStage({
             }
             hitEnemy.active = false
             hitEnemy.respawnAt =
-              difficulty === 'Noob'
+              gameMode === 'Levels' || difficulty === 'Noob'
                 ? Number.POSITIVE_INFINITY
                 : now + ENEMY_RESPAWN_SECONDS
             projectile.active = false
@@ -1043,7 +1177,11 @@ export default function RoundStage({
             const nextHealth = Math.max(
               0,
               healthRef.current -
-                (isDevelopmentMode ? 0 : difficultyConfig.enemyDamage)
+                (isDevelopmentMode
+                  ? 0
+                  : projectile.owner === 'boss'
+                    ? FINAL_BOSS_CONFIG.projectileDamage
+                    : combatConfig.enemyDamage)
             )
             const healthDelta = nextHealth - healthRef.current
             const hitDirection = getPlayerHitDirection(projectile.velocity)
@@ -1061,7 +1199,7 @@ export default function RoundStage({
 
     for (const painkillerState of painkillerStateRef.current) {
       if (!painkillerState.active) {
-        if (now >= painkillerState.respawnAt) {
+        if (gameMode !== 'Levels' && now >= painkillerState.respawnAt) {
           painkillerState.active = true
           painkillerState.position.copy(
             createRandomPainkillerPosition(runtimeCrateLayouts, treeLayouts)
@@ -1076,7 +1214,10 @@ export default function RoundStage({
         PAINKILLER_PICKUP_RADIUS
       ) {
         painkillerState.active = false
-        painkillerState.respawnAt = now + PAINKILLER_RESPAWN_SECONDS
+        painkillerState.respawnAt =
+          gameMode === 'Levels'
+            ? Number.POSITIVE_INFINITY
+            : now + PAINKILLER_RESPAWN_SECONDS
 
         const nextHealth = Math.min(
           MAX_HEALTH,
@@ -1127,9 +1268,16 @@ export default function RoundStage({
         difficulty={difficulty}
         shouldRenderVisualEffects={shouldRenderVisualEffects}
       />
-      <Enemy
-        enemyCount={difficultyConfig.enemyCount}
-        enemyStateRef={enemyStateRef}
+      {!isBossPhase ? (
+        <Enemy
+          enemyCount={combatConfig.enemyCount}
+          enemyStateRef={enemyStateRef}
+        />
+      ) : null}
+      <FinalBoss
+        isVisible={isBossPhase}
+        modelScale={FINAL_BOSS_CONFIG.modelScale}
+        positionRef={bossPositionRef}
       />
       {shouldRenderVisualEffects ? (
         <EnemyExplosionParticles

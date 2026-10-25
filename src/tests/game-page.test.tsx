@@ -27,8 +27,9 @@ vi.mock('@react-three/drei', () => ({
 
 vi.mock('pages/game-page/game-scene/scene', () => ({
   default: function MockGameScene({
+    combatConfig,
     difficulty,
-    difficultyConfig,
+    gameMode,
     health,
     isCameraOrbiting,
     onEnemyHit,
@@ -37,9 +38,10 @@ vi.mock('pages/game-page/game-scene/scene', () => ({
   }: IGameSceneProps) {
     return (
       <div data-testid="game-scene">
+        <div>Scene mode: {gameMode}</div>
         <div>Scene difficulty: {difficulty}</div>
-        <div>Scene enemy damage: {difficultyConfig.enemyDamage}</div>
-        <div>Scene enemy count: {difficultyConfig.enemyCount}</div>
+        <div>Scene enemy damage: {combatConfig.enemyDamage}</div>
+        <div>Scene enemy count: {combatConfig.enemyCount}</div>
         <div>Scene health: {health}</div>
         <div>Scene orbit: {String(isCameraOrbiting)}</div>
         <button onClick={() => onEnemyHit()} type="button">
@@ -198,7 +200,10 @@ describe('GamePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^hardcore$/i }))
     setPlayerName('Player1')
     fireEvent.click(screen.getByRole('button', { name: /^choose$/i }))
-    expect(screen.getByText(/mode: hardcore/i)).toBeInTheDocument()
+    expect(screen.getByText(/scene mode:\s*survive/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/scene difficulty:\s*hardcore/i)
+    ).toBeInTheDocument()
     expect(screen.getByText('Scene orbit: true')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^fight$/i })).toBeInTheDocument()
     expect(
@@ -257,6 +262,26 @@ describe('GamePage', () => {
     expect(
       screen.getByRole('button', { name: /^spotify$/i })
     ).toBeInTheDocument()
+  })
+
+  it('disables difficulty selection when levels mode is chosen', async () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    const noobButton = screen.getByRole('button', { name: /^noob$/i })
+
+    expect(noobButton).toBeEnabled()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /game modes/i }))
+    fireEvent.click(screen.getByRole('option', { name: /^levels$/i }))
+
+    await waitFor(() => {
+      expect(noobButton).toBeDisabled()
+      expect(screen.getByRole('button', { name: /^hardcore$/i })).toBeDisabled()
+    })
   })
 
   it('disables choose when player name is empty', () => {

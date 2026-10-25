@@ -16,12 +16,15 @@ import type { Mesh } from 'three'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
 
 function GameScene({
+  bossHealthPercent,
   cameraHorizontalSnapKey,
   characterConfig,
-  difficultyConfig,
+  combatConfig,
   difficulty,
+  gameMode,
   health,
   isActive,
+  isBossPhase,
   isDevelopmentMode,
   isCameraOrbiting,
   isLandscapeMobile,
@@ -33,6 +36,8 @@ function GameScene({
   mobileMoveVectorY,
   mobileShootPressCount,
   showMobileControls,
+  onBossDefeated,
+  onBossHealthChange,
   onHealthChange,
   onEnemyHit,
   onPlayerHitIndicator,
@@ -79,12 +84,15 @@ function GameScene({
               />
             </mesh>
             <RoundStage
+              bossHealthPercent={bossHealthPercent}
               cameraHorizontalSnapKey={cameraHorizontalSnapKey}
               characterConfig={characterConfig}
-              difficultyConfig={difficultyConfig}
+              combatConfig={combatConfig}
               difficulty={difficulty}
+              gameMode={gameMode}
               health={health}
               isActive={isActive}
+              isBossPhase={isBossPhase}
               isDevelopmentMode={isDevelopmentMode}
               isCameraOrbiting={isCameraOrbiting}
               isLandscapeMobile={isLandscapeMobile}
@@ -96,11 +104,13 @@ function GameScene({
               mobileMoveVectorY={mobileMoveVectorY}
               mobileShootPressCount={mobileShootPressCount}
               showMobileControls={showMobileControls}
+              onBossDefeated={onBossDefeated}
+              onBossHealthChange={onBossHealthChange}
               onHealthChange={onHealthChange}
               onEnemyHit={onEnemyHit}
               onPlayerHitIndicator={onPlayerHitIndicator}
               playerName={playerName}
-              key={`${difficulty}-${roundKey}`}
+              key={`${gameMode}-${difficulty}-${roundKey}`}
               roundKey={roundKey}
               showHealthMeter={showHealthMeter}
             />
