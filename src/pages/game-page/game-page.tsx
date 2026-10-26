@@ -102,7 +102,7 @@ function GamePage() {
   const [gameMode, setGameMode] = useState<TGameMode>('Survive')
   const [gameStatus, setGameStatus] = useState<TGameStatus>('menu')
   const [currentLevelId, setCurrentLevelId] = useState<TLevelId>(1)
-  const [levelEnemiesDefeated, setLevelEnemiesDefeated] = useState(0)
+  const [, setLevelEnemiesDefeated] = useState(0)
   const [isBossPhase, setIsBossPhase] = useState(false)
   const [isBossCountdownPending, setIsBossCountdownPending] = useState(false)
   const [bossHealthPercent, setBossHealthPercent] = useState(
@@ -226,6 +226,8 @@ function GamePage() {
     isMobileViewport && isLandscapeMobile && isRoundActive
   const shouldDisableTouchSelection =
     isMobileViewport && isLandscapeMobile && isRoundActive
+  const totalLevels = LEVEL_ORDER.length
+  const levelProgressLabel = `${currentLevelId}/${totalLevels}`
 
   const handleMobileMoveChange = (vector: IJoystickVector) => {
     setMobileMoveVector(vector)
@@ -581,41 +583,42 @@ function GamePage() {
       return
     }
 
-    const currentLevelConfig = LEVEL_CONFIGS[currentLevelId]
-    const nextLevelEnemiesDefeated = levelEnemiesDefeated + 1
+    setLevelEnemiesDefeated((currentLevelEnemiesDefeated) => {
+      const currentLevelConfig = LEVEL_CONFIGS[currentLevelId]
+      const nextLevelEnemiesDefeated = currentLevelEnemiesDefeated + 1
 
-    if (nextLevelEnemiesDefeated < currentLevelConfig.enemyCount) {
-      setLevelEnemiesDefeated(nextLevelEnemiesDefeated)
-      return
-    }
+      if (nextLevelEnemiesDefeated < currentLevelConfig.enemyCount) {
+        return nextLevelEnemiesDefeated
+      }
 
-    if (currentLevelId === LEVEL_ORDER[LEVEL_ORDER.length - 1]) {
-      setLevelEnemiesDefeated(nextLevelEnemiesDefeated)
-      setIsBossPhase(false)
-      setIsBossCountdownPending(true)
-      setCountdownLabel('FINAL BOSS')
-      setCountdownHint(
-        'Final boss enters the arena. Prepare for the last fight.'
-      )
+      if (currentLevelId === LEVEL_ORDER[LEVEL_ORDER.length - 1]) {
+        setIsBossPhase(false)
+        setIsBossCountdownPending(true)
+        setCountdownLabel('FINAL BOSS')
+        setCountdownHint(
+          'Final boss enters the arena. Prepare for the last fight.'
+        )
+        setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
+        setRoundKey((currentRoundKey) => currentRoundKey + 1)
+        setGameStatus('countdown')
+        return nextLevelEnemiesDefeated
+      }
+
+      const nextLevelId = LEVEL_ORDER[currentLevelId]
+
+      if (!nextLevelId) {
+        return nextLevelEnemiesDefeated
+      }
+
+      setCurrentLevelId(nextLevelId)
+      setCountdownLabel(`LEVEL ${nextLevelId}`)
+      setCountdownHint(`Level ${nextLevelId} starts in a moment. Stay sharp.`)
       setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
       setRoundKey((currentRoundKey) => currentRoundKey + 1)
       setGameStatus('countdown')
-      return
-    }
 
-    const nextLevelId = LEVEL_ORDER[currentLevelId]
-
-    if (!nextLevelId) {
-      return
-    }
-
-    setCurrentLevelId(nextLevelId)
-    setLevelEnemiesDefeated(0)
-    setCountdownLabel(`LEVEL ${nextLevelId}`)
-    setCountdownHint(`Level ${nextLevelId} starts in a moment. Stay sharp.`)
-    setCountdownSeconds(START_RUN_COUNTDOWN_SECONDS)
-    setRoundKey((currentRoundKey) => currentRoundKey + 1)
-    setGameStatus('countdown')
+      return 0
+    })
   }
 
   const handleOpenScoreboard = () => {
@@ -929,7 +932,9 @@ function GamePage() {
                       color="primary"
                       label={
                         isLevelsMode
-                          ? `Level ${currentLevelId}${isBossPhase ? ' + Boss' : ''}`
+                          ? isBossPhase
+                            ? `Boss ${bossHealthPercent}%`
+                            : levelProgressLabel
                           : isDevelopmentMode
                             ? '∞'
                             : `${remainingTime}s`
@@ -998,13 +1003,13 @@ function GamePage() {
                           sx={{ color: 'text.secondary' }}
                           variant="body2"
                         >
-                          Time left
+                          {isLevelsMode ? 'Levels' : 'Time left'}
                         </Typography>
                         <Typography variant="h3">
                           {isLevelsMode
                             ? isBossPhase
                               ? `Boss ${bossHealthPercent}%`
-                              : `L${currentLevelId}/7`
+                              : levelProgressLabel
                             : isDevelopmentMode
                               ? '∞'
                               : formatTimeLabel(remainingTime)}

@@ -572,6 +572,28 @@ describe('GamePage', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('allows selecting levels mode on mobile landscape', async () => {
+    mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
+
+    renderWithProviders(
+      <MemoryRouter>
+        <GamePage />
+      </MemoryRouter>
+    )
+
+    const noobButton = screen.getByRole('button', { name: /^noob$/i })
+
+    expect(noobButton).toBeEnabled()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /game modes/i }))
+    fireEvent.click(screen.getByRole('option', { name: /^levels$/i }))
+
+    await waitFor(() => {
+      expect(noobButton).toBeDisabled()
+      expect(screen.getByRole('button', { name: /^hardcore$/i })).toBeDisabled()
+    })
+  })
+
   it('hides result image in mobile landscape result dialog', () => {
     mockedUseWindowSize.mockReturnValue({ height: 500, width: 900 })
 

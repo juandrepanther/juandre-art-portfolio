@@ -90,6 +90,7 @@ function CharacterChooser({
   const levelOptions: TDevLevelOption[] = [1, 2, 3, 4, 5, 6, 7, 'Boss']
   const isChooseDisabled = playerName.trim().length === 0
   const isLevelsMode = selectedGameMode === 'Levels'
+  const shouldShowGameSetupBelowCharacterSelector = isMobileLandscape
   const isDevelopmentEnvironment = import.meta.env.DEV
   const shouldShowPlayerNameError =
     playerNameOptions.length === 0 && playerName.trim().length === 0
@@ -234,6 +235,65 @@ function CharacterChooser({
                 <ChevronRight />
               </IconButton>
             </Stack>
+
+            {shouldShowGameSetupBelowCharacterSelector ? (
+              <Stack spacing={0.8} sx={{ width: '100%', maxWidth: '100%' }}>
+                <Typography
+                  sx={{
+                    color: 'text.secondary',
+                    lineHeight: 1.6,
+                    fontSize: 12
+                  }}
+                >
+                  Game setup:
+                </Typography>
+                <Stack direction="row" spacing={1.2}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id="game-mode-select-label">
+                      Game modes
+                    </InputLabel>
+                    <Select<TGameMode>
+                      label="Game modes"
+                      labelId="game-mode-select-label"
+                      onChange={(e) => {
+                        onGameModeChange(e.target.value)
+                      }}
+                      value={selectedGameMode}
+                    >
+                      {gameModeOptions.map((gameModeOption) => (
+                        <MenuItem key={gameModeOption} value={gameModeOption}>
+                          {gameModeOption}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {isDevelopmentEnvironment ? (
+                    <FormControl size="small" fullWidth>
+                      <InputLabel id="dev-level-select-label">
+                        DEV level
+                      </InputLabel>
+                      <Select<TDevLevelOption>
+                        disabled={!isLevelsMode}
+                        label="DEV level"
+                        labelId="dev-level-select-label"
+                        onChange={(e) => {
+                          onDevLevelChange(e.target.value)
+                        }}
+                        value={selectedDevLevel}
+                      >
+                        {levelOptions.map((levelOption) => (
+                          <MenuItem key={levelOption} value={levelOption}>
+                            {levelOption === 'Boss'
+                              ? 'Boss'
+                              : `Level ${levelOption}`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : null}
+                </Stack>
+              </Stack>
+            ) : null}
 
             {!isMobileViewport ? (
               <Autocomplete
@@ -516,65 +576,75 @@ function CharacterChooser({
                       </Typography>
                       <Chip color="warning" label="Left Click" size="small" />
                     </Stack>
-                    <Stack spacing={0.8} sx={{ width: '100%', maxWidth: 460 }}>
-                      <Typography
-                        sx={{
-                          color: 'text.secondary',
-                          lineHeight: 1.6
-                        }}
-                      >
-                        Game setup:
-                      </Typography>
-                      <Stack direction="row" spacing={1.2}>
+                  </>
+                ) : null}
+
+                {!shouldShowGameSetupBelowCharacterSelector ? (
+                  <Stack
+                    spacing={0.8}
+                    sx={{
+                      width: '100%',
+                      maxWidth: isMobileViewport ? '100%' : 460
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: 'text.secondary',
+                        lineHeight: 1.6,
+                        fontSize: isMobileViewport ? 12 : undefined
+                      }}
+                    >
+                      Game setup:
+                    </Typography>
+                    <Stack direction="row" spacing={1.2}>
+                      <FormControl size="small" fullWidth>
+                        <InputLabel id="game-mode-select-label">
+                          Game modes
+                        </InputLabel>
+                        <Select<TGameMode>
+                          label="Game modes"
+                          labelId="game-mode-select-label"
+                          onChange={(e) => {
+                            onGameModeChange(e.target.value)
+                          }}
+                          value={selectedGameMode}
+                        >
+                          {gameModeOptions.map((gameModeOption) => (
+                            <MenuItem
+                              key={gameModeOption}
+                              value={gameModeOption}
+                            >
+                              {gameModeOption}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      {isDevelopmentEnvironment ? (
                         <FormControl size="small" fullWidth>
-                          <InputLabel id="game-mode-select-label">
-                            Game modes
+                          <InputLabel id="dev-level-select-label">
+                            DEV level
                           </InputLabel>
-                          <Select<TGameMode>
-                            label="Game modes"
-                            labelId="game-mode-select-label"
+                          <Select<TDevLevelOption>
+                            disabled={!isLevelsMode}
+                            label="DEV level"
+                            labelId="dev-level-select-label"
                             onChange={(e) => {
-                              onGameModeChange(e.target.value)
+                              onDevLevelChange(e.target.value)
                             }}
-                            value={selectedGameMode}
+                            value={selectedDevLevel}
                           >
-                            {gameModeOptions.map((gameModeOption) => (
-                              <MenuItem
-                                key={gameModeOption}
-                                value={gameModeOption}
-                              >
-                                {gameModeOption}
+                            {levelOptions.map((levelOption) => (
+                              <MenuItem key={levelOption} value={levelOption}>
+                                {levelOption === 'Boss'
+                                  ? 'Boss'
+                                  : `Level ${levelOption}`}
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {isDevelopmentEnvironment ? (
-                          <FormControl size="small" fullWidth>
-                            <InputLabel id="dev-level-select-label">
-                              DEV level
-                            </InputLabel>
-                            <Select<TDevLevelOption>
-                              disabled={!isLevelsMode}
-                              label="DEV level"
-                              labelId="dev-level-select-label"
-                              onChange={(e) => {
-                                onDevLevelChange(e.target.value)
-                              }}
-                              value={selectedDevLevel}
-                            >
-                              {levelOptions.map((levelOption) => (
-                                <MenuItem key={levelOption} value={levelOption}>
-                                  {levelOption === 'Boss'
-                                    ? 'Boss'
-                                    : `Level ${levelOption}`}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        ) : null}
-                      </Stack>
+                      ) : null}
                     </Stack>
-                  </>
+                  </Stack>
                 ) : null}
               </Stack>
             </Stack>
