@@ -234,6 +234,7 @@ export default function RoundStage({
   const [subscribeToKeyboard, getKeyboardState] =
     useKeyboardControls<TGameControl>()
   const [isPlayerHitFlashing, setIsPlayerHitFlashing] = useState(false)
+  const [isBossHitFlashing, setIsBossHitFlashing] = useState(false)
   const [treeLayouts] = useState(() => createRandomTreeLayouts())
   const [crateLayouts] = useState(() => createRandomBoxLayouts(treeLayouts))
   const [crateAnimationOffsets] = useState(() =>
@@ -241,6 +242,9 @@ export default function RoundStage({
   )
   const isCrateHeightAnimationEnabled = shouldAnimateCrateHeight(difficulty)
   const [cloudConfigs] = useState(() => createRandomCloudConfigs())
+  const painkillerCount = isBossPhase
+    ? FINAL_BOSS_CONFIG.painkillerCount
+    : combatConfig.painkillerCount
   const playerBodyRef = useRef<RapierRigidBody | null>(null)
   const playerRef = useRef<Group | null>(null)
   const controlsRef = useRef({
@@ -275,7 +279,7 @@ export default function RoundStage({
     )
   )
   const painkillerStateRef = useRef(
-    createPainkillerState(crateLayouts, treeLayouts)
+    createPainkillerState(crateLayouts, treeLayouts, painkillerCount)
   )
   const tntBoxStateRef = useRef(createTntState(crateLayouts, treeLayouts))
   const bossPositionRef = useRef(createRandomEnemyFlightPosition())
@@ -296,6 +300,7 @@ export default function RoundStage({
   const cameraForwardRef = useRef(new Vector3(0, 0, -1))
   const cameraRightRef = useRef(new Vector3(1, 0, 0))
   const hitFlashTimeoutRef = useRef<number | null>(null)
+  const bossHitFlashTimeoutRef = useRef<number | null>(null)
   const directionalLightRef = useRef<DirectionalLight | null>(null)
   const mobileLookDeltaRef = useRef<ILookDelta>({ x: 0, y: 0 })
   const consumedLookAccumulatorRef = useRef({ x: 0, y: 0 })
@@ -377,6 +382,19 @@ export default function RoundStage({
     hitFlashTimeoutRef.current = window.setTimeout(() => {
       setIsPlayerHitFlashing(false)
       hitFlashTimeoutRef.current = null
+    }, PLAYER_HIT_FLASH_DURATION_MS)
+  }
+
+  const triggerBossHitFlash = () => {
+    setIsBossHitFlashing(true)
+
+    if (bossHitFlashTimeoutRef.current !== null) {
+      window.clearTimeout(bossHitFlashTimeoutRef.current)
+    }
+
+    bossHitFlashTimeoutRef.current = window.setTimeout(() => {
+      setIsBossHitFlashing(false)
+      bossHitFlashTimeoutRef.current = null
     }, PLAYER_HIT_FLASH_DURATION_MS)
   }
 
@@ -503,6 +521,12 @@ export default function RoundStage({
       return
     }
 
+    painkillerStateRef.current = createPainkillerState(
+      crateLayouts,
+      treeLayouts,
+      FINAL_BOSS_CONFIG.painkillerCount
+    )
+
     for (const enemyState of enemyStateRef.current) {
       enemyState.active = false
       enemyState.respawnAt = Number.POSITIVE_INFINITY
@@ -513,7 +537,7 @@ export default function RoundStage({
         projectile.active = false
       }
     }
-  }, [isBossPhase])
+  }, [crateLayouts, isBossPhase, treeLayouts])
 
   useEffect(() => {
     bossHealthPercentRef.current = bossHealthPercent
@@ -523,6 +547,10 @@ export default function RoundStage({
     return () => {
       if (hitFlashTimeoutRef.current !== null) {
         window.clearTimeout(hitFlashTimeoutRef.current)
+      }
+
+      if (bossHitFlashTimeoutRef.current !== null) {
+        window.clearTimeout(bossHitFlashTimeoutRef.current)
       }
     }
   }, [])
@@ -671,6 +699,12 @@ export default function RoundStage({
     bossTargetPositionRef.current.copy(createRandomEnemyFlightPosition())
     bossNextThrowAtRef.current = clock.elapsedTime + 0.9
     bossDefeatedRef.current = false
+
+    if (bossHitFlashTimeoutRef.current !== null) {
+      window.clearTimeout(bossHitFlashTimeoutRef.current)
+      bossHitFlashTimeoutRef.current = null
+    }
+
     for (const particleState of enemyExplosionParticleStateRef.current) {
       resetEnemyExplosionParticleState(particleState)
     }
@@ -682,7 +716,8 @@ export default function RoundStage({
     }
     painkillerStateRef.current = createPainkillerState(
       crateLayouts,
-      treeLayouts
+      treeLayouts,
+      painkillerCount
     )
     tntBoxStateRef.current = createTntState(crateLayouts, treeLayouts)
 
@@ -711,6 +746,7 @@ export default function RoundStage({
     difficulty,
     gl,
     isCrateHeightAnimationEnabled,
+    painkillerCount,
     roundKey,
     treeLayouts
   ])
@@ -1112,6 +1148,7 @@ export default function RoundStage({
 
             if (isBossHit) {
               projectile.active = false
+              triggerBossHitFlash()
 
               const nextBossHealthPercent = Math.max(
                 0,
@@ -1275,6 +1312,9 @@ export default function RoundStage({
         />
       ) : null}
       <FinalBoss
+        health={bossHealthPercent}
+        isMobileViewport={isMobileViewport}
+        isHitFlashing={isBossHitFlashing}
         isVisible={isBossPhase}
         modelScale={FINAL_BOSS_CONFIG.modelScale}
         positionRef={bossPositionRef}

@@ -1,6 +1,5 @@
 import { Vector3 } from 'three'
 import {
-  PAINKILLER_RESPAWN_SECONDS,
   TREE_TRUNK_COLLIDER_ARGS,
   type ICrateLayout,
   type ITreeLayout
@@ -627,18 +626,27 @@ export function createRandomPainkillerPosition(
 
 export function createPainkillerState(
   crateLayouts: ICrateLayout[],
-  treeLayouts: ITreeLayout[]
+  treeLayouts: ITreeLayout[],
+  painkillerCount: number
 ) {
-  const initialPainkillerIndex = Math.floor(Math.random() * treeLayouts.length)
+  const normalizedPainkillerCount = Math.max(
+    0,
+    Math.min(treeLayouts.length, Math.floor(painkillerCount))
+  )
+  const activeIndexes = new Set<number>()
+
+  while (activeIndexes.size < normalizedPainkillerCount) {
+    activeIndexes.add(Math.floor(Math.random() * treeLayouts.length))
+  }
 
   return treeLayouts.map((_, index) => {
-    const isActive = index === initialPainkillerIndex
+    const isActive = activeIndexes.has(index)
 
     return {
       active: isActive,
       animationOffset: index * 0.45,
       position: createRandomPainkillerPosition(crateLayouts, treeLayouts),
-      respawnAt: isActive ? 0 : Math.random() * PAINKILLER_RESPAWN_SECONDS
+      respawnAt: isActive ? 0 : Number.POSITIVE_INFINITY
     }
   })
 }

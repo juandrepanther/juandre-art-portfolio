@@ -167,9 +167,9 @@ function AxeProjectile({ index, projectilesRef }: IAxeProjectile) {
           <meshStandardMaterial
             color="#ffe783"
             emissive="#ffd632"
-            emissiveIntensity={2.2}
-            metalness={0.15}
-            roughness={0.25}
+            emissiveIntensity={10}
+            metalness={1.0}
+            roughness={0}
           />
         </mesh>
       ) : (

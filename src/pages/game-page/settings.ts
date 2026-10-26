@@ -55,6 +55,7 @@ export interface IDifficultyConfig {
   enemyProjectileSpeed: number
   enemyThrowInterval: number
   label: TDifficultyLevel
+  painkillerCount: number
   roundTime: number
 }
 
@@ -66,6 +67,7 @@ export interface ILevelConfig {
   enemyThrowInterval: number
   id: TLevelId
   label: string
+  painkillerCount: number
 }
 
 export interface IBossConfig {
@@ -74,6 +76,7 @@ export interface IBossConfig {
   modelUrl: string
   modelScale: number
   movementSpeed: number
+  painkillerCount: number
   projectileDamage: number
   projectileSpeed: number
   throwInterval: number
@@ -232,6 +235,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 2.2,
     enemyProjectileSpeed: 8,
     enemyThrowInterval: 2.6,
+    painkillerCount: 5,
     roundTime: 40
   },
   Balls: {
@@ -241,6 +245,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 4.2,
     enemyProjectileSpeed: 13,
     enemyThrowInterval: 1.95,
+    painkillerCount: 4,
     roundTime: 60
   },
   Hardcore: {
@@ -250,6 +255,7 @@ export const DIFFICULTY_CONFIGS: Record<TDifficultyLevel, IDifficultyConfig> = {
     enemyMovementSpeed: 7.4,
     enemyProjectileSpeed: 18,
     enemyThrowInterval: 1.3,
+    painkillerCount: 3,
     roundTime: 80
   }
 }
@@ -262,7 +268,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 8,
     enemyMovementSpeed: 1.8,
     enemyProjectileSpeed: 6,
-    enemyThrowInterval: 3.2
+    enemyThrowInterval: 3.2,
+    painkillerCount: 8
   },
   2: {
     id: 2,
@@ -271,7 +278,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 10,
     enemyMovementSpeed: 2.2,
     enemyProjectileSpeed: 8,
-    enemyThrowInterval: 2.8
+    enemyThrowInterval: 2.8,
+    painkillerCount: 7
   },
   3: {
     id: 3,
@@ -280,7 +288,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 13,
     enemyMovementSpeed: 2.8,
     enemyProjectileSpeed: 9.5,
-    enemyThrowInterval: 2.4
+    enemyThrowInterval: 2.4,
+    painkillerCount: 6
   },
   4: {
     id: 4,
@@ -289,7 +298,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 16,
     enemyMovementSpeed: 3.5,
     enemyProjectileSpeed: 11,
-    enemyThrowInterval: 2.1
+    enemyThrowInterval: 2.1,
+    painkillerCount: 5
   },
   5: {
     id: 5,
@@ -298,7 +308,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 20,
     enemyMovementSpeed: 4.2,
     enemyProjectileSpeed: 13,
-    enemyThrowInterval: 1.95
+    enemyThrowInterval: 1.95,
+    painkillerCount: 4
   },
   6: {
     id: 6,
@@ -307,7 +318,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 22,
     enemyMovementSpeed: 5.8,
     enemyProjectileSpeed: 15.5,
-    enemyThrowInterval: 1.6
+    enemyThrowInterval: 1.6,
+    painkillerCount: 3
   },
   7: {
     id: 7,
@@ -316,7 +328,8 @@ export const LEVEL_CONFIGS: Record<TLevelId, ILevelConfig> = {
     enemyDamage: 25,
     enemyMovementSpeed: 7.4,
     enemyProjectileSpeed: 18,
-    enemyThrowInterval: 1.3
+    enemyThrowInterval: 1.3,
+    painkillerCount: 3
   }
 }
 export const FINAL_BOSS_CONFIG: IBossConfig = {
@@ -324,6 +337,7 @@ export const FINAL_BOSS_CONFIG: IBossConfig = {
   healthStepPercent: 5,
   modelScale: 0.03,
   movementSpeed: 10.8,
+  painkillerCount: 5,
   projectileSpeed: 14,
   throwInterval: 0.62,
   projectileDamage: 30,
@@ -466,6 +480,7 @@ export const PLAYER_CAMERA_DISTANCE = 6.5
 export const PLAYER_CAMERA_HEIGHT = 2
 export const PLAYER_CAMERA_ORBIT_SPEED = 0.14
 export const PLAYER_HEALTH_METER_OFFSET = 0.4
+export const BOSS_HEALTH_METER_OFFSET = 320.9
 export const PLAYER_COMBAT_TEXT_HEAD_OFFSET = 2.15
 export const PLAYER_COLLIDER_HALF_HEIGHT = 1.08
 export const PLAYER_HITBOX_OFFSET = new Vector3(0, 1.2, 0)
