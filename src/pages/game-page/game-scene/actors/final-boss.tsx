@@ -139,7 +139,9 @@ export function FinalBoss({
       visible={false}
     >
       <primitive object={modelScene} />
-      <BossHealthMeter health={health} isMobileViewport={isMobileViewport} />
+      {isVisible ? (
+        <BossHealthMeter health={health} isMobileViewport={isMobileViewport} />
+      ) : null}
     </group>
   )
 }
